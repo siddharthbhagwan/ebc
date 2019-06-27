@@ -1,5 +1,7 @@
 import React from "react";
 import * as L from "leaflet";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
 import { getDayWiseData } from "../utils/config";
 import decodePolyline from "decode-google-map-polyline";
@@ -8,12 +10,19 @@ class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
 
   componentDidMount() {
+    const that = this;
     const days = [1, 2, 4, 5, 6, 9, 12, 14];
     days.forEach(day => {
-      const day1 = getDayWiseData(day.toString());
-      if (day) {
-        const polyLine = L.polyline(decodePolyline(day1));
-        (this.leafletMap as any).leafletElement.addLayer(polyLine);
+      const daywiseData = getDayWiseData(day.toString());
+      if (daywiseData) {
+        const decodedData = decodePolyline(daywiseData);
+        const polyLine = L.polyline(decodedData).toGeoJSON();
+        polyLine.properties.day = day;
+        const layer = new L.GeoJSON(polyLine);
+        (this.leafletMap as any).leafletElement.addLayer(layer);
+        layer.on("mouseover", function(e: any) {
+          that.props.dispatchLayerDetails(e.layer.feature.properties);
+        });
       }
       // (this.leafletMap as any).leafletElement.fitBounds(polyLine.getBounds());
     });
@@ -36,4 +45,16 @@ class MapContainer extends React.Component<any, any> {
   }
 }
 
-export default MapContainer;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  dispatchLayerDetails: (layerDetails: any) => {
+    dispatch({
+      payload: { layerDetails },
+      type: "UPDATE_LAYER_DETAILS"
+    });
+  }
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(MapContainer);
