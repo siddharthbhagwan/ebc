@@ -3,7 +3,7 @@ import MapContainer from "./components/MapContainer";
 import Details from "./components/Details";
 import "./App.css";
 
-class App extends React.Component<any, any> {
+class App extends React.Component {
   render() {
     return (
       <div className="App">
