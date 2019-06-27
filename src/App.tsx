@@ -1,17 +1,23 @@
 import React from "react";
 import * as L from "leaflet";
-import { Map, TileLayer, Marker, Popup } from "react-leaflet";
-import { getStretch1 } from "./utils/data";
+import { Map, TileLayer } from "react-leaflet";
+import { getDayWiseData } from "./utils/config";
+import decodePolyline from "decode-google-map-polyline";
 import "./App.css";
 
 class App extends React.Component<any, any> {
   public leafletMap = null;
 
   componentDidMount() {
-    const s1 = getStretch1();
-    const layer = L.polyline(s1);
-    (this.leafletMap as any).leafletElement.addLayer(layer);
-    (this.leafletMap as any).leafletElement.fitBounds(layer.getBounds());
+    const days = [1, 2, 4, 5, 6, 9, 12, 14];
+    days.forEach(day => {
+      const day1 = getDayWiseData(day.toString());
+      if (day) {
+        const polyLine = L.polyline(decodePolyline(day1));
+        (this.leafletMap as any).leafletElement.addLayer(polyLine);
+      }
+      // (this.leafletMap as any).leafletElement.fitBounds(polyLine.getBounds());
+    });
   }
 
   render() {
