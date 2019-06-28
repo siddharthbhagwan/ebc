@@ -3,7 +3,7 @@ import * as L from "leaflet";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
-import { getDayWiseData } from "../utils/config";
+import { getDayWiseData, getHalts, getSummits } from "../utils/config";
 import decodePolyline from "decode-google-map-polyline";
 
 class MapContainer extends React.Component<any, any> {
@@ -26,6 +26,26 @@ class MapContainer extends React.Component<any, any> {
       }
       // (this.leafletMap as any).leafletElement.fitBounds(polyLine.getBounds());
     });
+
+    const halts = getHalts();
+    halts.forEach((halt: any) => {
+      L.marker(halt, {
+        icon: L.icon({
+          iconUrl: window.location.origin + "/tent.png",
+          iconSize: [22, 22]
+        })
+      }).addTo((this.leafletMap as any).leafletElement);
+    });
+
+    const summits = getSummits();
+    summits.forEach((summit: any) => {
+      L.marker(summit, {
+        icon: L.icon({
+          iconUrl: window.location.origin + "/summit.png",
+          iconSize: [22, 22]
+        })
+      }).addTo((this.leafletMap as any).leafletElement);
+    });
   }
 
   render() {
@@ -38,7 +58,7 @@ class MapContainer extends React.Component<any, any> {
       >
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
       </Map>
     );
