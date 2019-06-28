@@ -3,30 +3,26 @@ import * as L from "leaflet";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
-import { getDayWiseData, getHalts, getSummits } from "../utils/config";
+import {
+  getDayWiseDataG,
+  getDayWiseDataP,
+  getHalts,
+  getSummits
+} from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
 
-  componentDidMount() {
-    const that = this;
-    const days = [1, 2, 4, 5, 6, 9, 12, 14];
-    days.forEach(day => {
-      const daywiseData = getDayWiseData(day.toString());
-      if (daywiseData) {
-        const decodedData = decodePolyline(daywiseData);
-        const polyLine = L.polyline(decodedData).toGeoJSON();
-        polyLine.properties.day = day;
-        const layer = new L.GeoJSON(polyLine);
-        (this.leafletMap as any).leafletElement.addLayer(layer);
-        layer.on("mouseover", function(e: any) {
-          that.props.dispatchLayerDetails(e.layer.feature.properties);
-        });
-      }
-      // (this.leafletMap as any).leafletElement.fitBounds(polyLine.getBounds());
-    });
+  public constructor(props: any) {
+    super(props);
+    this.plotHalts = this.plotHalts.bind(this);
+    this.plotSummits = this.plotSummits.bind(this);
+    this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
+    this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
+  }
 
+  public plotHalts = () => {
     const halts = getHalts();
     halts.forEach((halt: any) => {
       L.marker(halt, {
@@ -36,7 +32,9 @@ class MapContainer extends React.Component<any, any> {
         })
       }).addTo((this.leafletMap as any).leafletElement);
     });
+  };
 
+  public plotSummits = () => {
     const summits = getSummits();
     summits.forEach((summit: any) => {
       L.marker(summit, {
@@ -46,6 +44,42 @@ class MapContainer extends React.Component<any, any> {
         })
       }).addTo((this.leafletMap as any).leafletElement);
     });
+  };
+
+  public plotPolylineRoutes = () => {
+    const that = this;
+    const routes = getDayWiseDataP();
+    Object.keys(routes).forEach((day: any) => {
+      if (routes[day]) {
+        const decodedData = decodePolyline(routes[day]);
+        const polyLine = L.polyline(decodedData).toGeoJSON();
+        polyLine.properties.day = day;
+        const layer = new L.GeoJSON(polyLine);
+        (this.leafletMap as any).leafletElement.addLayer(layer);
+        layer.on("mouseover", function(e: any) {
+          that.props.dispatchLayerDetails(e.layer.feature.properties);
+        });
+      }
+    });
+  };
+
+  public plotGeoJsonRoutes = () => {
+    const routes = getDayWiseDataG();
+    Object.values(routes).forEach((route: any) => {
+      const geoJsonLayer = L.geoJSON(route);
+      (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
+      geoJsonLayer.on("mouseover", function(e: any) {
+        console.log(e);
+        console.log(e.latlng);
+      });
+    });
+  };
+
+  componentDidMount() {
+    this.plotHalts();
+    this.plotSummits();
+    this.plotGeoJsonRoutes();
+    this.plotPolylineRoutes();
   }
 
   render() {

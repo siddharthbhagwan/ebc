@@ -1,3 +1,5 @@
+import * as GeoJsonData from "./geoJson";
+
 const lukla_to_phakding =
   "co~gDk}ipOYm@OWCOGOe@m@k@e@u@mAeAwBUW_@AICw@i@KKGOQIKGEIEEGEWOUOGEGCELIZU^kAtAg@l@{@n@SDeCb@GHCHEDk@Lo@BG?KACDOZETKLi@Zq@N]BEAEOGII?ONKHE@KCKIGUCGMGUCEEMYGKM@[d@c@l@ITALCZOX?TIJGPk@j@kAp@YJS@IDMVELcAl@EZYZKFmALSLCLIZYNe@AIDEJEb@CRBJCLw@d@IFU`@K\\W\\_@b@OX{@dAGJAXGLC`@Ud@IDs@A]Pc@^MXCNg@d@WPQb@SX[V[^MVIb@ENa@V_@VQT]Vo@h@KPc@Rg@dAm@f@c@PKNQHGTi@`@a@b@k@l@INS^I^Bp@KZFXJVCTEf@GFEBJPOn@YTw@@y@OYQOBGD]KgAc@a@a@_@Um@}@W]Fe@R}@@m@y@I[TKP?XQTk@h@c@XOXa@zA[bAIN[d@k@d@k@b@_ApAS?i@WSPSPk@Ag@YONUIU@MTK`@Ab@c@Lq@?}Bz@e@f@o@bAw@j@UH{@Ck@\\c@PMKY?gAVo@FUNeACONEHDTKRUBg@VeA\\oC_@aJkAiEQgB}@mAk@SCcCUEIYe@Ru@Y}@[C[SKCo@A]?KBGHEb@@b@Hd@Nb@Jf@@RDZP\\LJ@LQxAGVg@DSAq@K}@QsBq@gBm@}AQo@NSPe@CaAL{@Hs@IaA@kBCYAk@Ow@U[C]CU@YGKEEMo@J]DUCSJ}@NOA[C[HOHSAMBe@?WHe@BOGKMQ@_@LONQFUPEHINI@QNOFIEIFGCGBKCWEEGk@PW^Q?WFe@?{@VOBKJEJQ@U?c@BSIw@g@MCOIi@Dg@EiBXk@D]Ng@Dk@Jk@VyDhAsAE_H`Dy@l@mAI}Bj@MC_@M[DyD_BgAAkB`Ao@PY@O?s@U{@s@}Bm@q@i@GQMIQPIT";
 
@@ -13,45 +15,32 @@ const tyenboche_to_dingboche =
 const dingboche_to_chukung =
   "_yfiDub~pOy@k@QGg@WaA{@W[a@QSYOYeAgBeDkEc@y@KYcAoEg@iCQy@]w@K[?WDe@De@ESa@{@Sq@Ou@Ce@Gy@Ce@HaATyA@a@EYw@aCSo@Ik@Gq@BaAAgAIa@OSEU?WH[Jw@N{@H}AA[?g@Hi@T_BDw@@mA@e@?iCOuBc@cB[w@Sm@Ee@MqAsAgI[uA[}@]yAAi@DYDg@EW]KGGsAqC_AkBm@eAg@aAOS]w@WUS[CWEyAEYM_BAoAS_BAe@B_@Lg@Be@@kA?OOk@_@k@i@sB[aA?_@?YNYRON[BW?SAk@BSPg@B[GK?a@CcAg@uAQYGECM@SGQCKIGI_@GcBEk@Qi@e@{ASe@IUMKCYOu@Gm@Du@Bs@GYOWKUE_@?q@Ok@]}@QgAOk@c@e@Wi@[c@K[IQ@YCY]o@[U_@sAEUCe@EYo@iBQaAD]@a@KeA@i@J_@Jq@Ce@CUKS_@YMK";
 
-const chhukung_to_chhukung_ri = "q~hiDecfqOMi@?o@@]CMIIKGOA";
-
-const chhukung_to_kongma_la_to_lobuche = "";
-
-const lobuche_to_gorak_shep =
-  "gvqiDiezpOJa@Bm@Aa@Y_@]m@WWU_@W_AG[mAmB_BmB_As@i@IoAKc@Ii@Y]W]Q]C_@Os@i@w@a@wC{@uAQU?g@@WASISY]_@q@k@OKej@}RkFgCcF{B_IcD}@Ya@W[]c@{@a@o@cDeCiOoL_AYMIIWOcBOk@kAiCQkAqDCuEr@mDBk@AOCEGgAmC_Ao@wWiBm@Oi@MMKMSm@]qD@mAA";
-
-const gorak_shep_to_ebc_to_gorakshep =
-  "}`xiDsu}pOlA@jDEU_@s@g@sA_BmAWw@o@[WYKs@w@QkAD]?UAIOUUYQMWc@[[MCGGa@m@Wa@Kc@_@e@EECWKMUSI[MIU_@m@}@s@_A[i@g@_Aa@gAM[BWJY\\KREDGCOAKLg@LBBAAIGu@I_@IMa@m@c@_@Mi@_@_@a@k@UIYMa@[s@m@k@cAq@cAk@e@GKQOOEQ?Q?SK_Bm@[KW[_@WSISSO_@QQOWOk@QUWQMO[_@SCODYAe@Ye@Q]SIMCg@EIWCWI]UaAg@m@Ui@EY@yA[m@a@YEg@Ck@OqAa@gAQo@UcAa@o@OkA_@g@c@m@MiA_@_AUg@UkAs@k@USQ{B_Au@]wEmCy@e@u@o@eBwBi@k@Yy@u@{@[aAUc@o@o@{CgBeBsAmA}@lA|@dBrAzCfBn@n@Tb@Z`At@z@Xx@h@j@dBvBt@n@x@d@fCzAdCnAzB~@RPj@TjAr@f@T~@ThA^l@Lf@b@jA^n@NbA`@n@TfAPpA`@j@Nf@BXDl@`@xAZXAh@Dl@T`Af@\\TVHVBDHBf@HL\\Rd@Pd@XX@NERBZ^LNVPPTNj@NVPPN^RRRH^VVZZJt@X|@^b@?NDPNr@p@p@bAj@bAr@l@`@ZXLTH`@j@^^Lh@b@^`@l@HLH^Ft@?B@BGBKAKj@DL?FEFq@PKXCVn@bBbAhBr@~@l@|@T^LHBFDRTRJLBVDD^d@Jb@V`@`@l@TJZZVb@PLTXNT@H?TE\\PjAr@v@XJZVv@n@lAVrA~Ar@f@T^kDDmAA";
-
-const gorak_shep_to_kala_patthar_to_lobuche =
-  "}`xiDsu}pOc@AsAMrALpBBpDAl@\\LRLJh@Ll@NvWhB~@n@fAlCDFNBj@@lDCtEs@pDBPjAjAhCNj@NbBHVLH~@XhOnLbDdC`@n@b@z@Z\\`@V|@X~HbDbFzBjFfClIxCv_@bNNJp@j@\\^RXRHV@f@AT?tAPvCz@v@`@r@h@^N\\B\\P\\Vh@Xb@HnAJh@H~@r@~AlBlAlBFZV~@T^VV\\l@X^@`@Cl@Oh@Y`@EZ?TFLPJ";
-
 const lobuche_to_dzongla =
   "qvqiDsazpOHBD?LBJ?jFoAd@Gn@BdCHd@AZBLDvEtATHl@Rb@\\nA`@`Bh@h@\\nBx@^HpCzAfCjAtBp@B@nBd@hFt@`@JxBl@lCnAjAh@NJBBNLHLrFhJvCdEDJBJDFLHD@DDZd@FLFHJJPLBFDFDDFBHBFBLTJDL@RHFBPDHDRJLPFTDPBPDNBLDHBDDBNLf@Vj@V^Rt@ZVJLBj@PFDBDDBZJ@?jAPv@R`@FH@B?N@D@F@HDJBJ?V@^BbB^RB`ANtAJ~ADd@?fAFzBJl@@V@ZHXHPFNDHFDD@@@@BH@BBL@L?V?V?BD\\Lb@DJBH?P@D?H?TAh@W|Am@zACDmAtDe@pAMNMLERYd@i@`AABa@~AYx@CFCB?F?D?HAPCLCNGLGVAHCJ@N?PDNAF@D@FAFGRIv@Ih@Ux@CLELKHG@I@QEECIC[CS@[Fa@Lo@HM?ICGCGAA?SHWHCDEHKJWJODODGJGFK@A@IHKPGXANAXEZIVGVAR?RDP@NDRLTH\\@bAAb@CZIb@Od@GXCf@Eh@O~@?@_@`AA@m@^a@PUL[XSRQRiB~BUXm@jBOr@a@~@A@g@n@GFa@h@QL]V{@f@a@VORONUHGBm@JiAK}@KsBZK@i@@WEUBOJCB[^OVCF[t@St@WNc@T_@HYd@e@d@i@TQZEDKLm@p@OVQXMv@Kz@Gp@CT[h@Wj@w@z@CNCL?@?P@H?HAj@BT@F@@?BABA@I^YnAGJMHCBGRANDRFNJNLFBB@B?B?HGf@ENwA~DsArEAF?d@Nj@LTpB~C";
 
-const dzongla_to_cho_la_pass_to_gokyo =
-  "qvqiDsazpOHBD?LBJ?jFoAd@Gn@BdCHd@AZBLDvEtATHl@Rb@\\nA`@`Bh@h@\\nBx@^HpCzAfCjAtBp@B@nBd@hFt@`@JxBl@lCnAjAh@NJBBNLHLrFhJvCdEDJBJDFLHD@DDZd@FLFHJJPLBFDFDDFBHBFBLTJDL@RHFBPDHDRJLPFTDPBPDNBLDHBDDBNLf@Vj@V^Rt@ZVJLBj@PFDBDDBZJ@?jAPv@R`@FH@B?N@D@F@HDJBJ?V@^BbB^RB`ANtAJ~ADd@?fAFzBJl@@V@ZHXHPFNDHFDD@@@@BH@BBL@L?V?V?BD\\Lb@DJBH?P@D?H?TAh@W|Am@zACDmAtDe@pAMNMLERYd@i@`AABa@~AYx@CFCB?F?D?HAPCLCNGLGVAHCJ@N?PDNAF@D@FAFGRIv@Ih@Ux@CLELKHG@I@QEECIC[CS@[Fa@Lo@HM?ICGCGAA?SHWHCDEHKJWJODODGJGFK@A@IHKPGXANAXEZIVGVAR?RDP@NDRLTH\\@bAAb@CZIb@Od@GXCf@Eh@O~@?@_@`AA@m@^a@PUL[XSRQRiB~BUXm@jBOr@a@~@A@g@n@GFa@h@QL]V{@f@a@VORONUHGBm@JiAK}@KsBZK@i@@WEUBOJCB[^OVCF[t@St@WNc@T_@HYd@e@d@i@TQZEDKLm@p@OVQXMv@Kz@Gp@CT[h@Wj@w@z@CNCL?@?P@H?HAj@BT@F@@?BABA@I^YnAGJMHCBGRANDRFNJNLFBB@B?B?HGf@ENwA~DsArEAF?d@Nj@LTpB~C";
-
-const tarngga_to_namache_bazaar =
-  "ce{hDu}zoO]iCMyAG_A?]Bo@Fq@j@kBX]TKZEHO`AmAb@_@f@Eh@O`@SRUNMFMBMDKHGHAF@Lc@P_@^w@f@{@p@u@TMPa@PWLk@?g@KkAGi@Aa@Um@o@gAEAMDIF[FOBMDQP[BYDW?QCICI@MCLIDGS?KEPSNSMEk@CQEGQHi@X_B`@m@X[PY?ICSR}@@OP_@Na@Pm@DYN]PYFUOYCYF]JUP]XUHU\\o@@}@Ay@LYfAe@j@MVU@W\\S\\GXq@l@{@LOJa@?Y@e@EUC{@TWTYJa@d@_Al@a@RSDWTMr@uAv@{@FEFFFHDEM]Sa@?QNI\\AN@JEDE@[Pk@@a@Hc@VWNe@VYx@sATq@dBqCRsAd@yA@[H]^gAN_@HW\\a@Ve@JYVYNa@XSd@eARa@DI@[?QIGNQ?YDYPYEO@GJK?YG_@?QXg@Pa@PWb@e@n@UIKe@MES@MHIj@S`@UJO?KM]Ea@?y@|@o@VMPGBG@QDOJIREZIF@DNHPHED_@R]DGLCDe@AIEEa@EKWB]HW?SPYN_BRgA`@eAv@}ARgATi@FUJYh@w@Ru@f@_A|@cAZQVa@z@m@bAc@vBEz@AbAP^@\\Cd@Dv@EDEHUV]f@KRI@GBINMPANCDOJONO@KEImAw@sBcB_@[]{@]s@So@m@oA]o@Bo@Xs@jAH`@MZLv@N`@Lt@Jh@Cf@Fl@Hd@?bA?d@Bd@Jl@H\\?t@?d@]W_@a@i@s@e@Sc@Ya@q@a@Qe@e@YJo@d@]d@Sz@s@v@_ARQr@Ch@YzA?dA?H?d@m@L]\\YB]Rc@D_@GQE_@Ga@I{@?YPc@FQPO^k@UAQQCKBa@Jc@LYNS?IAOASI_@Sk@Ek@@s@Jc@J[^]\\uBRiAN_@v@oAb@{Aj@sA~@yAJq@Em@?u@FiADGNENGJKDK@SGg@HKHCRMXYl@WXWt@u@LQPg@FcAFM^_@`AoAhCmEf@aADMBY@WOu@FWHS\\SHOBQPa@HU?MC]Fa@DIX[XWNQBMBETYXa@LODODMJGPQRi@^[\\ILGJQNOLIFENUd@[T[PKNC`ACr@J`@JR?XCn@Qt@e@`Aq@DG@Ec@e@UUk@c@QOQWU_@IW@q@Qm@iA}Bc@Qg@_@i@e@u@q@[KOEw@Yk@_@MKYa@M[Us@E[Mw@Pu@Ds@H_@RYDMFQXk@@IH[DO?IBGRINIT[Vc@j@e@h@]XIDCFKBMAOCOAIE@M?KCGEGHKBGAGGWGIIKACEC@G@CIQGG?GDa@RKDK?QGW_@e@EMMCC";
-
-const dayWiseData: any = {
+const dayWiseDataP: any = {
   "1": lukla_to_phakding,
   "2": phakding_to_namache_bazaar,
   "4": namache_bazaar_to_tyengboche,
   "5": tyenboche_to_dingboche,
   "6": dingboche_to_chukung,
-  "7": chhukung_to_chhukung_ri,
-  "8": chhukung_to_kongma_la_to_lobuche,
-  "9": lobuche_to_gorak_shep,
-  "10": gorak_shep_to_ebc_to_gorakshep,
-  "11": gorak_shep_to_kala_patthar_to_lobuche,
-  "12": lobuche_to_dzongla,
-  "13": dzongla_to_cho_la_pass_to_gokyo,
-  "14": tarngga_to_namache_bazaar
+  "13": lobuche_to_dzongla
 };
 
-const getDayWiseData = (day: string) => dayWiseData[day];
+const getDayWiseDataP = () => dayWiseDataP;
+
+const dayWiseDataG: any = {
+  "7": GeoJsonData.chhukung_to_chhukung_ri_to_chhukung,
+  "8": GeoJsonData.chhukung_to_kongma_la_to_lobuche,
+  "10": GeoJsonData.lobuche_to_ebc_to_gorak_shep,
+  "12": GeoJsonData.gorak_shep_to_kala_patthar_to_lobuche,
+  "14": GeoJsonData.dzongla_to_thangnak_to_gokyo,
+  "15": GeoJsonData.gokyo_to_gokyo_ri,
+  "17": GeoJsonData.gokyo_to_marulung,
+  "18": GeoJsonData.marulung_to_namche_bazaar
+};
+
+const getDayWiseDataG = () => dayWiseDataG;
 
 const halts = [
   [27.74004, 86.712555], // Phakding
@@ -62,22 +51,22 @@ const halts = [
   [27.9485, 86.8104], // Lobuche
   [27.9809, 86.8285], // Gorak Shep
   [27.9397, 86.7733], // Dzongla
-  [27.9755, 86.6758], // Gokyo
+  [27.9535, 86.6945], // Gokyo
   [27.8877, 86.6365] // Marlung
 ];
 
 const getHalts = () => halts;
 
 const summits = [
-  [27.553, 86.5245], // Chhukung Ri
-  [27.929916, 86.836273], // Kongma La
-  [28.004333316, 86.855663244], // EBC
-  [27.99582935, 86.828413353], // Kala Patthar
+  [27.925527275065452, 86.87898159027101], // Chhukung Ri
+  [27.92990551745897, 86.83660816488556], // Kongma La
+  [28.004240016938017, 86.85706000015217], // EBC
+  [27.995700274264355, 86.82849997210725], // Kala Patthar
   [27.962122, 86.751923], // Cho La
-  [27.9608, 86.6811], // Gokyo Ri
+  [27.962148839539353, 86.68291701535055], // Gokyo Ri
   [27.9473697, 86.6584966] // Renjo La
 ];
 
 const getSummits = () => summits;
 
-export { getDayWiseData, getHalts, getSummits };
+export { getDayWiseDataP, getDayWiseDataG, getHalts, getSummits };
