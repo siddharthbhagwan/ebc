@@ -53,4 +53,31 @@ const dayWiseData: any = {
 
 const getDayWiseData = (day: string) => dayWiseData[day];
 
-export { getDayWiseData };
+const halts = [
+  [27.74004, 86.712555], // Phakding
+  [27.8069, 86.714], // Namche Bazaar
+  [27.8362, 86.7646], // Tengboche
+  [27.8923, 86.8314], // Dingboche
+  [27.9045, 86.8713], // Chhukung
+  [27.9485, 86.8104], // Lobuche
+  [27.9809, 86.8285], // Gorak Shep
+  [27.9397, 86.7733], // Dzongla
+  [27.9755, 86.6758], // Gokyo
+  [27.8877, 86.6365] // Marlung
+];
+
+const getHalts = () => halts;
+
+const summits = [
+  [27.553, 86.5245], // Chhukung Ri
+  [27.929916, 86.836273], // Kongma La
+  [28.004333316, 86.855663244], // EBC
+  [27.99582935, 86.828413353], // Kala Patthar
+  [27.962122, 86.751923], // Cho La
+  [27.9608, 86.6811], // Gokyo Ri
+  [27.9473697, 86.6584966] // Renjo La
+];
+
+const getSummits = () => summits;
+
+export { getDayWiseData, getHalts, getSummits };
