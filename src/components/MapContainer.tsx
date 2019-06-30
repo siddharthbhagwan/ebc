@@ -49,7 +49,7 @@ class MapContainer extends React.Component<any, any> {
   public plotPolylineRoutes = () => {
     const that = this;
     const routes = getDayWiseDataP();
-    Object.keys(routes).forEach((day: any) => {
+    Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
         const decodedData = decodePolyline(routes[day]);
         const polyLine = L.polyline(decodedData).toGeoJSON();
@@ -64,6 +64,7 @@ class MapContainer extends React.Component<any, any> {
   };
 
   public plotGeoJsonRoutes = () => {
+    const that = this;
     const routes = getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const geoJsonLayer = L.geoJSON(route);
@@ -71,6 +72,7 @@ class MapContainer extends React.Component<any, any> {
       geoJsonLayer.on("mouseover", function(e: any) {
         console.log(e);
         console.log(e.latlng);
+        that.props.dispatchLayerDetails(e.layer.feature.properties);
       });
     });
   };
