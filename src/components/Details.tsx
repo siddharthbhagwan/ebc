@@ -14,7 +14,7 @@ class Details extends React.Component<any, any> {
           borderRadius: "5px",
           paddingTop: "20px",
           paddingBottom: "20px",
-          fontSize: "24px"
+          fontSize: "22px"
         }}
         className="row"
       >

@@ -135,8 +135,9 @@ class MapContainer extends React.Component<any, any> {
   render() {
     return (
       <Map
-        center={[27.933489, 86.713486]}
-        zoom={11}
+        center={[27.816795860382836, 86.76689146300015]}
+        zoomSnap={0.1}
+        zoom={11.1}
         style={{ height: "100vh", width: "100%" }}
         ref={mapRef => ((this.leafletMap as any) = mapRef)}
       >
