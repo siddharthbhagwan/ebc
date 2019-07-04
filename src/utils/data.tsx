@@ -74,11 +74,76 @@ const getPasses = () => passes;
 const airport = [27.68725044382488, 86.73143742664253];
 const getAirport = () => airport;
 
+const polyLineProperties = {
+  "1": {
+    day: 1,
+    name: "Lukla - Phakding",
+    distance: "4.66 mi / 7.5 km",
+    time: "3h 30m",
+    start_alt: "9,373",
+    end_alt: "8,562",
+    net_climb: "-1,060",
+    descent: "705"
+  },
+  "2": {
+    day: "2",
+    name: "Phakding - Namache Bazaar",
+    distance: "6.72 mi / 10.81 km",
+    time: "5h 30m",
+    start_alt: "8,562",
+    end_alt: "11,266",
+    total_climb: "3,556",
+    descent: "935"
+  },
+  "4": {
+    day: "4",
+    name: "Namache Bazaar - Tyengboche",
+    distance: "5.95 mi / 9.57 km",
+    time: "5h 30m",
+    start_alt: "8,562",
+    end_alt: "11,266",
+    total_climb: "2,785",
+    descent: "1,283"
+  },
+  "5": {
+    day: "5",
+    name: "Tengboche - Dingboche",
+    distance: "mi / km",
+    time: "5h 30m",
+    start_alt: "",
+    end_alt: "",
+    total_climb: "",
+    descent: ""
+  },
+  "6": {
+    day: "6",
+    name: "Dingboche - Chhukung",
+    distance: "mi / km",
+    time: "4h 00m",
+    start_alt: "",
+    end_alt: "",
+    total_climb: "",
+    descent: ""
+  },
+  "13": {
+    day: "13",
+    name: "Lobuche - Dzongla",
+    distance: "mi / km",
+    time: "4h 30m",
+    start_alt: "",
+    end_alt: "",
+    total_climb: "",
+    descent: ""
+  }
+};
+const getPolyLineProperties = () => polyLineProperties;
+
 export {
   getAirport,
   getDayWiseDataP,
   getDayWiseDataG,
   getHalts,
   getPasses,
+  getPolyLineProperties,
   getSummits
 };
