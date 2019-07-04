@@ -1,7 +1,7 @@
 import * as GeoJsonData from "./geoJson";
 
 const lukla_to_phakding =
-  "co~gDk}ipOYm@OWCOGOe@m@k@e@u@mAeAwBUW_@AICw@i@KKGOQIKGEIEEGEWOUOGEGCELIZU^kAtAg@l@{@n@SDeCb@GHCHEDk@Lo@BG?KACDOZETKLi@Zq@N]BEAEOGII?ONKHE@KCKIGUCGMGUCEEMYGKM@[d@c@l@ITALCZOX?TIJGPk@j@kAp@YJS@IDMVELcAl@EZYZKFmALSLCLIZYNe@AIDEJEb@CRBJCLw@d@IFU`@K\\W\\_@b@OX{@dAGJAXGLC`@Ud@IDs@A]Pc@^MXCNg@d@WPQb@SX[V[^MVIb@ENa@V_@VQT]Vo@h@KPc@Rg@dAm@f@c@PKNQHGTi@`@a@b@k@l@INS^I^Bp@KZFXJVCTEf@GFEBJPOn@YTw@@y@OYQOBGD]KgAc@a@a@_@Um@}@W]Fe@R}@@m@y@I[TKP?XQTk@h@c@XOXa@zA[bAIN[d@k@d@k@b@_ApAS?i@WSPSPk@Ag@YONUIU@MTK`@Ab@c@Lq@?}Bz@e@f@o@bAw@j@UH{@Ck@\\c@PMKY?gAVo@FUNeACONEHDTKRUBg@VeA\\oC_@aJkAiEQgB}@mAk@SCcCUEIYe@Ru@Y}@[C[SKCo@A]?KBGHEb@@b@Hd@Nb@Jf@@RDZP\\LJ@LQxAGVg@DSAq@K}@QsBq@gBm@}AQo@NSPe@CaAL{@Hs@IaA@kBCYAk@Ow@U[C]CU@YGKEEMo@J]DUCSJ}@NOA[C[HOHSAMBe@?WHe@BOGKMQ@_@LONQFUPEHINI@QNOFIEIFGCGBKCWEEGk@PW^Q?WFe@?{@VOBKJEJQ@U?c@BSIw@g@MCOIi@Dg@EiBXk@D]Ng@Dk@Jk@VyDhAsAE_H`Dy@l@mAI}Bj@MC_@M[DyD_BgAAkB`Ao@PY@O?s@U{@s@}Bm@q@i@GQMIQPIT";
+  "it~gDovjpOt@IFC@GKe@e@eBOGE@w@RaAXM@MFe@ZAJP~@J`@EB_@Ng@VONi@`Ai@tASr@m@t@_@`@k@v@cAv@qB^o@LABGP]Hy@H[AOREXIN[Va@N]Hc@FCAM[IAMJQPWGIWCIIEUGIAKSIQMCy@fAMXCPCVO\\ATGLCFELa@d@OHc@To@^_@DOLITCFw@b@KHCTINMLGFcALQBKFKJCVKPSHQ?GAQ@EDENATETBLALIHa@RWRa@~@w@`A[f@w@bAAXGLC`@IRKRIBs@Aw@d@MPMb@g@d@WPQb@SX[V[^Up@GXaAn@e@d@a@^WPKPc@RYf@Sb@g@`@c@PKNQHGTi@`@mApA]n@I^@^@PKZRp@I|@MJJPKVCVYTw@@SEe@IYQWH_A[e@S[]e@YeA{AZcB@m@y@I[TKP?XQTk@h@c@XOXQt@k@hBe@t@oAbAu@`ASTQ?i@Wg@b@k@Ag@YONSIW@MTK`@Ab@c@Lq@?}Bz@e@f@[d@S\\w@j@UH{@CoAn@MKY?gAVo@FUNa@Ac@AONEHDTKRUBg@VeA\\qNkBiEQGCmDeBwCY_@o@Ru@Y}@[CWQGCq@C]AUHGRAj@DZTv@Jh@Bh@N\\TZMtAI^i@F_@AcB]oDkAk@S}AQo@NSPe@Cg@HuALs@Iw@BeBCi@CcBe@oAEe@MEMWFa@DSBUCSJ}@Nk@E[HOH]@i@?WHW?U@OQOCWJUJSLQNMHKT[POFIEIFGCGBc@IEGc@NUNIPQ?WFS?Q?k@N_@JQVSBw@@SIUSa@SMCQKg@F[CKAiANy@NQ?]Ng@Dk@Jk@VyDhAsAEeF`Cy@^y@l@mAI}Bj@m@Q[DyD_BgAAQJyAt@o@Pi@@s@U]Y]Ye@OwA]q@i@GUMEQPIT";
 
 const phakding_to_namache_bazaar =
   "c_ihD}`gpOELoAi@q@Yk@?s@SyAMsEaCcAKe@Ik@lES`@OHg@Lm@GqA?a@JWIWKc@?q@@]Pe@n@QDKL[@q@NeBO{@AgAWcAa@m@c@]@k@Pa@@{@^g@d@QBcA\\a@Ta@X]\\k@\\{Af@{BpAa@x@APc@dEKPa@IIg@]YNw@Sa@g@iA]Fc@HKRWBo@UsBHsF_@aD~@cAf@aAZkCIMKYQ_C^eImBmBc@sA{BsEsH@Sf@MLK@q@?i@oAEY_ASkAEsA^[PFP?JQFm@HQCg@^OJULu@Ec@Uk@c@Qa@e@Cu@M]Y[{AoAe@G][m@sA[KQqAmA}D]_Ai@Wm@I`@{DkAoA{HmIgAiAc@?eARq@J_@?gBLu@D[LwA?UA}@_AWMg@c@]Io@CIYQEITMNe@FsARe@NOBGNIJ_@P[NGJSXQHWP[D_@CY?g@Wu@G[BQDOASCUROHYDYRMTy@l@wAr@eAXaHGWAg@Fc@P_AxB[`@C@q@[UMMAKMBOOSiAw@wBa@mASYBUDe@RGPAZDfAw@tAwCnA}C`AwDV}JjCiAX]@a@@s@USJWb@k@b@{BJi@TQBa@Fc@EyBa@[CcAj@KFM@YKwC_Be@QsB_@{@BAOOMe@CKDGHKfFCTGLe@f@KAKDMZSTONSCa@b@ABEC?S@a@CCE?ONS\\ADC?AW?GCAEBKr@Cp@@b@F\\JRAJIH[^O^c@j@OHc@NeAVmAP[BGAEGIUOKoCZiEpBoAjAWXQf@I^C`@Fh@?NCLKNg@`@e@j@c@t@O`@QLo@~@Q^KJ_@FOH]b@i@pAIFYDOEc@SSI{AAQBOZEf@GLkAb@SDSGIDCJGd@QPa@JQ?mAMkD{Ay@_@OEe@EUD]LYH_@Di@NY\\GLANDLE\\GRIHEN?FLT@H?DGHe@LK?_@KqBm@S?MCs@Wi@KYTG@ADI?KMEAE?IHIAOEMEDi@@CFC~@a@FC?QEUBERAXN\\FN?DCBO@MAKKMMUy@iBYkAIeAS]QKMEB?IKW_@WIaAQE@M?KCGEGHKBGAGGKCKCIIKACEC@G@CIEAKEG?GDOHQHKDK?QGKQKMOAUCMMCC";
@@ -26,7 +26,6 @@ const dayWiseDataP: any = {
   "6": dingboche_to_chukung,
   "13": lobuche_to_dzongla
 };
-
 const getDayWiseDataP = () => dayWiseDataP;
 
 const dayWiseDataG: any = {
@@ -40,7 +39,6 @@ const dayWiseDataG: any = {
   "18": GeoJsonData.gokyo_to_marulung,
   "19": GeoJsonData.marulung_to_namche_bazaar
 };
-
 const getDayWiseDataG = () => dayWiseDataG;
 
 const halts = [
@@ -56,19 +54,31 @@ const halts = [
   [27.9535, 86.6945], // Gokyo
   [27.8877, 86.6365] // Marlung
 ];
-
 const getHalts = () => halts;
 
 const summits = [
   [27.925527275065452, 86.87898159027101], // Chhukung Ri
-  [27.92990551745897, 86.83660816488556], // Kongma La
   [28.004240016938017, 86.85706000015217], // EBC
   [27.995700274264355, 86.82849997210725], // Kala Patthar
-  [27.962122, 86.751923], // Cho La
-  [27.962148839539353, 86.68291701535055], // Gokyo Ri
-  [27.9473697, 86.6584966] // Renjo La
+  [27.962148839539353, 86.68291701535055] // Gokyo Ri
 ];
-
 const getSummits = () => summits;
 
-export { getDayWiseDataP, getDayWiseDataG, getHalts, getSummits };
+const passes = [
+  [27.92990551745897, 86.83660816488556], // Kongma La
+  [27.962122, 86.751923], // Cho La
+  [27.9473697, 86.6584966] // Renjo La
+];
+const getPasses = () => passes;
+
+const airport = [27.68725044382488, 86.73143742664253];
+const getAirport = () => airport;
+
+export {
+  getAirport,
+  getDayWiseDataP,
+  getDayWiseDataG,
+  getHalts,
+  getPasses,
+  getSummits
+};

@@ -3,15 +3,12 @@ import * as L from "leaflet";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
-import {
-  getDayWiseDataG,
-  getDayWiseDataP,
-  getHalts,
-  getSummits
-} from "../utils/data";
+import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
 import tentIcon from "../resources/images/tent.png";
 import summitIcon from "../resources/images/summit.png";
+import airportIcon from "../resources/images/airport.png";
+import passIcon from "../resources/images/pass.png";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -19,13 +16,15 @@ class MapContainer extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.plotHalts = this.plotHalts.bind(this);
+    this.plotPasses = this.plotPasses.bind(this);
     this.plotSummits = this.plotSummits.bind(this);
+    this.plotMiscellaneous = this.plotMiscellaneous.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
   }
 
   public plotHalts = () => {
-    const halts = getHalts();
+    const halts = Data.getHalts();
     halts.forEach((halt: any) => {
       L.marker(halt, {
         icon: L.icon({
@@ -37,7 +36,7 @@ class MapContainer extends React.Component<any, any> {
   };
 
   public plotSummits = () => {
-    const summits = getSummits();
+    const summits = Data.getSummits();
     summits.forEach((summit: any) => {
       L.marker(summit, {
         icon: L.icon({
@@ -50,7 +49,7 @@ class MapContainer extends React.Component<any, any> {
 
   public plotPolylineRoutes = () => {
     const that = this;
-    const routes = getDayWiseDataP();
+    const routes = Data.getDayWiseDataP();
     Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
         const decodedData = decodePolyline(routes[day]);
@@ -58,30 +57,67 @@ class MapContainer extends React.Component<any, any> {
         polyLine.properties.day = day;
         const layer = new L.GeoJSON(polyLine);
         (this.leafletMap as any).leafletElement.addLayer(layer);
-        layer.on("mouseover", function(e: any) {
-          that.props.dispatchLayerDetails(e.layer.feature.properties);
-        });
+        layer
+          .on("mouseover", function(e: any) {
+            console.log(e.latlng);
+            that.props.dispatchLayerDetails(e.layer.feature.properties);
+          })
+          .on("click", function(e: any) {
+            (that.leafletMap as any).leafletElement.fitBounds(
+              layer.getBounds()
+            );
+          });
       }
     });
   };
 
   public plotGeoJsonRoutes = () => {
     const that = this;
-    const routes = getDayWiseDataG();
+    const routes = Data.getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const geoJsonLayer = L.geoJSON(route);
       (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
-      geoJsonLayer.on("mouseover", function(e: any) {
-        console.log(e);
-        console.log(e.latlng);
-        that.props.dispatchLayerDetails(e.layer.feature.properties);
-      });
+      geoJsonLayer
+        .on("mouseover", function(e: any) {
+          console.log(e);
+          console.log(e.latlng);
+          that.props.dispatchLayerDetails(e.layer.feature.properties);
+        })
+        .on("click", function(e: any) {
+          (that.leafletMap as any).leafletElement.fitBounds(
+            geoJsonLayer.getBounds()
+          );
+        });
     });
+  };
+
+  public plotPasses = () => {
+    const passes = Data.getPasses();
+    passes.forEach((pass: any) => {
+      L.marker(pass, {
+        icon: L.icon({
+          iconUrl: passIcon,
+          iconSize: [22, 22]
+        })
+      }).addTo((this.leafletMap as any).leafletElement);
+    });
+  };
+
+  public plotMiscellaneous = () => {
+    const airport: any = Data.getAirport();
+    L.marker(airport, {
+      icon: L.icon({
+        iconUrl: airportIcon,
+        iconSize: [22, 22]
+      })
+    }).addTo((this.leafletMap as any).leafletElement);
   };
 
   componentDidMount() {
     this.plotHalts();
+    this.plotPasses();
     this.plotSummits();
+    this.plotMiscellaneous();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
   }
