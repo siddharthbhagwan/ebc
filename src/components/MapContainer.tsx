@@ -10,6 +10,8 @@ import {
   getSummits
 } from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
+import tentIcon from "../resources/images/tent.png";
+import summitIcon from "../resources/images/summit.png";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -27,7 +29,7 @@ class MapContainer extends React.Component<any, any> {
     halts.forEach((halt: any) => {
       L.marker(halt, {
         icon: L.icon({
-          iconUrl: window.location.origin + "/tent.png",
+          iconUrl: tentIcon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
@@ -39,7 +41,7 @@ class MapContainer extends React.Component<any, any> {
     summits.forEach((summit: any) => {
       L.marker(summit, {
         icon: L.icon({
-          iconUrl: window.location.origin + "/summit.png",
+          iconUrl: summitIcon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
@@ -49,7 +51,7 @@ class MapContainer extends React.Component<any, any> {
   public plotPolylineRoutes = () => {
     const that = this;
     const routes = getDayWiseDataP();
-    Object.keys(routes).forEach((day: any) => {
+    Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
         const decodedData = decodePolyline(routes[day]);
         const polyLine = L.polyline(decodedData).toGeoJSON();
@@ -64,6 +66,7 @@ class MapContainer extends React.Component<any, any> {
   };
 
   public plotGeoJsonRoutes = () => {
+    const that = this;
     const routes = getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const geoJsonLayer = L.geoJSON(route);
@@ -71,6 +74,7 @@ class MapContainer extends React.Component<any, any> {
       geoJsonLayer.on("mouseover", function(e: any) {
         console.log(e);
         console.log(e.latlng);
+        that.props.dispatchLayerDetails(e.layer.feature.properties);
       });
     });
   };

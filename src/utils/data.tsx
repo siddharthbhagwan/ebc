@@ -34,10 +34,11 @@ const dayWiseDataG: any = {
   "8": GeoJsonData.chhukung_to_kongma_la_to_lobuche,
   "10": GeoJsonData.lobuche_to_ebc_to_gorak_shep,
   "12": GeoJsonData.gorak_shep_to_kala_patthar_to_lobuche,
-  "14": GeoJsonData.dzongla_to_thangnak_to_gokyo,
-  "15": GeoJsonData.gokyo_to_gokyo_ri,
-  "17": GeoJsonData.gokyo_to_marulung,
-  "18": GeoJsonData.marulung_to_namche_bazaar
+  "14": GeoJsonData.dzongla_to_thangnak,
+  "15": GeoJsonData.thangnak_to_gokyo,
+  "16": GeoJsonData.gokyo_to_gokyo_ri,
+  "18": GeoJsonData.gokyo_to_marulung,
+  "19": GeoJsonData.marulung_to_namche_bazaar
 };
 
 const getDayWiseDataG = () => dayWiseDataG;
@@ -51,6 +52,7 @@ const halts = [
   [27.9485, 86.8104], // Lobuche
   [27.9809, 86.8285], // Gorak Shep
   [27.9397, 86.7733], // Dzongla
+  [27.94058, 86.721246], //Thangnak
   [27.9535, 86.6945], // Gokyo
   [27.8877, 86.6365] // Marlung
 ];
