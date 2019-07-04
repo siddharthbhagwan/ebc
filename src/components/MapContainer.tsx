@@ -59,8 +59,12 @@ class MapContainer extends React.Component<any, any> {
         (this.leafletMap as any).leafletElement.addLayer(layer);
         layer
           .on("mouseover", function(e: any) {
-            console.log(e.latlng);
-            that.props.dispatchLayerDetails(e.layer.feature.properties);
+            const hovered = e.target;
+            hovered.setStyle({ color: "#666" });
+          })
+          .on("mouseout", function(e: any) {
+            const hovered = e.target;
+            hovered.setStyle({ color: "#2c7dff" });
           })
           .on("click", function(e: any) {
             (that.leafletMap as any).leafletElement.fitBounds(
@@ -79,9 +83,13 @@ class MapContainer extends React.Component<any, any> {
       (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
       geoJsonLayer
         .on("mouseover", function(e: any) {
-          console.log(e);
-          console.log(e.latlng);
+          const hovered = e.target;
+          hovered.setStyle({ color: "#666" });
           that.props.dispatchLayerDetails(e.layer.feature.properties);
+        })
+        .on("mouseout", function(e: any) {
+          const hovered = e.target;
+          hovered.setStyle({ color: "#2c7dff" });
         })
         .on("click", function(e: any) {
           (that.leafletMap as any).leafletElement.fitBounds(
