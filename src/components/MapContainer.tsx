@@ -10,6 +10,8 @@ import {
   getSummits
 } from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
+import tentIcon from "../resources/images/tent.png";
+import summitIcon from "../resources/images/summit.png";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -27,7 +29,7 @@ class MapContainer extends React.Component<any, any> {
     halts.forEach((halt: any) => {
       L.marker(halt, {
         icon: L.icon({
-          iconUrl: window.location.origin + "/tent.png",
+          iconUrl: tentIcon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
@@ -39,7 +41,7 @@ class MapContainer extends React.Component<any, any> {
     summits.forEach((summit: any) => {
       L.marker(summit, {
         icon: L.icon({
-          iconUrl: window.location.origin + "/summit.png",
+          iconUrl: summitIcon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
