@@ -74,11 +74,76 @@ const getPasses = () => passes;
 const airport = [27.68725044382488, 86.73143742664253];
 const getAirport = () => airport;
 
+const polyLineProperties = {
+  "1": {
+    day: 1,
+    name: "Lukla - Phakding",
+    distance: "4.66 mi / 7.5 km",
+    time: "3h 30m",
+    start_alt: "9,373",
+    end_alt: "8,563",
+    net_climb: "-1,060",
+    descent: "705"
+  },
+  "2": {
+    day: "2",
+    name: "Phakding - Namache Bazaar",
+    distance: "6.72 mi / 10.81 km",
+    time: "5h 30m",
+    start_alt: "8,563",
+    end_alt: "11,286",
+    total_climb: "3,556",
+    descent: "935"
+  },
+  "4": {
+    day: "4",
+    name: "Namache Bazaar - Tengboche",
+    distance: "5.95 mi / 9.57 km",
+    time: "5h 30m",
+    start_alt: "11,286",
+    end_alt: "12,644",
+    total_climb: "2,785",
+    descent: "1,283"
+  },
+  "5": {
+    day: "5",
+    name: "Tengboche - Dingboche",
+    distance: "6.71 mi / 10.8 km",
+    time: "5h 30m",
+    start_alt: "12,644",
+    end_alt: "14,470",
+    total_climb: "",
+    descent: ""
+  },
+  "6": {
+    day: "6",
+    name: "Dingboche - Chhukung",
+    distance: "2.80 mi / 10.41 km",
+    time: "4h 00m",
+    start_alt: "14,470",
+    end_alt: "15,535",
+    total_climb: "",
+    descent: ""
+  },
+  "13": {
+    day: "13",
+    name: "Lobuche - Dzongla",
+    distance: "3.91 mi / 6.29 km",
+    time: "4h 00m",
+    start_alt: "16,210",
+    end_alt: "15,850",
+    total_climb: "",
+    descent: ""
+  }
+};
+const getPolyLineProperties = () => polyLineProperties;
+
 export {
   getAirport,
   getDayWiseDataP,
   getDayWiseDataG,
   getHalts,
   getPasses,
+  getPolyLineProperties,
   getSummits
 };

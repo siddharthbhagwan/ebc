@@ -50,17 +50,19 @@ class MapContainer extends React.Component<any, any> {
   public plotPolylineRoutes = () => {
     const that = this;
     const routes = Data.getDayWiseDataP();
+    const properties: any = Data.getPolyLineProperties();
     Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
         const decodedData = decodePolyline(routes[day]);
         const polyLine = L.polyline(decodedData).toGeoJSON();
-        polyLine.properties.day = day;
+        polyLine.properties = properties[day];
         const layer = new L.GeoJSON(polyLine);
         (this.leafletMap as any).leafletElement.addLayer(layer);
         layer
           .on("mouseover", function(e: any) {
             const hovered = e.target;
             hovered.setStyle({ color: "#666" });
+            that.props.dispatchLayerDetails(e.layer.feature.properties);
           })
           .on("mouseout", function(e: any) {
             const hovered = e.target;
@@ -133,8 +135,9 @@ class MapContainer extends React.Component<any, any> {
   render() {
     return (
       <Map
-        center={[27.933489, 86.713486]}
-        zoom={11}
+        center={[27.816795860382836, 86.76689146300015]}
+        zoomSnap={0.1}
+        zoom={11.1}
         style={{ height: "100vh", width: "100%" }}
         ref={mapRef => ((this.leafletMap as any) = mapRef)}
       >
