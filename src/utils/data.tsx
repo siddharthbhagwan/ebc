@@ -46,32 +46,61 @@ const dayWiseDataG: any = {
 };
 const getDayWiseDataG = () => dayWiseDataG;
 
-const halts = [
-  { icon: tentIcon, point: [27.74004, 86.712555] }, // Phakding
-  { icon: tentIcon, point: [27.8069, 86.714] }, // Namche Bazaar
-  { icon: tentIcon, point: [27.8362, 86.7646] }, // Tengboche
-  { icon: tentIcon, point: [27.8923, 86.8314] }, // Dingboche
-  { icon: tentIcon, point: [27.9045, 86.8713] }, // Chhukung
-  { icon: tentIcon, point: [27.9485, 86.8104] }, // Lobuche
-  { icon: tentIcon, point: [27.9809, 86.8285] }, // Gorak Shep
-  { icon: tentIcon, point: [27.9397, 86.7733] }, // Dzongla
-  { icon: tentIcon, point: [27.94058, 86.721246] }, //Thangnak
-  { icon: tentIcon, point: [27.9535, 86.6945] }, // Gokyo
-  { icon: tentIcon, point: [27.8877, 86.6365] } // Marlung
-];
-const getHalts = () => halts;
+const markers = [
+  { point: [27.74004, 86.712555], icon: tentIcon, size: [15, 15] }, // Phakding
+  { point: [27.8069, 86.714], icon: tentIcon, size: [15, 15] }, // Namche Bazaar
+  { point: [27.8362, 86.7646], icon: tentIcon, size: [15, 15] }, // Tengboche
+  { point: [27.8923, 86.8314], icon: tentIcon, size: [15, 15] }, // Dingboche
+  { point: [27.9045, 86.8713], icon: tentIcon, size: [15, 15] }, // Chhukung
+  { point: [27.9485, 86.8104], icon: tentIcon, size: [15, 15] }, // Lobuche
+  { point: [27.9809, 86.8285], icon: tentIcon, size: [15, 15] }, // Gorak Shep
+  { point: [27.9397, 86.7733], icon: tentIcon, size: [15, 15] }, // Dzongla
+  { point: [27.94058, 86.721246], icon: tentIcon, size: [15, 15] }, //Thangnak
+  { point: [27.9535, 86.6945], icon: tentIcon, size: [15, 15] }, // Gokyo
+  { point: [27.8877, 86.6365], icon: tentIcon, size: [15, 15] }, // Marlung
 
-const summits = [
-  { point: [27.925527275065452, 86.87898159027101], icon: summitIcon }, // Chhukung Ri
-  { point: [28.004240016938017, 86.85706000015217], icon: ebcIcon }, // EBC
-  { point: [27.995700274264355, 86.82849997210725], icon: summitIcon }, // Kala Patthar
-  { point: [27.962148839539353, 86.68291701535055], icon: summitIcon }, // Gokyo Ri
-  { point: [27.92990551745897, 86.83660816488556], icon: passIcon }, // Kongma La
-  { point: [27.962122, 86.751923], icon: passIcon }, // Cho La
-  { point: [27.9473697, 86.6584966], icon: passIcon }, // Renjo La
-  { point: [27.68725044382488, 86.73143742664253], icon: airportIcon } // airport
+  {
+    point: [27.925527275065452, 86.87898159027101],
+    icon: summitIcon,
+    size: [24, 24]
+  }, // Chhukung Ri
+  {
+    point: [28.004240016938017, 86.85706000015217],
+    icon: ebcIcon,
+    size: [24, 24]
+  }, // EBC
+  {
+    point: [27.995700274264355, 86.82849997210725],
+    icon: summitIcon,
+    size: [24, 24]
+  }, // Kala Patthar
+  {
+    point: [27.962148839539353, 86.68291701535055],
+    icon: summitIcon,
+    size: [24, 24]
+  }, // Gokyo Ri
+  {
+    point: [27.92990551745897, 86.83660816488556],
+    icon: passIcon,
+    size: [24, 24]
+  }, // Kongma La
+  {
+    point: [27.962122, 86.751923],
+    icon: passIcon,
+    size: [24, 24]
+  }, // Cho La
+  {
+    point: [27.9473697, 86.6584966],
+    icon: passIcon,
+    size: [24, 24]
+  }, // Renjo La
+  {
+    point: [27.68725044382488, 86.73143742664253],
+    icon: airportIcon,
+    size: [22, 22]
+  } // airport
 ];
-const getSummits = () => summits;
+const getMarkers = () => markers;
 
 const polyLineProperties = {
   "1": {
@@ -143,10 +172,4 @@ const polyLineProperties = {
 };
 const getPolyLineProperties = () => polyLineProperties;
 
-export {
-  getDayWiseDataP,
-  getDayWiseDataG,
-  getHalts,
-  getPolyLineProperties,
-  getSummits
-};
+export { getDayWiseDataP, getDayWiseDataG, getMarkers, getPolyLineProperties };
