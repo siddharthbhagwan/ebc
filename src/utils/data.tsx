@@ -1,4 +1,9 @@
 import * as GeoJsonData from "./geoJson";
+import tentIcon from "../resources/images/tent.svg";
+import summitIcon from "../resources/images/summit.svg";
+import airportIcon from "../resources/images/airport.svg";
+import passIcon from "../resources/images/pass.svg";
+import ebcIcon from "../resources/images/ebc.svg";
 
 const lukla_to_phakding =
   "it~gDovjpOt@IFC@GKe@e@eBOGE@w@RaAXM@MFe@ZAJP~@J`@EB_@Ng@VONi@`Ai@tASr@m@t@_@`@k@v@cAv@qB^o@LABGP]Hy@H[AOREXIN[Va@N]Hc@FCAM[IAMJQPWGIWCIIEUGIAKSIQMCy@fAMXCPCVO\\ATGLCFELa@d@OHc@To@^_@DOLITCFw@b@KHCTINMLGFcALQBKFKJCVKPSHQ?GAQ@EDENATETBLALIHa@RWRa@~@w@`A[f@w@bAAXGLC`@IRKRIBs@Aw@d@MPMb@g@d@WPQb@SX[V[^Up@GXaAn@e@d@a@^WPKPc@RYf@Sb@g@`@c@PKNQHGTi@`@mApA]n@I^@^@PKZRp@I|@MJJPKVCVYTw@@SEe@IYQWH_A[e@S[]e@YeA{AZcB@m@y@I[TKP?XQTk@h@c@XOXQt@k@hBe@t@oAbAu@`ASTQ?i@Wg@b@k@Ag@YONSIW@MTK`@Ab@c@Lq@?}Bz@e@f@[d@S\\w@j@UH{@CoAn@MKY?gAVo@FUNa@Ac@AONEHDTKRUBg@VeA\\qNkBiEQGCmDeBwCY_@o@Ru@Y}@[CWQGCq@C]AUHGRAj@DZTv@Jh@Bh@N\\TZMtAI^i@F_@AcB]oDkAk@S}AQo@NSPe@Cg@HuALs@Iw@BeBCi@CcBe@oAEe@MEMWFa@DSBUCSJ}@Nk@E[HOH]@i@?WHW?U@OQOCWJUJSLQNMHKT[POFIEIFGCGBc@IEGc@NUNIPQ?WFS?Q?k@N_@JQVSBw@@SIUSa@SMCQKg@F[CKAiANy@NQ?]Ng@Dk@Jk@VyDhAsAEeF`Cy@^y@l@mAI}Bj@m@Q[DyD_BgAAQJyAt@o@Pi@@s@U]Y]Ye@OwA]q@i@GUMEQPIT";
@@ -29,50 +34,44 @@ const dayWiseDataP: any = {
 const getDayWiseDataP = () => dayWiseDataP;
 
 const dayWiseDataG: any = {
-  "7": GeoJsonData.chhukung_to_chhukung_ri_to_chhukung,
-  "8": GeoJsonData.chhukung_to_kongma_la_to_lobuche,
-  "10": GeoJsonData.lobuche_to_ebc_to_gorak_shep,
-  "12": GeoJsonData.gorak_shep_to_kala_patthar_to_lobuche,
-  "14": GeoJsonData.dzongla_to_thangnak,
-  "15": GeoJsonData.thangnak_to_gokyo,
-  "16": GeoJsonData.gokyo_to_gokyo_ri,
-  "18": GeoJsonData.gokyo_to_marulung,
-  "19": GeoJsonData.marulung_to_namche_bazaar
+  "7": GeoJsonData.chhukung_to_chhukung_ri_to_chhukung_7,
+  "8": GeoJsonData.chhukung_to_kongma_la_to_lobuche_8,
+  "10": GeoJsonData.lobuche_to_ebc_to_gorak_shep_10,
+  "12": GeoJsonData.gorak_shep_to_kala_patthar_to_lobuche_12,
+  "14": GeoJsonData.dzongla_to_thangnak_14,
+  "15": GeoJsonData.thangnak_to_gokyo_15,
+  "16": GeoJsonData.gokyo_to_gokyo_ri_16,
+  "18": GeoJsonData.gokyo_to_marulung_18,
+  "19": GeoJsonData.marulung_to_namche_bazaar_19
 };
 const getDayWiseDataG = () => dayWiseDataG;
 
 const halts = [
-  [27.74004, 86.712555], // Phakding
-  [27.8069, 86.714], // Namche Bazaar
-  [27.8362, 86.7646], // Tengboche
-  [27.8923, 86.8314], // Dingboche
-  [27.9045, 86.8713], // Chhukung
-  [27.9485, 86.8104], // Lobuche
-  [27.9809, 86.8285], // Gorak Shep
-  [27.9397, 86.7733], // Dzongla
-  [27.94058, 86.721246], //Thangnak
-  [27.9535, 86.6945], // Gokyo
-  [27.8877, 86.6365] // Marlung
+  { icon: tentIcon, point: [27.74004, 86.712555] }, // Phakding
+  { icon: tentIcon, point: [27.8069, 86.714] }, // Namche Bazaar
+  { icon: tentIcon, point: [27.8362, 86.7646] }, // Tengboche
+  { icon: tentIcon, point: [27.8923, 86.8314] }, // Dingboche
+  { icon: tentIcon, point: [27.9045, 86.8713] }, // Chhukung
+  { icon: tentIcon, point: [27.9485, 86.8104] }, // Lobuche
+  { icon: tentIcon, point: [27.9809, 86.8285] }, // Gorak Shep
+  { icon: tentIcon, point: [27.9397, 86.7733] }, // Dzongla
+  { icon: tentIcon, point: [27.94058, 86.721246] }, //Thangnak
+  { icon: tentIcon, point: [27.9535, 86.6945] }, // Gokyo
+  { icon: tentIcon, point: [27.8877, 86.6365] } // Marlung
 ];
 const getHalts = () => halts;
 
 const summits = [
-  [27.925527275065452, 86.87898159027101], // Chhukung Ri
-  [28.004240016938017, 86.85706000015217], // EBC
-  [27.995700274264355, 86.82849997210725], // Kala Patthar
-  [27.962148839539353, 86.68291701535055] // Gokyo Ri
+  { point: [27.925527275065452, 86.87898159027101], icon: summitIcon }, // Chhukung Ri
+  { point: [28.004240016938017, 86.85706000015217], icon: ebcIcon }, // EBC
+  { point: [27.995700274264355, 86.82849997210725], icon: summitIcon }, // Kala Patthar
+  { point: [27.962148839539353, 86.68291701535055], icon: summitIcon }, // Gokyo Ri
+  { point: [27.92990551745897, 86.83660816488556], icon: passIcon }, // Kongma La
+  { point: [27.962122, 86.751923], icon: passIcon }, // Cho La
+  { point: [27.9473697, 86.6584966], icon: passIcon }, // Renjo La
+  { point: [27.68725044382488, 86.73143742664253], icon: airportIcon } // airport
 ];
 const getSummits = () => summits;
-
-const passes = [
-  [27.92990551745897, 86.83660816488556], // Kongma La
-  [27.962122, 86.751923], // Cho La
-  [27.9473697, 86.6584966] // Renjo La
-];
-const getPasses = () => passes;
-
-const airport = [27.68725044382488, 86.73143742664253];
-const getAirport = () => airport;
 
 const polyLineProperties = {
   "1": {
@@ -83,7 +82,8 @@ const polyLineProperties = {
     start_alt: "9,373",
     end_alt: "8,563",
     net_climb: "-1,060",
-    descent: "705"
+    descent: "705",
+    color: "#FABC74"
   },
   "2": {
     day: "2",
@@ -93,7 +93,8 @@ const polyLineProperties = {
     start_alt: "8,563",
     end_alt: "11,286",
     total_climb: "3,556",
-    descent: "935"
+    descent: "935",
+    color: "#F3A96E"
   },
   "4": {
     day: "4",
@@ -103,7 +104,8 @@ const polyLineProperties = {
     start_alt: "11,286",
     end_alt: "12,644",
     total_climb: "2,785",
-    descent: "1,283"
+    descent: "1,283",
+    color: "#EC9769"
   },
   "5": {
     day: "5",
@@ -113,7 +115,8 @@ const polyLineProperties = {
     start_alt: "12,644",
     end_alt: "14,470",
     total_climb: "",
-    descent: ""
+    descent: "",
+    color: "#E58463"
   },
   "6": {
     day: "6",
@@ -123,7 +126,8 @@ const polyLineProperties = {
     start_alt: "14,470",
     end_alt: "15,535",
     total_climb: "",
-    descent: ""
+    descent: "",
+    color: "#DE725E"
   },
   "13": {
     day: "13",
@@ -133,17 +137,16 @@ const polyLineProperties = {
     start_alt: "16,210",
     end_alt: "15,850",
     total_climb: "",
-    descent: ""
+    descent: "",
+    color: "#BB1542"
   }
 };
 const getPolyLineProperties = () => polyLineProperties;
 
 export {
-  getAirport,
   getDayWiseDataP,
   getDayWiseDataG,
   getHalts,
-  getPasses,
   getPolyLineProperties,
   getSummits
 };
