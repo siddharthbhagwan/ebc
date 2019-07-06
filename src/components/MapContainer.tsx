@@ -11,31 +11,18 @@ class MapContainer extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
-    this.plotHalts = this.plotHalts.bind(this);
-    this.plotSummits = this.plotSummits.bind(this);
+    this.plotMarkers = this.plotMarkers.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
   }
 
-  public plotHalts = () => {
-    const halts = Data.getHalts();
-    halts.forEach((halt: any) => {
-      L.marker(halt.point, {
+  public plotMarkers = () => {
+    const markers = Data.getMarkers();
+    markers.forEach((marker: any) => {
+      L.marker(marker.point, {
         icon: L.icon({
-          iconUrl: halt.icon,
-          iconSize: [22, 22]
-        })
-      }).addTo((this.leafletMap as any).leafletElement);
-    });
-  };
-
-  public plotSummits = () => {
-    const summits = Data.getSummits();
-    summits.forEach((summit: any) => {
-      L.marker(summit.point, {
-        icon: L.icon({
-          iconUrl: summit.icon,
-          iconSize: [22, 22]
+          iconUrl: marker.icon,
+          iconSize: marker.size
         })
       }).addTo((this.leafletMap as any).leafletElement);
     });
@@ -51,9 +38,7 @@ class MapContainer extends React.Component<any, any> {
         const polyLine = L.polyline(decodedData).toGeoJSON();
         polyLine.properties = properties[day];
         const color = polyLine.properties.color || "#3288FF";
-        const layer = new L.GeoJSON(polyLine, {
-          style: { color }
-        });
+        const layer = new L.GeoJSON(polyLine, { style: { color } });
         (this.leafletMap as any).leafletElement.addLayer(layer);
         layer
           .on("mouseover", function(e: any) {
@@ -67,7 +52,8 @@ class MapContainer extends React.Component<any, any> {
           })
           .on("click", function(e: any) {
             (that.leafletMap as any).leafletElement.fitBounds(
-              layer.getBounds()
+              e.target.getBounds(),
+              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
             );
           });
       }
@@ -79,9 +65,7 @@ class MapContainer extends React.Component<any, any> {
     const routes = Data.getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const color = route.features[0].properties.color || "#3288FF";
-      const geoJsonLayer = L.geoJSON(route, {
-        style: { color }
-      });
+      const geoJsonLayer = L.geoJSON(route, { style: { color } });
       (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
       geoJsonLayer
         .on("mouseover", function(e: any) {
@@ -94,16 +78,17 @@ class MapContainer extends React.Component<any, any> {
           hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
+          // e.target.efireEvent
           (that.leafletMap as any).leafletElement.fitBounds(
-            geoJsonLayer.getBounds()
+            e.target.getBounds(),
+            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
           );
         });
     });
   };
 
   componentDidMount() {
-    this.plotHalts();
-    this.plotSummits();
+    this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
   }
