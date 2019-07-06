@@ -5,10 +5,6 @@ import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
 import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
-import tentIcon from "../resources/images/tent.png";
-import summitIcon from "../resources/images/summit.png";
-import airportIcon from "../resources/images/airport.png";
-import passIcon from "../resources/images/pass.png";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -16,9 +12,7 @@ class MapContainer extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.plotHalts = this.plotHalts.bind(this);
-    this.plotPasses = this.plotPasses.bind(this);
     this.plotSummits = this.plotSummits.bind(this);
-    this.plotMiscellaneous = this.plotMiscellaneous.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
   }
@@ -26,9 +20,9 @@ class MapContainer extends React.Component<any, any> {
   public plotHalts = () => {
     const halts = Data.getHalts();
     halts.forEach((halt: any) => {
-      L.marker(halt, {
+      L.marker(halt.point, {
         icon: L.icon({
-          iconUrl: tentIcon,
+          iconUrl: halt.icon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
@@ -38,9 +32,9 @@ class MapContainer extends React.Component<any, any> {
   public plotSummits = () => {
     const summits = Data.getSummits();
     summits.forEach((summit: any) => {
-      L.marker(summit, {
+      L.marker(summit.point, {
         icon: L.icon({
-          iconUrl: summitIcon,
+          iconUrl: summit.icon,
           iconSize: [22, 22]
         })
       }).addTo((this.leafletMap as any).leafletElement);
@@ -56,17 +50,20 @@ class MapContainer extends React.Component<any, any> {
         const decodedData = decodePolyline(routes[day]);
         const polyLine = L.polyline(decodedData).toGeoJSON();
         polyLine.properties = properties[day];
-        const layer = new L.GeoJSON(polyLine);
+        const color = polyLine.properties.color || "#3288FF";
+        const layer = new L.GeoJSON(polyLine, {
+          style: { color }
+        });
         (this.leafletMap as any).leafletElement.addLayer(layer);
         layer
           .on("mouseover", function(e: any) {
             const hovered = e.target;
-            hovered.setStyle({ color: "#666" });
+            hovered.setStyle({ color: "#1EBBD7" });
             that.props.dispatchLayerDetails(e.layer.feature.properties);
           })
           .on("mouseout", function(e: any) {
             const hovered = e.target;
-            hovered.setStyle({ color: "#2c7dff" });
+            hovered.setStyle({ color });
           })
           .on("click", function(e: any) {
             (that.leafletMap as any).leafletElement.fitBounds(
@@ -81,17 +78,20 @@ class MapContainer extends React.Component<any, any> {
     const that = this;
     const routes = Data.getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
-      const geoJsonLayer = L.geoJSON(route);
+      const color = route.features[0].properties.color || "#3288FF";
+      const geoJsonLayer = L.geoJSON(route, {
+        style: { color }
+      });
       (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
       geoJsonLayer
         .on("mouseover", function(e: any) {
           const hovered = e.target;
-          hovered.setStyle({ color: "#666" });
+          hovered.setStyle({ color: "#1EBBD7" });
           that.props.dispatchLayerDetails(e.layer.feature.properties);
         })
         .on("mouseout", function(e: any) {
           const hovered = e.target;
-          hovered.setStyle({ color: "#2c7dff" });
+          hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
           (that.leafletMap as any).leafletElement.fitBounds(
@@ -101,33 +101,9 @@ class MapContainer extends React.Component<any, any> {
     });
   };
 
-  public plotPasses = () => {
-    const passes = Data.getPasses();
-    passes.forEach((pass: any) => {
-      L.marker(pass, {
-        icon: L.icon({
-          iconUrl: passIcon,
-          iconSize: [22, 22]
-        })
-      }).addTo((this.leafletMap as any).leafletElement);
-    });
-  };
-
-  public plotMiscellaneous = () => {
-    const airport: any = Data.getAirport();
-    L.marker(airport, {
-      icon: L.icon({
-        iconUrl: airportIcon,
-        iconSize: [22, 22]
-      })
-    }).addTo((this.leafletMap as any).leafletElement);
-  };
-
   componentDidMount() {
     this.plotHalts();
-    this.plotPasses();
     this.plotSummits();
-    this.plotMiscellaneous();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
   }
