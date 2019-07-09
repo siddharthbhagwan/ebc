@@ -185,7 +185,37 @@ const getLegendHtml = () => `
 <img src="${tentIcon}" width="15px"> Lodging
 `;
 
+const getPeakAlt = (peakAlt: any) => {
+  if (peakAlt.length) {
+    return `${peakAlt} ft -`;
+  }
+  return "";
+};
+
+const getDashboardHtml = (props: any) => `
+  <h5>EBC 3 Pass Trek, Nepal</h5>
+  <br/>
+  <div class="dashboardDetails">
+    <div>Day ${props.day}</div><br/>
+    
+    <div>
+      <span>${props.name}</span>
+      <br/>
+      ${props.start_alt}ft -
+      ${getPeakAlt(props.peak_alt)}
+      ${props.end_alt} ft
+      <br/>
+    </div><br/>
+    
+    <div>
+      ${props.distance}<br />
+      ${props.time}
+    </div>
+  </div
+`;
+
 export {
+  getDashboardHtml,
   getDayWiseDataP,
   getDayWiseDataG,
   getMarkers,

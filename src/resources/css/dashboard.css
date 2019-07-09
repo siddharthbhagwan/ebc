@@ -1,4 +1,4 @@
-.legend {
+.dashboard {
   padding: 15px 15px;
   font: 14px/16px Arial, Helvetica, sans-serif;
   background: white;
@@ -6,4 +6,15 @@
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   text-align: left;
+  color: #777;
+  text-align: center;
+}
+
+.dashboard h5 {
+  margin: 0 0 5px;
+}
+
+.dashboardDetails {
+  font-size: 18px;
+  line-height: 23px;
 }
