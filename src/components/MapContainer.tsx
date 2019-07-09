@@ -20,14 +20,20 @@ class MapContainer extends React.Component<any, any> {
   }
 
   public plotMarkers = () => {
-    const markers = Data.getMarkers();
-    markers.forEach((marker: any) => {
-      L.marker(marker.point, {
+    const that = this;
+    const markerData = Data.getMarkers();
+    markerData.forEach((markerPoint: any) => {
+      const marker = L.marker(markerPoint.point, {
         icon: L.icon({
-          iconUrl: marker.icon,
-          iconSize: marker.size
+          iconUrl: markerPoint.icon,
+          iconSize: markerPoint.size
         })
       }).addTo((this.leafletMap as any).leafletElement);
+      marker.feature = markerPoint.properties;
+      marker.on("click", function(e: any) {
+        (that.leafletMap as any).leafletElement.setView(e.latlng, 16);
+        that.state.dashboard.update(e.target.feature);
+      });
     });
   };
 
