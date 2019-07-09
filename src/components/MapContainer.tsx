@@ -3,8 +3,8 @@ import * as L from "leaflet";
 import { Map, TileLayer } from "react-leaflet";
 import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
-import "../resources/css/legend.css";
-import "../resources/css/dashboard.css";
+import "leaflet-easybutton";
+import resetIcon from "../resources/images/map.svg";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -31,7 +31,9 @@ class MapContainer extends React.Component<any, any> {
       }).addTo((this.leafletMap as any).leafletElement);
       marker.feature = markerPoint.properties;
       marker.on("click", function(e: any) {
-        (that.leafletMap as any).leafletElement.setView(e.latlng, 16);
+        (that.leafletMap as any).leafletElement.flyTo(e.latlng, 16, {
+          duration: 0.5
+        });
         that.state.dashboard.update(e.target.feature);
       });
     });
@@ -60,9 +62,10 @@ class MapContainer extends React.Component<any, any> {
             hovered.setStyle({ color });
           })
           .on("click", function(e: any) {
-            (that.leafletMap as any).leafletElement.fitBounds(
+            (that.leafletMap as any).leafletElement.flyToBounds(
               e.target.getBounds(),
-              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
+              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
+              { duration: 0.5 }
             );
           });
       }
@@ -87,9 +90,10 @@ class MapContainer extends React.Component<any, any> {
           hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
-          (that.leafletMap as any).leafletElement.fitBounds(
+          (that.leafletMap as any).leafletElement.flyToBounds(
             e.target.getBounds(),
-            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
+            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
+            { duration: 0.5 }
           );
         });
     });
@@ -136,20 +140,29 @@ class MapContainer extends React.Component<any, any> {
     this.setState({ dashboard });
   };
 
+  addResetButton = () => {
+    L.easyButton(`<img src="${resetIcon}" width="15px">`, function(btn, map) {
+      map.flyTo([27.840457443855108, 86.76420972837559], 11.4, {
+        duration: 0.5
+      });
+    }).addTo((this.leafletMap as any).leafletElement);
+  };
+
   componentDidMount() {
     this.addLegend();
     this.addDashboard();
     this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
+    this.addResetButton();
   }
 
   render() {
     return (
       <Map
-        center={[27.833588687119132, 86.76737845989464]}
+        center={[27.840457443855108, 86.76420972837559]}
         zoomSnap={0.1}
-        zoom={11.1}
+        zoom={11.4}
         style={{ height: "100vh", width: "100%" }}
         ref={mapRef => ((this.leafletMap as any) = mapRef)}
       >
