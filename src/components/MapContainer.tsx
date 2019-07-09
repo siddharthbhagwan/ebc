@@ -5,12 +5,14 @@ import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
 import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
+import "../resources/css/legend.css";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
 
   public constructor(props: any) {
     super(props);
+    this.addLegend = this.addLegend.bind(this);
     this.plotMarkers = this.plotMarkers.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
@@ -87,7 +89,21 @@ class MapContainer extends React.Component<any, any> {
     });
   };
 
+  public addLegend = () => {
+    // @ts-ignore
+    const legend = L.control({ position: "bottomright" });
+
+    legend.onAdd = function() {
+      this._div = L.DomUtil.create("div", "legend");
+      this._div.innerHTML = Data.getLegendHtml();
+      return this._div;
+    };
+
+    legend.addTo((this.leafletMap as any).leafletElement);
+  };
+
   componentDidMount() {
+    this.addLegend();
     this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();

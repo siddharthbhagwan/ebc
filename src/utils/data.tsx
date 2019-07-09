@@ -178,4 +178,17 @@ const polyLineProperties = {
 };
 const getPolyLineProperties = () => polyLineProperties;
 
-export { getDayWiseDataP, getDayWiseDataG, getMarkers, getPolyLineProperties };
+const getLegendHtml = () => `
+<img src="${ebcIcon}" width="20px"> Everest Base Camp <br/>
+<img src="${summitIcon}" width="20px"> Summit <br/>
+<img src="${passIcon}" width="20px"> Pass <br/>
+<img src="${tentIcon}" width="15px"> Lodging
+`;
+
+export {
+  getDayWiseDataP,
+  getDayWiseDataG,
+  getMarkers,
+  getPolyLineProperties,
+  getLegendHtml
+};
