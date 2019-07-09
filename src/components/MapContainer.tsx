@@ -1,19 +1,20 @@
 import React from "react";
 import * as L from "leaflet";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
 import { Map, TileLayer } from "react-leaflet";
 import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
 import "../resources/css/legend.css";
+import "../resources/css/dashboard.css";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
 
   public constructor(props: any) {
     super(props);
+    this.state = { dashboard: null };
     this.addLegend = this.addLegend.bind(this);
     this.plotMarkers = this.plotMarkers.bind(this);
+    this.addDashboard = this.addDashboard.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
   }
@@ -46,7 +47,7 @@ class MapContainer extends React.Component<any, any> {
           .on("mouseover", function(e: any) {
             const hovered = e.target;
             hovered.setStyle({ color: "#1EBBD7" });
-            that.props.dispatchLayerDetails(e.layer.feature.properties);
+            that.state.dashboard.update(e.layer.feature.properties);
           })
           .on("mouseout", function(e: any) {
             const hovered = e.target;
@@ -73,14 +74,13 @@ class MapContainer extends React.Component<any, any> {
         .on("mouseover", function(e: any) {
           const hovered = e.target;
           hovered.setStyle({ color: "#1EBBD7" });
-          that.props.dispatchLayerDetails(e.layer.feature.properties);
+          that.state.dashboard.update(e.layer.feature.properties);
         })
         .on("mouseout", function(e: any) {
           const hovered = e.target;
           hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
-          // e.target.efireEvent
           (that.leafletMap as any).leafletElement.fitBounds(
             e.target.getBounds(),
             { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
@@ -102,8 +102,37 @@ class MapContainer extends React.Component<any, any> {
     legend.addTo((this.leafletMap as any).leafletElement);
   };
 
+  public addDashboard = () => {
+    // @ts-ignore
+    const dashboard = L.control({ position: "topright" });
+
+    dashboard.onAdd = function() {
+      this._div = L.DomUtil.create("div", "dashboard");
+      this.update();
+      return this._div;
+    };
+
+    dashboard.update = function(
+      props: any = {
+        day: "0",
+        name: "Fly from Kathmandu to Lukla",
+        time: "0h 00m",
+        distance: "0 mi / 0 km",
+        start_alt: "0",
+        end_alt: "0",
+        peak_alt: ""
+      }
+    ) {
+      this._div.innerHTML = Data.getDashboardHtml(props);
+    };
+
+    dashboard.addTo((this.leafletMap as any).leafletElement);
+    this.setState({ dashboard });
+  };
+
   componentDidMount() {
     this.addLegend();
+    this.addDashboard();
     this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
@@ -112,7 +141,7 @@ class MapContainer extends React.Component<any, any> {
   render() {
     return (
       <Map
-        center={[27.816795860382836, 86.76689146300015]}
+        center={[27.833588687119132, 86.76737845989464]}
         zoomSnap={0.1}
         zoom={11.1}
         style={{ height: "100vh", width: "100%" }}
@@ -127,16 +156,4 @@ class MapContainer extends React.Component<any, any> {
   }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  dispatchLayerDetails: (layerDetails: any) => {
-    dispatch({
-      payload: { layerDetails },
-      type: "UPDATE_LAYER_DETAILS"
-    });
-  }
-});
-
-export default connect(
-  null,
-  mapDispatchToProps
-)(MapContainer);
+export default MapContainer;
