@@ -62,9 +62,10 @@ class MapContainer extends React.Component<any, any> {
             hovered.setStyle({ color });
           })
           .on("click", function(e: any) {
-            (that.leafletMap as any).leafletElement.fitBounds(
+            (that.leafletMap as any).leafletElement.flyToBounds(
               e.target.getBounds(),
-              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
+              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
+              { duration: 0.5 }
             );
           });
       }
@@ -89,9 +90,10 @@ class MapContainer extends React.Component<any, any> {
           hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
-          (that.leafletMap as any).leafletElement.fitBounds(
+          (that.leafletMap as any).leafletElement.flyToBounds(
             e.target.getBounds(),
-            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] }
+            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
+            { duration: 0.5 }
           );
         });
     });
@@ -140,7 +142,7 @@ class MapContainer extends React.Component<any, any> {
 
   addResetButton = () => {
     L.easyButton(`<img src="${resetIcon}" width="15px">`, function(btn, map) {
-      map.flyTo([27.833588687119132, 86.76737845989464], 11.4, {
+      map.flyTo([27.840457443855108, 86.76420972837559], 11.4, {
         duration: 0.5
       });
     }).addTo((this.leafletMap as any).leafletElement);
@@ -158,7 +160,7 @@ class MapContainer extends React.Component<any, any> {
   render() {
     return (
       <Map
-        center={[27.833588687119132, 86.76737845989464]}
+        center={[27.840457443855108, 86.76420972837559]}
         zoomSnap={0.1}
         zoom={11.4}
         style={{ height: "100vh", width: "100%" }}
