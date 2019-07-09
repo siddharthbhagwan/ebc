@@ -4,6 +4,8 @@ import summitIcon from "../resources/images/summit.svg";
 import airportIcon from "../resources/images/airport.svg";
 import passIcon from "../resources/images/pass.svg";
 import ebcIcon from "../resources/images/ebc.svg";
+import "../resources/css/legend.css";
+import "../resources/css/dashboard.css";
 
 const lukla_to_phakding =
   "it~gDovjpOt@IFC@GKe@e@eBOGE@w@RaAXM@MFe@ZAJP~@J`@EB_@Ng@VONi@`Ai@tASr@m@t@_@`@k@v@cAv@qB^o@LABGP]Hy@H[AOREXIN[Va@N]Hc@FCAM[IAMJQPWGIWCIIEUGIAKSIQMCy@fAMXCPCVO\\ATGLCFELa@d@OHc@To@^_@DOLITCFw@b@KHCTINMLGFcALQBKFKJCVKPSHQ?GAQ@EDENATETBLALIHa@RWRa@~@w@`A[f@w@bAAXGLC`@IRKRIBs@Aw@d@MPMb@g@d@WPQb@SX[V[^Up@GXaAn@e@d@a@^WPKPc@RYf@Sb@g@`@c@PKNQHGTi@`@mApA]n@I^@^@PKZRp@I|@MJJPKVCVYTw@@SEe@IYQWH_A[e@S[]e@YeA{AZcB@m@y@I[TKP?XQTk@h@c@XOXQt@k@hBe@t@oAbAu@`ASTQ?i@Wg@b@k@Ag@YONSIW@MTK`@Ab@c@Lq@?}Bz@e@f@[d@S\\w@j@UH{@CoAn@MKY?gAVo@FUNa@Ac@AONEHDTKRUBg@VeA\\qNkBiEQGCmDeBwCY_@o@Ru@Y}@[CWQGCq@C]AUHGRAj@DZTv@Jh@Bh@N\\TZMtAI^i@F_@AcB]oDkAk@S}AQo@NSPe@Cg@HuALs@Iw@BeBCi@CcBe@oAEe@MEMWFa@DSBUCSJ}@Nk@E[HOH]@i@?WHW?U@OQOCWJUJSLQNMHKT[POFIEIFGCGBc@IEGc@NUNIPQ?WFS?Q?k@N_@JQVSBw@@SIUSa@SMCQKg@F[CKAiANy@NQ?]Ng@Dk@Jk@VyDhAsAEeF`Cy@^y@l@mAI}Bj@m@Q[DyD_BgAAQJyAt@o@Pi@@s@U]Y]Ye@OwA]q@i@GUMEQPIT";
