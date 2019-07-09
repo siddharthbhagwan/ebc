@@ -58,7 +58,8 @@ const chhukung_to_chhukung_ri_to_chhukung_7 = {
         distance: "3.49 mi / 5.61 km",
         time: "4h 30m",
         start_alt: "15,535",
-        end_alt: "18,104",
+        peak_alt: "18,104",
+        end_alt: "15,535",
         total_climb: "2,497",
         descent: "2,510",
         color: "#D75F58",
@@ -193,7 +194,7 @@ const chhukung_to_kongma_la_to_lobuche_8 = {
       },
       properties: {
         day: "8",
-        name: "Chhukung - KongmaLa Pass - Lobuche",
+        name: "Chhukung - Kongma La Pass - Lobuche",
         distance: "5.79 mi / 9.31 km",
         time: "11h 30m",
         start_alt: "15,535",
@@ -871,7 +872,7 @@ const dzongla_to_thangnak_14 = {
       },
       properties: {
         day: "14",
-        name: "Dzongla - ChoLaPass - Thangnak",
+        name: "Dzongla - Cho La Pass - Thangnak",
         distance: "4.98 mi / 8.01 km",
         time: "7h 00m",
         start_alt: "15,850",
