@@ -1782,6 +1782,19 @@ const marulung_to_namche_bazaar_19 = {
   ]
 };
 
+const dayWiseDataG: any = {
+  "7": chhukung_to_chhukung_ri_to_chhukung_7,
+  "8": chhukung_to_kongma_la_to_lobuche_8,
+  "10": lobuche_to_ebc_to_gorak_shep_10,
+  "12": gorak_shep_to_kala_patthar_to_lobuche_12,
+  "14": dzongla_to_thangnak_14,
+  "15": thangnak_to_gokyo_15,
+  "16": gokyo_to_gokyo_ri_16,
+  "18": gokyo_to_marulung_18,
+  "19": marulung_to_namche_bazaar_19
+};
+const getDayWiseDataG = () => dayWiseDataG;
+
 export {
   chhukung_to_chhukung_ri_to_chhukung_7,
   chhukung_to_kongma_la_to_lobuche_8,
@@ -1791,5 +1804,6 @@ export {
   thangnak_to_gokyo_15,
   gokyo_to_gokyo_ri_16,
   gokyo_to_marulung_18,
-  marulung_to_namche_bazaar_19
+  marulung_to_namche_bazaar_19,
+  getDayWiseDataG
 };
