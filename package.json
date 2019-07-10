@@ -8,7 +8,6 @@
     "gh-pages": "^2.0.1",
     "leaflet": "^1.5.1",
     "leaflet-easybutton": "^2.4.0",
-    "polyline-encoded": "0.0.8",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.9",
     "react-dom": "^16.8.6",
