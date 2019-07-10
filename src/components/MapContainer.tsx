@@ -1,10 +1,13 @@
 import React from "react";
 import * as L from "leaflet";
 import { Map, TileLayer } from "react-leaflet";
+import { getMarkers } from "../utils/markers";
+import { getDayWiseDataG } from "../utils/geoJson";
+import { getDayWiseDataP } from "../utils/polylines";
 import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
-import "leaflet-easybutton";
 import resetIcon from "../resources/images/map.svg";
+import "leaflet-easybutton";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
@@ -21,7 +24,7 @@ class MapContainer extends React.Component<any, any> {
 
   public plotMarkers = () => {
     const that = this;
-    const markerData = Data.getMarkers();
+    const markerData = getMarkers();
     markerData.forEach((markerPoint: any) => {
       const marker = L.marker(markerPoint.point, {
         icon: L.icon({
@@ -30,28 +33,29 @@ class MapContainer extends React.Component<any, any> {
         })
       }).addTo((this.leafletMap as any).leafletElement);
       marker.feature = markerPoint.properties;
-      marker.on("click", function(e: any) {
-        (that.leafletMap as any).leafletElement.flyTo(e.latlng, 16, {
-          duration: 0.5
+      marker
+        .on("click", function(e: any) {
+          (that.leafletMap as any).leafletElement.flyTo(e.latlng, 16, {
+            duration: 0.5
+          });
+          that.state.dashboard.update(e.target.feature);
+        })
+        .on("mouseover", function(e: any) {
+          that.state.dashboard.update(e.target.feature);
         });
-        that.state.dashboard.update(e.target.feature);
-      });
     });
   };
 
   public plotPolylineRoutes = () => {
     const that = this;
-    const routes = Data.getDayWiseDataP();
-    const properties: any = Data.getPolyLineProperties();
+    const routes = getDayWiseDataP();
     Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
-        const decodedData = decodePolyline(routes[day]);
+        const decodedData = decodePolyline(routes[day].route);
         const polyLine = L.polyline(decodedData).toGeoJSON();
-        polyLine.properties = properties[day];
+        polyLine.properties = routes[day].properties;
         const color = polyLine.properties.color || "#3288FF";
-        const layer = new L.GeoJSON(polyLine, { style: { color } });
-        (this.leafletMap as any).leafletElement.addLayer(layer);
-        layer
+        const layer = new L.GeoJSON(polyLine, { style: { color } })
           .on("mouseover", function(e: any) {
             const hovered = e.target;
             hovered.setStyle({ color: "#1EBBD7" });
@@ -68,18 +72,17 @@ class MapContainer extends React.Component<any, any> {
               { duration: 0.5 }
             );
           });
+        (this.leafletMap as any).leafletElement.addLayer(layer);
       }
     });
   };
 
   public plotGeoJsonRoutes = () => {
     const that = this;
-    const routes = Data.getDayWiseDataG();
+    const routes = getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const color = route.features[0].properties.color || "#3288FF";
-      const geoJsonLayer = L.geoJSON(route, { style: { color } });
-      (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
-      geoJsonLayer
+      const geoJsonLayer = L.geoJSON(route, { style: { color } })
         .on("mouseover", function(e: any) {
           const hovered = e.target;
           hovered.setStyle({ color: "#1EBBD7" });
@@ -96,6 +99,7 @@ class MapContainer extends React.Component<any, any> {
             { duration: 0.5 }
           );
         });
+      (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
     });
   };
 
