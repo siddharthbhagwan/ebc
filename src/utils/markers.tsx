@@ -1,5 +1,5 @@
 import tentIcon from "../resources/images/tent.svg";
-import summitIcon from "../resources/images/summit.png";
+import summitIcon from "../resources/images/summit.svg";
 import airportIcon from "../resources/images/airport.svg";
 import passIcon from "../resources/images/pass.svg";
 import ebcIcon from "../resources/images/ebc.svg";
