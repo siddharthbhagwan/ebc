@@ -1,5 +1,6 @@
 import React from "react";
 import * as L from "leaflet";
+import Legend from "./Legend";
 import { Map, TileLayer } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
 import { getDayWiseDataG } from "../utils/geoJson";
@@ -14,8 +15,18 @@ class MapContainer extends React.Component<any, any> {
 
   public constructor(props: any) {
     super(props);
-    this.state = { dashboard: null };
-    this.addLegend = this.addLegend.bind(this);
+    this.state = {
+      dashboard: null,
+      dayProps: {
+        day: "0",
+        name: "Fly from Kathmandu to Lukla",
+        time: "0h 00m",
+        distance: "0 mi / 0 km",
+        start_alt: "0",
+        end_alt: "0",
+        peak_alt: ""
+      }
+    };
     this.plotMarkers = this.plotMarkers.bind(this);
     this.addDashboard = this.addDashboard.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
@@ -103,20 +114,9 @@ class MapContainer extends React.Component<any, any> {
     });
   };
 
-  public addLegend = () => {
-    // @ts-ignore
-    const legend = L.control({ position: "bottomright" });
-
-    legend.onAdd = function() {
-      this._div = L.DomUtil.create("div", "legend");
-      this._div.innerHTML = Data.getLegendHtml();
-      return this._div;
-    };
-
-    legend.addTo((this.leafletMap as any).leafletElement);
-  };
-
   public addDashboard = () => {
+    const that = this;
+
     // @ts-ignore
     const dashboard = L.control({ position: "topright" });
 
@@ -126,18 +126,8 @@ class MapContainer extends React.Component<any, any> {
       return this._div;
     };
 
-    dashboard.update = function(
-      props: any = {
-        day: "0",
-        name: "Fly from Kathmandu to Lukla",
-        time: "0h 00m",
-        distance: "0 mi / 0 km",
-        start_alt: "0",
-        end_alt: "0",
-        peak_alt: ""
-      }
-    ) {
-      this._div.innerHTML = Data.getDashboardHtml(props);
+    dashboard.update = function(dayProps: any = that.state.dayProps) {
+      this._div.innerHTML = Data.getDashboardHtml(dayProps);
     };
 
     dashboard.addTo((this.leafletMap as any).leafletElement);
@@ -153,7 +143,6 @@ class MapContainer extends React.Component<any, any> {
   };
 
   componentDidMount() {
-    this.addLegend();
     this.addDashboard();
     this.plotMarkers();
     this.plotGeoJsonRoutes();
@@ -174,6 +163,7 @@ class MapContainer extends React.Component<any, any> {
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
+        <Legend mapHandle={this.leafletMap as any} />
       </Map>
     );
   }
