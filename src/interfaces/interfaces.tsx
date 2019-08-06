@@ -20,3 +20,17 @@ export interface IDay {
   end_alt: string;
   peak_alt: string;
 }
+
+export interface IMapProps {
+  url: string;
+  attribution: string;
+  center: [number, number];
+  zoom: number;
+  zoomSnap: number;
+  hoverColor: string;
+  markerZoom: number;
+  style: { height: string; width: string };
+  zoomDuration: number;
+  topLeftPadding: [number, number];
+  bottomRightPadding: [number, number];
+}
