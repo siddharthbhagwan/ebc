@@ -1,4 +1,4 @@
-import React, { Ref } from "react";
+import React from "react";
 import * as L from "leaflet";
 import { getLegendHtml } from "../utils/data";
 
