@@ -3,15 +3,16 @@ import summitIcon from "../resources/images/summit.svg";
 import airportIcon from "../resources/images/airport.svg";
 import passIcon from "../resources/images/pass.svg";
 import ebcIcon from "../resources/images/ebc.svg";
+import { IMarker } from "../interfaces/interfaces";
 
-const markers = [
+const markers: IMarker[] = [
   {
     // Phakding
     point: [27.74004, 86.712555],
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 1,
+      day: "1",
       name: "Phakding",
       start_alt: "8,563"
     }
@@ -33,7 +34,7 @@ const markers = [
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 4,
+      day: "4",
       name: "Tengboche",
       start_alt: "12,644"
     }
@@ -44,7 +45,7 @@ const markers = [
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 5,
+      day: "5",
       name: "Dingboche",
       start_alt: "14,470"
     }
@@ -88,7 +89,7 @@ const markers = [
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 13,
+      day: "13",
       name: "Dzongla",
       start_alt: "15,850"
     }
@@ -99,7 +100,7 @@ const markers = [
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 14,
+      day: "14",
       name: "Thangnak",
       start_alt: "15,420"
     }
@@ -121,7 +122,7 @@ const markers = [
     icon: tentIcon,
     size: [15, 15],
     properties: {
-      day: 7,
+      day: "19",
       name: "Chhukung Ri Summit",
       start_alt: "18,058"
     }
@@ -132,7 +133,7 @@ const markers = [
     icon: summitIcon,
     size: [24, 24],
     properties: {
-      day: 7,
+      day: "7",
       name: "Chhukung Ri Summit",
       start_alt: "18,058"
     }
@@ -143,7 +144,7 @@ const markers = [
     icon: ebcIcon,
     size: [24, 24],
     properties: {
-      day: 10,
+      day: "10",
       name: "Everest Base Camp",
       start_alt: "17,600"
     }
@@ -154,7 +155,7 @@ const markers = [
     icon: summitIcon,
     size: [24, 24],
     properties: {
-      day: 12,
+      day: "12",
       name: "Kala Patthar Sumnmit",
       start_alt: "18,519"
     }
@@ -165,7 +166,7 @@ const markers = [
     icon: summitIcon,
     size: [24, 24],
     properties: {
-      day: 16,
+      day: "16",
       name: "Gokyo Ri Summit",
       start_alt: "17,989"
     }
@@ -176,7 +177,7 @@ const markers = [
     icon: passIcon,
     size: [24, 24],
     properties: {
-      day: 8,
+      day: "8",
       name: "Kongma La Pass",
       start_alt: "18,058"
     }
@@ -187,7 +188,7 @@ const markers = [
     icon: passIcon,
     size: [24, 24],
     properties: {
-      day: 14,
+      day: "14",
       name: "Cho La Pass",
       start_alt: "17,625"
     }
@@ -198,7 +199,7 @@ const markers = [
     icon: passIcon,
     size: [24, 24],
     properties: {
-      day: 18,
+      day: "18",
       name: "Renjo La Pass",
       start_alt: "17,680"
     }

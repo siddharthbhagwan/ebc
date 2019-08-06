@@ -1,8 +1,18 @@
 import React from "react";
 import * as L from "leaflet";
 import { getDashboardHtml } from "../utils/data";
+import { IDay } from "../interfaces/interfaces";
 
-class Dashboard extends React.Component<any, any> {
+interface IProps {
+  mapHandle: any;
+  day: IDay;
+}
+
+interface IState {
+  dashboard: any;
+}
+
+class Dashboard extends React.Component<IProps, IState> {
   constructor(props: any) {
     super(props);
     this.state = { dashboard: null };

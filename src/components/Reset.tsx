@@ -3,8 +3,14 @@ import * as L from "leaflet";
 import resetIcon from "../resources/images/map.svg";
 import "leaflet-easybutton";
 
-class Reset extends React.Component<any, any> {
-  constructor(props: any) {
+interface IProps {
+  mapHandle: any;
+  center: [number, number];
+  zoom: number;
+}
+
+class Reset extends React.Component<IProps> {
+  constructor(props: IProps) {
     super(props);
     this.addResetButton = this.addResetButton.bind(this);
   }

@@ -1,8 +1,12 @@
-import React from "react";
+import React, { Ref } from "react";
 import * as L from "leaflet";
 import { getLegendHtml } from "../utils/data";
 
-class Legend extends React.Component<any, any> {
+interface IProps {
+  mapHandle: any;
+}
+
+class Legend extends React.Component<IProps> {
   constructor(props: any) {
     super(props);
     this.addLegend = this.addLegend.bind(this);

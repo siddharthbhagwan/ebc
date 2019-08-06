@@ -3,13 +3,33 @@ import * as L from "leaflet";
 import Dashboard from "./Dashboard";
 import Legend from "./Legend";
 import Reset from "./Reset";
-import { Map, TileLayer } from "react-leaflet";
+import { Map, TileLayer, LeafletContext } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { getDayWiseDataP } from "../utils/polylines";
 import decodePolyline from "decode-google-map-polyline";
+import { IDay, IMarker } from "../interfaces/interfaces";
 
-class MapContainer extends React.Component<any, any> {
+interface IProps {
+  url: string;
+  attribution: string;
+  center: [number, number];
+  zoom: number;
+  zoomSnap: number;
+  hoverColor: string;
+  markerZoom: number;
+  style: { height: string; width: string };
+  zoomDuration: number;
+  topLeftPadding: [number, number];
+  bottomRightPadding: [number, number];
+}
+
+interface IState {
+  map: IProps;
+  dayProps: IDay;
+}
+
+class MapContainer extends React.Component<any, IState> {
   public mapRef: any;
 
   public constructor(props: any) {
@@ -50,7 +70,7 @@ class MapContainer extends React.Component<any, any> {
     const lookup = this.state.map;
     const markerData = getMarkers();
 
-    markerData.forEach((markerPoint: any) => {
+    markerData.forEach((markerPoint: IMarker) => {
       const marker = L.marker(markerPoint.point, {
         icon: L.icon({
           iconUrl: markerPoint.icon,
@@ -67,6 +87,7 @@ class MapContainer extends React.Component<any, any> {
           that.setState({ dayProps: e.target.feature });
         });
 
+      // @ts-ignore
       marker.feature = markerPoint.properties;
       this.mapRef.current.leafletElement.addLayer(marker);
     });
