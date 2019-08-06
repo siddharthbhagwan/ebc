@@ -1,4 +1,6 @@
-const chhukung_to_chhukung_ri_to_chhukung_7 = {
+import { FeatureCollection } from "geojson";
+
+const chhukung_to_chhukung_ri_to_chhukung_7: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -70,7 +72,7 @@ const chhukung_to_chhukung_ri_to_chhukung_7 = {
   ]
 };
 
-const chhukung_to_kongma_la_to_lobuche_8 = {
+const chhukung_to_kongma_la_to_lobuche_8: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -210,7 +212,7 @@ const chhukung_to_kongma_la_to_lobuche_8 = {
   ]
 };
 
-const lobuche_to_ebc_to_gorak_shep_10 = {
+const lobuche_to_ebc_to_gorak_shep_10: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -548,7 +550,7 @@ const lobuche_to_ebc_to_gorak_shep_10 = {
   ]
 };
 
-const gorak_shep_to_kala_patthar_to_lobuche_12 = {
+const gorak_shep_to_kala_patthar_to_lobuche_12: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -810,7 +812,7 @@ const gorak_shep_to_kala_patthar_to_lobuche_12 = {
   ]
 };
 
-const dzongla_to_thangnak_14 = {
+const dzongla_to_thangnak_14: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -888,7 +890,7 @@ const dzongla_to_thangnak_14 = {
   ]
 };
 
-const thangnak_to_gokyo_15 = {
+const thangnak_to_gokyo_15: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -959,7 +961,7 @@ const thangnak_to_gokyo_15 = {
   ]
 };
 
-const gokyo_to_gokyo_ri_16 = {
+const gokyo_to_gokyo_ri_16: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -1013,7 +1015,7 @@ const gokyo_to_gokyo_ri_16 = {
   ]
 };
 
-const gokyo_to_marulung_18 = {
+const gokyo_to_marulung_18: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -1392,7 +1394,7 @@ const gokyo_to_marulung_18 = {
   ]
 };
 
-const marulung_to_namche_bazaar_19 = {
+const marulung_to_namche_bazaar_19: FeatureCollection = {
   type: "FeatureCollection",
   features: [
     {
@@ -1782,7 +1784,7 @@ const marulung_to_namche_bazaar_19 = {
   ]
 };
 
-const dayWiseDataG: any = {
+const dayWiseDataG = {
   "7": chhukung_to_chhukung_ri_to_chhukung_7,
   "8": chhukung_to_kongma_la_to_lobuche_8,
   "10": lobuche_to_ebc_to_gorak_shep_10,
@@ -1795,15 +1797,4 @@ const dayWiseDataG: any = {
 };
 const getDayWiseDataG = () => dayWiseDataG;
 
-export {
-  chhukung_to_chhukung_ri_to_chhukung_7,
-  chhukung_to_kongma_la_to_lobuche_8,
-  lobuche_to_ebc_to_gorak_shep_10,
-  gorak_shep_to_kala_patthar_to_lobuche_12,
-  dzongla_to_thangnak_14,
-  thangnak_to_gokyo_15,
-  gokyo_to_gokyo_ri_16,
-  gokyo_to_marulung_18,
-  marulung_to_namche_bazaar_19,
-  getDayWiseDataG
-};
+export { getDayWiseDataG };
