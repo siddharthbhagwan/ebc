@@ -16,9 +16,18 @@ class MapContainer extends React.Component<any, any> {
     super(props);
     this.state = {
       map: {
+        url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+        attribution:
+          '<a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
         center: [27.840457443855108, 86.76420972837559],
         zoom: 11.4,
-        zoomSnap: 0.1
+        zoomSnap: 0.1,
+        hoverColor: "#1EBBD7",
+        markerZoom: 16,
+        style: { height: "100vh", width: "100%" },
+        zoomDuration: 0.5,
+        topLeftPadding: [0, 50],
+        bottomRightPadding: [0, 150]
       },
       dayProps: {
         day: "0",
@@ -38,30 +47,34 @@ class MapContainer extends React.Component<any, any> {
 
   public plotMarkers = () => {
     const that = this;
+    const lookup = this.state.map;
     const markerData = getMarkers();
+
     markerData.forEach((markerPoint: any) => {
       const marker = L.marker(markerPoint.point, {
         icon: L.icon({
           iconUrl: markerPoint.icon,
           iconSize: markerPoint.size
         })
-      }).addTo(this.mapRef.current.leafletElement);
-      marker.feature = markerPoint.properties;
-      marker
-        .on("click", function(e: any) {
-          that.mapRef.current.leafletElement.flyTo(e.latlng, 16, {
-            duration: 0.5
-          });
-          that.setState({ dayProps: e.target.feature });
-        })
-        .on("mouseover", function(e: any) {
+      })
+        .on("mouseover", e => that.setState({ dayProps: e.target.feature }))
+        .on("click", (e: any) => {
+          that.mapRef.current.leafletElement.flyTo(
+            e.latlng,
+            lookup.markerZoom,
+            { duration: lookup.zoomDuration }
+          );
           that.setState({ dayProps: e.target.feature });
         });
+
+      marker.feature = markerPoint.properties;
+      this.mapRef.current.leafletElement.addLayer(marker);
     });
   };
 
   public plotPolylineRoutes = () => {
     const that = this;
+    const lookup = this.state.map;
     const routes = getDayWiseDataP();
     Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
@@ -70,20 +83,19 @@ class MapContainer extends React.Component<any, any> {
         polyLine.properties = routes[day].properties;
         const color = polyLine.properties.color || "#3288FF";
         const layer = new L.GeoJSON(polyLine, { style: { color } })
-          .on("mouseover", function(e: any) {
-            const hovered = e.target;
-            hovered.setStyle({ color: "#1EBBD7" });
+          .on("mouseover", (e: any) => {
+            e.target.setStyle({ color: lookup.hoverColor });
             that.setState({ dayProps: e.layer.feature.properties });
           })
-          .on("mouseout", function(e: any) {
-            const hovered = e.target;
-            hovered.setStyle({ color });
-          })
-          .on("click", function(e: any) {
+          .on("mouseout", e => e.target.setStyle({ color }))
+          .on("click", e => {
             that.mapRef.current.leafletElement.flyToBounds(
               e.target.getBounds(),
-              { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
-              { duration: 0.5 }
+              {
+                paddingTopLeft: lookup.topLeftPadding,
+                paddingBottomRight: lookup.bottomRightPadding
+              },
+              { duration: lookup.zoomDuration }
             );
           });
         this.mapRef.current.leafletElement.addLayer(layer);
@@ -93,24 +105,24 @@ class MapContainer extends React.Component<any, any> {
 
   public plotGeoJsonRoutes = () => {
     const that = this;
+    const lookup = this.state.map;
     const routes = getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
       const color = route.features[0].properties.color || "#3288FF";
       const geoJsonLayer = L.geoJSON(route, { style: { color } })
-        .on("mouseover", function(e: any) {
-          const hovered = e.target;
-          hovered.setStyle({ color: "#1EBBD7" });
+        .on("mouseover", (e: any) => {
+          e.target.setStyle({ color: lookup.hoverColor });
           that.setState({ dayProps: e.layer.feature.properties });
         })
-        .on("mouseout", function(e: any) {
-          const hovered = e.target;
-          hovered.setStyle({ color });
-        })
-        .on("click", function(e: any) {
+        .on("mouseout", e => e.target.setStyle({ color }))
+        .on("click", e => {
           that.mapRef.current.leafletElement.flyToBounds(
             e.target.getBounds(),
-            { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
-            { duration: 0.5 }
+            {
+              paddingTopLeft: lookup.topLeftPadding,
+              paddingBottomRight: lookup.bottomRightPadding
+            },
+            { duration: lookup.zoomDuration }
           );
         });
       this.mapRef.current.leafletElement.addLayer(geoJsonLayer);
@@ -129,12 +141,12 @@ class MapContainer extends React.Component<any, any> {
         center={this.state.map.center}
         zoomSnap={this.state.map.zoomSnap}
         zoom={this.state.map.zoom}
-        style={{ height: "100vh", width: "100%" }}
+        style={this.state.map.style}
         ref={this.mapRef}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url={this.state.map.url}
+          attribution={this.state.map.attribution}
         />
         <Reset
           mapHandle={this.mapRef}
