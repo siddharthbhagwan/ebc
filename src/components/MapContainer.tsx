@@ -2,14 +2,12 @@ import React from "react";
 import * as L from "leaflet";
 import Dashboard from "./Dashboard";
 import Legend from "./Legend";
+import Reset from "./Reset";
 import { Map, TileLayer } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { getDayWiseDataP } from "../utils/polylines";
-import * as Data from "../utils/data";
 import decodePolyline from "decode-google-map-polyline";
-import resetIcon from "../resources/images/map.svg";
-import "leaflet-easybutton";
 
 class MapContainer extends React.Component<any, any> {
   public mapRef: any;
@@ -17,7 +15,11 @@ class MapContainer extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.state = {
-      dashboard: null,
+      map: {
+        center: [27.840457443855108, 86.76420972837559],
+        zoom: 11.4,
+        zoomSnap: 0.1
+      },
       dayProps: {
         day: "0",
         name: "Fly from Kathmandu to Lukla",
@@ -115,33 +117,29 @@ class MapContainer extends React.Component<any, any> {
     });
   };
 
-  addResetButton = () => {
-    L.easyButton(`<img src="${resetIcon}" width="15px">`, function(btn, map) {
-      map.flyTo([27.840457443855108, 86.76420972837559], 11.4, {
-        duration: 0.5
-      });
-    }).addTo(this.mapRef.current.leafletElement);
-  };
-
   componentDidMount() {
     this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
-    this.addResetButton();
   }
 
   render() {
     return (
       <Map
-        center={[27.840457443855108, 86.76420972837559]}
-        zoomSnap={0.1}
-        zoom={11.4}
+        center={this.state.map.center}
+        zoomSnap={this.state.map.zoomSnap}
+        zoom={this.state.map.zoom}
         style={{ height: "100vh", width: "100%" }}
         ref={this.mapRef}
       >
         <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <Reset
+          mapHandle={this.mapRef}
+          center={this.state.map.center}
+          zoom={this.state.map.zoom}
         />
         <Legend mapHandle={this.mapRef} />
         <Dashboard mapHandle={this.mapRef} day={this.state.dayProps} />
