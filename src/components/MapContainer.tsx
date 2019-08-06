@@ -12,6 +12,7 @@ import "leaflet-easybutton";
 
 class MapContainer extends React.Component<any, any> {
   public leafletMap = null;
+  mapRef: any;
 
   public constructor(props: any) {
     super(props);
@@ -27,6 +28,7 @@ class MapContainer extends React.Component<any, any> {
         peak_alt: ""
       }
     };
+    this.mapRef = React.createRef();
     this.plotMarkers = this.plotMarkers.bind(this);
     this.addDashboard = this.addDashboard.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
@@ -42,7 +44,7 @@ class MapContainer extends React.Component<any, any> {
           iconUrl: markerPoint.icon,
           iconSize: markerPoint.size
         })
-      }).addTo((this.leafletMap as any).leafletElement);
+      }).addTo(this.mapRef.current.leafletElement);
       marker.feature = markerPoint.properties;
       marker
         .on("click", function(e: any) {
@@ -83,7 +85,7 @@ class MapContainer extends React.Component<any, any> {
               { duration: 0.5 }
             );
           });
-        (this.leafletMap as any).leafletElement.addLayer(layer);
+        this.mapRef.current.leafletElement.addLayer(layer);
       }
     });
   };
@@ -110,7 +112,7 @@ class MapContainer extends React.Component<any, any> {
             { duration: 0.5 }
           );
         });
-      (this.leafletMap as any).leafletElement.addLayer(geoJsonLayer);
+      this.mapRef.current.leafletElement.addLayer(geoJsonLayer);
     });
   };
 
@@ -130,7 +132,7 @@ class MapContainer extends React.Component<any, any> {
       this._div.innerHTML = Data.getDashboardHtml(dayProps);
     };
 
-    dashboard.addTo((this.leafletMap as any).leafletElement);
+    dashboard.addTo(this.mapRef.current.leafletElement);
     this.setState({ dashboard });
   };
 
@@ -139,7 +141,7 @@ class MapContainer extends React.Component<any, any> {
       map.flyTo([27.840457443855108, 86.76420972837559], 11.4, {
         duration: 0.5
       });
-    }).addTo((this.leafletMap as any).leafletElement);
+    }).addTo(this.mapRef.current.leafletElement);
   };
 
   componentDidMount() {
@@ -157,13 +159,13 @@ class MapContainer extends React.Component<any, any> {
         zoomSnap={0.1}
         zoom={11.4}
         style={{ height: "100vh", width: "100%" }}
-        ref={mapRef => ((this.leafletMap as any) = mapRef)}
+        ref={this.mapRef}
       >
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
-        <Legend mapHandle={this.leafletMap as any} />
+        <Legend mapHandle={this.mapRef} />
       </Map>
     );
   }
