@@ -1,5 +1,6 @@
 import React from "react";
 import * as L from "leaflet";
+import Dashboard from "./Dashboard";
 import Legend from "./Legend";
 import { Map, TileLayer } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
@@ -11,8 +12,7 @@ import resetIcon from "../resources/images/map.svg";
 import "leaflet-easybutton";
 
 class MapContainer extends React.Component<any, any> {
-  public leafletMap = null;
-  mapRef: any;
+  public mapRef: any;
 
   public constructor(props: any) {
     super(props);
@@ -30,7 +30,6 @@ class MapContainer extends React.Component<any, any> {
     };
     this.mapRef = React.createRef();
     this.plotMarkers = this.plotMarkers.bind(this);
-    this.addDashboard = this.addDashboard.bind(this);
     this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
     this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
   }
@@ -48,13 +47,13 @@ class MapContainer extends React.Component<any, any> {
       marker.feature = markerPoint.properties;
       marker
         .on("click", function(e: any) {
-          (that.leafletMap as any).leafletElement.flyTo(e.latlng, 16, {
+          that.mapRef.current.leafletElement.flyTo(e.latlng, 16, {
             duration: 0.5
           });
-          that.state.dashboard.update(e.target.feature);
+          that.setState({ dayProps: e.target.feature });
         })
         .on("mouseover", function(e: any) {
-          that.state.dashboard.update(e.target.feature);
+          that.setState({ dayProps: e.target.feature });
         });
     });
   };
@@ -72,14 +71,14 @@ class MapContainer extends React.Component<any, any> {
           .on("mouseover", function(e: any) {
             const hovered = e.target;
             hovered.setStyle({ color: "#1EBBD7" });
-            that.state.dashboard.update(e.layer.feature.properties);
+            that.setState({ dayProps: e.layer.feature.properties });
           })
           .on("mouseout", function(e: any) {
             const hovered = e.target;
             hovered.setStyle({ color });
           })
           .on("click", function(e: any) {
-            (that.leafletMap as any).leafletElement.flyToBounds(
+            that.mapRef.current.leafletElement.flyToBounds(
               e.target.getBounds(),
               { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
               { duration: 0.5 }
@@ -99,14 +98,14 @@ class MapContainer extends React.Component<any, any> {
         .on("mouseover", function(e: any) {
           const hovered = e.target;
           hovered.setStyle({ color: "#1EBBD7" });
-          that.state.dashboard.update(e.layer.feature.properties);
+          that.setState({ dayProps: e.layer.feature.properties });
         })
         .on("mouseout", function(e: any) {
           const hovered = e.target;
           hovered.setStyle({ color });
         })
         .on("click", function(e: any) {
-          (that.leafletMap as any).leafletElement.flyToBounds(
+          that.mapRef.current.leafletElement.flyToBounds(
             e.target.getBounds(),
             { paddingTopLeft: [0, 50], paddingBottomRight: [0, 150] },
             { duration: 0.5 }
@@ -114,26 +113,6 @@ class MapContainer extends React.Component<any, any> {
         });
       this.mapRef.current.leafletElement.addLayer(geoJsonLayer);
     });
-  };
-
-  public addDashboard = () => {
-    const that = this;
-
-    // @ts-ignore
-    const dashboard = L.control({ position: "topright" });
-
-    dashboard.onAdd = function() {
-      this._div = L.DomUtil.create("div", "dashboard");
-      this.update();
-      return this._div;
-    };
-
-    dashboard.update = function(dayProps: any = that.state.dayProps) {
-      this._div.innerHTML = Data.getDashboardHtml(dayProps);
-    };
-
-    dashboard.addTo(this.mapRef.current.leafletElement);
-    this.setState({ dashboard });
   };
 
   addResetButton = () => {
@@ -145,7 +124,6 @@ class MapContainer extends React.Component<any, any> {
   };
 
   componentDidMount() {
-    this.addDashboard();
     this.plotMarkers();
     this.plotGeoJsonRoutes();
     this.plotPolylineRoutes();
@@ -166,6 +144,7 @@ class MapContainer extends React.Component<any, any> {
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
         <Legend mapHandle={this.mapRef} />
+        <Dashboard mapHandle={this.mapRef} day={this.state.dayProps} />
       </Map>
     );
   }
