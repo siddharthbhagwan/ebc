@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "http://siddharthbhagwan.github.io/ebc-dashboard/",
   "dependencies": {
+    "@types/leaflet": "^1.5.0",
     "decode-google-map-polyline": "^1.0.1",
     "gh-pages": "^2.0.1",
     "leaflet": "^1.5.1",
