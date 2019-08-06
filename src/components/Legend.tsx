@@ -18,7 +18,7 @@ class Legend extends React.Component<any, any> {
       return this._div;
     };
 
-    legend.addTo(this.props.mapHandle.leafletElement);
+    legend.addTo(this.props.mapHandle.current.leafletElement);
   };
 
   componentDidMount() {
