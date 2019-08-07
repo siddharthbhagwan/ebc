@@ -61,7 +61,7 @@ const getDashboardHtml = (props: any) => `
     </div><br/>
     
     ${getTimeDist(props)}
-  </div
+  </div>
 `;
 
 export { getDashboardHtml, getLegendHtml };
