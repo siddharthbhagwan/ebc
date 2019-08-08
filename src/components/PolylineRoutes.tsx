@@ -6,9 +6,10 @@ import decodePolyline from "decode-google-map-polyline";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-class Polylines extends React.Component<any, any> {
+class PolylineRoutes extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
+    this.clickhandler = this.clickhandler.bind(this);
     this.addPolylines = this.addPolylines.bind(this);
     this.mouseoutHandler = this.mouseoutHandler.bind(this);
     this.mouseoverHandler = this.mouseoverHandler.bind(this);
@@ -79,4 +80,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
 export default connect(
   null,
   mapDispatchToProps
-)(Polylines);
+)(PolylineRoutes);

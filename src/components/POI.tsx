@@ -9,7 +9,7 @@ class POI extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.addPOIs = this.addPOIs.bind(this);
-    this.mouseoutHandler = this.mouseoutHandler.bind(this);
+    this.clickhandler = this.clickhandler.bind(this);
     this.mouseoverHandler = this.mouseoverHandler.bind(this);
   }
 
@@ -17,19 +17,18 @@ class POI extends React.Component<any, any> {
     const markerData = getMarkers();
     const arr: any = [];
     markerData.forEach((markerPoint: any) => {
-      console.log(markerPoint);
       arr.push(
         <Marker
           position={markerPoint.point}
           style={markerPoint.properties}
           key={markerPoint.point.toString()}
           onclick={this.clickhandler}
-          onmouseout={this.mouseoutHandler}
           onmouseover={this.mouseoverHandler}
           icon={L.icon({
             iconUrl: markerPoint.icon,
             iconSize: markerPoint.size
           })}
+          properties={markerPoint.properties}
         />
       );
     });
@@ -47,13 +46,8 @@ class POI extends React.Component<any, any> {
     );
   };
 
-  public mouseoverHandler = (e: any) => {
-    e.target.setStyle({ color: this.props.hoverColor });
-    this.props.dispatchLayerDetails(e.layer.feature.properties);
-  };
-
-  public mouseoutHandler = (e: any) =>
-    e.target.setStyle({ color: e.layer.feature.properties.color });
+  public mouseoverHandler = (e: any) =>
+    this.props.dispatchLayerDetails(e.target.options.properties);
 
   componentDidMount() {
     this.addPOIs();

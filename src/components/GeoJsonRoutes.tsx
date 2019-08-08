@@ -9,9 +9,10 @@ import { connect } from "react-redux";
 class GeoJsonRoutes extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
-    this.addGeoJsonRoutes = this.addGeoJsonRoutes.bind(this);
+    this.clickhandler = this.clickhandler.bind(this);
     this.mouseoutHandler = this.mouseoutHandler.bind(this);
     this.mouseoverHandler = this.mouseoverHandler.bind(this);
+    this.addGeoJsonRoutes = this.addGeoJsonRoutes.bind(this);
   }
 
   public addGeoJsonRoutes = () => {
