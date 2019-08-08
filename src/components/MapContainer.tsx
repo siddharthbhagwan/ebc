@@ -4,7 +4,7 @@ import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import POI from "./POI";
 import PolylineRoutes from "./PolylineRoutes";
-// import Reset from "./Reset";
+import Reset from "./Reset";
 import { Map, TileLayer } from "react-leaflet";
 import { IDay, IMapProps, IMarker } from "../interfaces/interfaces";
 import { getDefaultDayDetails, getDefaultMapState } from "../utils/config";
@@ -35,12 +35,7 @@ class MapContainer extends React.Component<any, IState> {
           url={this.state.map.url}
           attribution={this.state.map.attribution}
         />
-        {/* <Reset
-          mapHandle={this.mapRef}
-          center={this.state.map.center}
-          zoom={this.state.map.zoom}
-        />
-         */}
+        <Reset center={this.state.map.center} zoom={this.state.map.zoom} />
         <Dashboard />
         <Legend />
         <PolylineRoutes
