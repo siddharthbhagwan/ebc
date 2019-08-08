@@ -1,19 +1,13 @@
 import React from "react";
 import * as L from "leaflet";
-import { GeoJSON } from "react-leaflet";
+import { MapControl, GeoJSON, withLeaflet } from "react-leaflet";
 import { getDayWiseDataP } from "../utils/polylines";
 import decodePolyline from "decode-google-map-polyline";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-class PolylineRoutes extends React.Component<any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.clickhandler = this.clickhandler.bind(this);
-    this.addPolylines = this.addPolylines.bind(this);
-    this.mouseoutHandler = this.mouseoutHandler.bind(this);
-    this.mouseoverHandler = this.mouseoverHandler.bind(this);
-  }
+class PolylineRoutes extends MapControl<any, any> {
+  public createLeafletElement(props: any) {}
 
   public addPolylines = () => {
     const routes = getDayWiseDataP();
@@ -39,7 +33,8 @@ class PolylineRoutes extends React.Component<any, any> {
   };
 
   public clickhandler = (e: any) => {
-    e.target._map.flyToBounds(
+    const { map } = this.props.leaflet;
+    map.flyToBounds(
       e.target.getBounds(),
       {
         paddingTopLeft: this.props.topLeftPadding,
@@ -77,7 +72,14 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   };
 };
 
+const mapStateToProps = (state: any) => ({
+  hoverColor: state.mapState.hoverColor,
+  zoomDuration: state.mapState.zoomDuration,
+  topLeftPadding: state.mapState.topLeftPadding,
+  bottomRightPadding: state.mapState.bottomRightPadding
+});
+
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
-)(PolylineRoutes);
+)(withLeaflet(PolylineRoutes));

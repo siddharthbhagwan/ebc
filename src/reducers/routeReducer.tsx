@@ -8,8 +8,7 @@ const initialState = {
   peak_alt: ""
 };
 
-export const detailsReducer = (state = initialState, action: any) => {
-  console.log(action);
+export const routeReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case "UPDATE_LAYER_DETAILS":
       return {

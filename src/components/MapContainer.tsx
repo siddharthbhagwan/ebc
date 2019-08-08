@@ -1,59 +1,50 @@
 import React from "react";
+import { Map, TileLayer } from "react-leaflet";
+import { connect } from "react-redux";
 import Dashboard from "./Dashboard";
 import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import POI from "./POI";
 import PolylineRoutes from "./PolylineRoutes";
 import Reset from "./Reset";
-import { Map, TileLayer } from "react-leaflet";
-import { IDay, IMapProps, IMarker } from "../interfaces/interfaces";
-import { getDefaultDayDetails, getDefaultMapState } from "../utils/config";
 
-interface IState {
-  map: IMapProps;
-  dayProps: IDay;
-}
-
-class MapContainer extends React.Component<any, IState> {
+class MapContainer extends React.Component<any> {
   public constructor(props: any) {
     super(props);
-    this.state = {
-      map: getDefaultMapState(),
-      dayProps: getDefaultDayDetails()
-    };
   }
 
   render() {
     return (
       <Map
-        center={this.state.map.center}
-        zoomSnap={this.state.map.zoomSnap}
-        zoom={this.state.map.zoom}
-        style={this.state.map.style}
+        center={this.props.center}
+        zoomSnap={this.props.zoomSnap}
+        zoom={this.props.zoom}
+        style={this.props.style}
       >
-        <TileLayer
-          url={this.state.map.url}
-          attribution={this.state.map.attribution}
-        />
-        <Reset center={this.state.map.center} zoom={this.state.map.zoom} />
-        <Dashboard />
-        <Legend />
-        <PolylineRoutes
-          hoverColor={this.state.map.hoverColor}
-          zoomDuration={this.state.map.zoomDuration}
-          topLeftPadding={this.state.map.topLeftPadding}
-          bottomRightPadding={this.state.map.bottomRightPadding}
-        />
-        <GeoJsonRoutes
-          hoverColor={this.state.map.hoverColor}
-          zoomDuration={this.state.map.zoomDuration}
-          topLeftPadding={this.state.map.topLeftPadding}
-          bottomRightPadding={this.state.map.bottomRightPadding}
-        />
+        <TileLayer url={this.props.url} attribution={this.props.attribution} />
+        <Reset />
         <POI />
+        <Legend />
+        <Dashboard />
+        <GeoJsonRoutes />
+        <PolylineRoutes />
       </Map>
     );
   }
 }
 
-export default MapContainer;
+const mapStateToProps = (state: any) => ({
+  url: state.mapState.url,
+  zoom: state.mapState.zoom,
+  style: state.mapState.style,
+  center: state.mapState.center,
+  zoomSnap: state.mapState.zoomSnap,
+  hoverColor: state.mapState.hoverColor,
+  markerZoom: state.mapState.markerZoom,
+  attribution: state.mapState.attribution,
+  zoomDuration: state.mapState.zoomDuration,
+  topLeftPadding: state.mapState.topLeftPadding,
+  bottomRightPadding: state.mapState.bottomRightPadding
+});
+
+export default connect(mapStateToProps)(MapContainer);
