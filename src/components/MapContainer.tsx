@@ -1,13 +1,11 @@
 import React from "react";
-import * as L from "leaflet";
 import Dashboard from "./Dashboard";
+import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
+import POI from "./POI";
+import PolylineRoutes from "./PolylineRoutes";
 import Reset from "./Reset";
 import { Map, TileLayer } from "react-leaflet";
-import { getMarkers } from "../utils/markers";
-import { getDayWiseDataG } from "../utils/geoJson";
-import { getDayWiseDataP } from "../utils/polylines";
-import decodePolyline from "decode-google-map-polyline";
 import { IDay, IMapProps, IMarker } from "../interfaces/interfaces";
 import { getDefaultDayDetails, getDefaultMapState } from "../utils/config";
 
@@ -17,109 +15,12 @@ interface IState {
 }
 
 class MapContainer extends React.Component<any, IState> {
-  public mapRef: any;
-
   public constructor(props: any) {
     super(props);
     this.state = {
       map: getDefaultMapState(),
       dayProps: getDefaultDayDetails()
     };
-    this.mapRef = React.createRef();
-    this.plotMarkers = this.plotMarkers.bind(this);
-    this.plotGeoJsonRoutes = this.plotGeoJsonRoutes.bind(this);
-    this.plotPolylineRoutes = this.plotPolylineRoutes.bind(this);
-  }
-
-  public plotMarkers = () => {
-    const that = this;
-    const lookup = this.state.map;
-    const markerData = getMarkers();
-
-    markerData.forEach((markerPoint: IMarker) => {
-      const marker = L.marker(markerPoint.point, {
-        icon: L.icon({
-          iconUrl: markerPoint.icon,
-          iconSize: markerPoint.size
-        })
-      })
-        .on("mouseover", e => that.setState({ dayProps: e.target.feature }))
-        .on("click", (e: any) => {
-          that.mapRef.current.leafletElement.flyTo(
-            e.latlng,
-            lookup.markerZoom,
-            { duration: lookup.zoomDuration }
-          );
-          that.setState({ dayProps: e.target.feature });
-        });
-
-      // @ts-ignore
-      marker.feature = markerPoint.properties;
-      this.mapRef.current.leafletElement.addLayer(marker);
-    });
-  };
-
-  public plotPolylineRoutes = () => {
-    const that = this;
-    const lookup = this.state.map;
-    const routes = getDayWiseDataP();
-    Object.keys(routes).forEach((day: string) => {
-      if (routes[day]) {
-        const decodedData = decodePolyline(routes[day].route);
-        const polyLine = L.polyline(decodedData).toGeoJSON();
-        polyLine.properties = routes[day].properties;
-        const color = polyLine.properties.color || "#3288FF";
-        const layer = new L.GeoJSON(polyLine, { style: { color } })
-          .on("mouseover", (e: any) => {
-            e.target.setStyle({ color: lookup.hoverColor });
-            that.setState({ dayProps: e.layer.feature.properties });
-          })
-          .on("mouseout", e => e.target.setStyle({ color }))
-          .on("click", e => {
-            that.mapRef.current.leafletElement.flyToBounds(
-              e.target.getBounds(),
-              {
-                paddingTopLeft: lookup.topLeftPadding,
-                paddingBottomRight: lookup.bottomRightPadding
-              },
-              { duration: lookup.zoomDuration }
-            );
-          });
-        this.mapRef.current.leafletElement.addLayer(layer);
-      }
-    });
-  };
-
-  public plotGeoJsonRoutes = () => {
-    const that = this;
-    const lookup = this.state.map;
-    const routes = getDayWiseDataG();
-    Object.values(routes).forEach((route: any) => {
-      const color = route.features[0].properties.color || "#3288FF";
-      const geoJsonLayer = L.geoJSON(route, { style: { color } })
-        .on("mouseover", (e: any) => {
-          e.target.setStyle({ color: lookup.hoverColor });
-          that.setState({ dayProps: e.layer.feature.properties });
-        })
-        .on("mouseout", e => e.target.setStyle({ color }))
-        .on("click", e => {
-          that.mapRef.current.leafletElement.flyToBounds(
-            e.target.getBounds(),
-            {
-              paddingTopLeft: lookup.topLeftPadding,
-              paddingBottomRight: lookup.bottomRightPadding
-            },
-            { duration: lookup.zoomDuration }
-          );
-        });
-      this.mapRef.current.leafletElement.addLayer(geoJsonLayer);
-    });
-  };
-
-  componentDidMount() {
-    this.plotMarkers();
-    this.plotGeoJsonRoutes();
-    this.plotPolylineRoutes();
   }
 
   render() {
@@ -129,19 +30,27 @@ class MapContainer extends React.Component<any, IState> {
         zoomSnap={this.state.map.zoomSnap}
         zoom={this.state.map.zoom}
         style={this.state.map.style}
-        ref={this.mapRef}
       >
         <TileLayer
           url={this.state.map.url}
           attribution={this.state.map.attribution}
         />
-        <Reset
-          mapHandle={this.mapRef}
-          center={this.state.map.center}
-          zoom={this.state.map.zoom}
+        <Reset center={this.state.map.center} zoom={this.state.map.zoom} />
+        <Dashboard />
+        <Legend />
+        <PolylineRoutes
+          hoverColor={this.state.map.hoverColor}
+          zoomDuration={this.state.map.zoomDuration}
+          topLeftPadding={this.state.map.topLeftPadding}
+          bottomRightPadding={this.state.map.bottomRightPadding}
         />
-        <Legend mapHandle={this.mapRef} />
-        <Dashboard mapHandle={this.mapRef} day={this.state.dayProps} />
+        <GeoJsonRoutes
+          hoverColor={this.state.map.hoverColor}
+          zoomDuration={this.state.map.zoomDuration}
+          topLeftPadding={this.state.map.topLeftPadding}
+          bottomRightPadding={this.state.map.bottomRightPadding}
+        />
+        <POI />
       </Map>
     );
   }

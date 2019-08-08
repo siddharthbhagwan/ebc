@@ -1,22 +1,21 @@
-import React from "react";
+import { MapControl, withLeaflet } from "react-leaflet";
 import * as L from "leaflet";
 import { getDashboardHtml } from "../utils/data";
-import { IDay } from "../interfaces/interfaces";
+import { connect } from "react-redux";
+// import { IDay } from "../interfaces/interfaces";
 
-interface IProps {
-  mapHandle: any;
-  day: IDay;
-}
+// interface IProps {
+//   day: IDay;
+// }
 
-interface IState {
-  dashboard: any;
-}
+// interface IState {
+//   dashboard: any;
+// }
 
-class Dashboard extends React.Component<IProps, IState> {
-  constructor(props: any) {
-    super(props);
+class Dashboard extends MapControl<any, any> {
+  // @ts-ignore
+  public createLeafletElement(props: any) {
     this.state = { dashboard: null };
-    this.addDashboard = this.addDashboard.bind(this);
   }
 
   public addDashboard() {
@@ -27,7 +26,7 @@ class Dashboard extends React.Component<IProps, IState> {
 
     dashboard.onAdd = function() {
       this._div = L.DomUtil.create("div", "dashboard");
-      this.update(that.props.day);
+      this.update(that.props);
       return this._div;
     };
 
@@ -35,7 +34,9 @@ class Dashboard extends React.Component<IProps, IState> {
       this._div.innerHTML = getDashboardHtml(day);
     };
 
-    dashboard.addTo(this.props.mapHandle.current.leafletElement);
+    // @ts-ignore
+    const { map } = this.props.leaflet;
+    dashboard.addTo(map);
     this.setState({ dashboard });
   }
 
@@ -44,11 +45,23 @@ class Dashboard extends React.Component<IProps, IState> {
   }
 
   render() {
+    // @ts-ignore
     if (this.state.dashboard) {
-      this.state.dashboard.update(this.props.day);
+      // @ts-ignore
+      this.state.dashboard.update(this.props);
     }
     return null;
   }
 }
 
-export default Dashboard;
+const mapStateToProps = (state: any) => ({
+  day: state.details.day,
+  name: state.details.name,
+  time: state.details.time,
+  end_alt: state.details.end_alt,
+  distance: state.details.distance,
+  peak_alt: state.details.peak_alt,
+  start_alt: state.details.start_alt
+});
+
+export default connect(mapStateToProps)(withLeaflet(Dashboard));

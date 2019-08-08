@@ -1,16 +1,10 @@
-import React from "react";
+import { MapControl, withLeaflet } from "react-leaflet";
 import * as L from "leaflet";
 import { getLegendHtml } from "../utils/data";
 
-interface IProps {
-  mapHandle: any;
-}
-
-class Legend extends React.Component<IProps> {
-  constructor(props: any) {
-    super(props);
-    this.addLegend = this.addLegend.bind(this);
-  }
+class Legend extends MapControl {
+  // @ts-ignore
+  public createLeafletElement(props: any) {}
 
   public addLegend = () => {
     // @ts-ignore
@@ -22,7 +16,9 @@ class Legend extends React.Component<IProps> {
       return this._div;
     };
 
-    legend.addTo(this.props.mapHandle.current.leafletElement);
+    // @ts-ignore
+    const { map } = this.props.leaflet;
+    legend.addTo(map);
   };
 
   componentDidMount() {
@@ -34,4 +30,4 @@ class Legend extends React.Component<IProps> {
   }
 }
 
-export default Legend;
+export default withLeaflet(Legend);
