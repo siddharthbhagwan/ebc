@@ -17,13 +17,13 @@ class PolylineRoutes extends React.Component<any, any> {
 
   public addPolylines = () => {
     const routes = getDayWiseDataP();
-    const arr: any = [];
+    const polylineArr: any = [];
     Object.keys(routes).forEach((day: string) => {
       if (routes[day]) {
         const decodedData = decodePolyline(routes[day].route);
         const polyLine = L.polyline(decodedData).toGeoJSON();
         polyLine.properties = routes[day].properties;
-        arr.push(
+        polylineArr.push(
           <GeoJSON
             data={polyLine}
             style={polyLine.properties}
@@ -35,7 +35,7 @@ class PolylineRoutes extends React.Component<any, any> {
         );
       }
     });
-    return arr;
+    return polylineArr;
   };
 
   public clickhandler = (e: any) => {

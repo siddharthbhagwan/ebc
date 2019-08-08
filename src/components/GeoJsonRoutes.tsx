@@ -1,8 +1,6 @@
 import React from "react";
-import * as L from "leaflet";
 import { GeoJSON } from "react-leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
-import decodePolyline from "decode-google-map-polyline";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
@@ -16,11 +14,10 @@ class GeoJsonRoutes extends React.Component<any, any> {
   }
 
   public addGeoJsonRoutes = () => {
-    const that = this;
-    const arr: any = [];
+    const geoJsonArr: any = [];
     const routes = getDayWiseDataG();
     Object.values(routes).forEach((route: any) => {
-      arr.push(
+      geoJsonArr.push(
         <GeoJSON
           data={route}
           style={route.features[0].properties}
@@ -31,7 +28,7 @@ class GeoJsonRoutes extends React.Component<any, any> {
         />
       );
     });
-    return arr;
+    return geoJsonArr;
   };
 
   public clickhandler = (e: any) => {
