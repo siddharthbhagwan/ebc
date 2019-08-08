@@ -3,10 +3,10 @@ import * as L from "leaflet";
 import Dashboard from "./Dashboard";
 import Legend from "./Legend";
 import Polylines from "./Polylines";
-import Reset from "./Reset";
+// import Reset from "./Reset";
 import { Map, TileLayer, DivOverlay, Polyline, GeoJSON } from "react-leaflet";
-import { getMarkers } from "../utils/markers";
-import { getDayWiseDataG } from "../utils/geoJson";
+// import { getMarkers } from "../utils/markers";
+// import { getDayWiseDataG } from "../utils/geoJson";
 import { getDayWiseDataP } from "../utils/polylines";
 import decodePolyline from "decode-google-map-polyline";
 import { IDay, IMapProps, IMarker } from "../interfaces/interfaces";
@@ -141,7 +141,7 @@ class MapContainer extends React.Component<any, IState> {
           zoom={this.state.map.zoom}
         />
          */}
-        <Dashboard day={this.state.dayProps} />
+        <Dashboard />
         <Legend />
         <Polylines
           hoverColor={this.state.map.hoverColor}

@@ -1,6 +1,7 @@
 import { MapControl, withLeaflet } from "react-leaflet";
 import * as L from "leaflet";
 import { getDashboardHtml } from "../utils/data";
+import { connect } from "react-redux";
 // import { IDay } from "../interfaces/interfaces";
 
 // interface IProps {
@@ -11,9 +12,11 @@ import { getDashboardHtml } from "../utils/data";
 //   dashboard: any;
 // }
 
-class Dashboard extends MapControl<any> {
+class Dashboard extends MapControl<any, any> {
   // @ts-ignore
-  public createLeafletElement(props: any) {}
+  public createLeafletElement(props: any) {
+    this.state = { dashboard: null };
+  }
 
   public addDashboard() {
     const that = this;
@@ -23,7 +26,7 @@ class Dashboard extends MapControl<any> {
 
     dashboard.onAdd = function() {
       this._div = L.DomUtil.create("div", "dashboard");
-      this.update(that.props.day);
+      this.update(that.props);
       return this._div;
     };
 
@@ -34,7 +37,7 @@ class Dashboard extends MapControl<any> {
     // @ts-ignore
     const { map } = this.props.leaflet;
     dashboard.addTo(map);
-    // this.setState({ dashboard });
+    this.setState({ dashboard });
   }
 
   componentDidMount() {
@@ -42,11 +45,23 @@ class Dashboard extends MapControl<any> {
   }
 
   render() {
-    // if (this.state.dashboard) {
-    //   this.state.dashboard.update(this.props.day);
-    // }
+    // @ts-ignore
+    if (this.state.dashboard) {
+      // @ts-ignore
+      this.state.dashboard.update(this.props);
+    }
     return null;
   }
 }
 
-export default withLeaflet(Dashboard);
+const mapStateToProps = (state: any) => ({
+  day: state.details.day,
+  name: state.details.name,
+  time: state.details.time,
+  end_alt: state.details.end_alt,
+  distance: state.details.distance,
+  peak_alt: state.details.peak_alt,
+  start_alt: state.details.start_alt
+});
+
+export default connect(mapStateToProps)(withLeaflet(Dashboard));

@@ -3,8 +3,10 @@ import * as L from "leaflet";
 import { GeoJSON } from "react-leaflet";
 import { getDayWiseDataP } from "../utils/polylines";
 import decodePolyline from "decode-google-map-polyline";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
 
-class MapContainer extends React.Component<any, any> {
+class Polylines extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.addPolylines = this.addPolylines.bind(this);
@@ -48,7 +50,7 @@ class MapContainer extends React.Component<any, any> {
 
   public mouseoverHandler = (e: any) => {
     e.target.setStyle({ color: this.props.hoverColor });
-    // this.setState({ dayProps: e.layer.feature.properties });
+    this.props.dispatchLayerDetails(e.layer.feature.properties);
   };
 
   public mouseoutHandler = (e: any) =>
@@ -63,4 +65,18 @@ class MapContainer extends React.Component<any, any> {
   }
 }
 
-export default MapContainer;
+const mapDispatchToProps = (dispatch: Dispatch) => {
+  return {
+    dispatchLayerDetails: (layerDetails: any) => {
+      dispatch({
+        payload: { layerDetails },
+        type: "UPDATE_LAYER_DETAILS"
+      });
+    }
+  };
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(Polylines);
