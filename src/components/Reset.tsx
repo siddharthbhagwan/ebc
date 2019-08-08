@@ -1,4 +1,5 @@
 import { MapControl, withLeaflet } from "react-leaflet";
+import { connect } from "react-redux";
 import * as L from "leaflet";
 import resetIcon from "../resources/images/map.svg";
 import "leaflet-easybutton";
@@ -37,4 +38,9 @@ class Reset extends MapControl<any> {
   }
 }
 
-export default withLeaflet(Reset);
+const mapStateToProps = (state: any) => ({
+  zoom: state.mapState.zoom,
+  center: state.mapState.center
+});
+
+export default connect(mapStateToProps)(withLeaflet(Reset));

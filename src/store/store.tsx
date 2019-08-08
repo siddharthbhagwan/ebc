@@ -1,8 +1,10 @@
 import { combineReducers, createStore } from "redux";
-import { detailsReducer } from "../reducers/detailsReducer";
+import { routeReducer } from "../reducers/routeReducer";
+import { mapStateReducer } from "../reducers/mapStateReducer";
 
 export const store = createStore(
   combineReducers({
-    details: detailsReducer
+    route: routeReducer,
+    mapState: mapStateReducer
   })
 );

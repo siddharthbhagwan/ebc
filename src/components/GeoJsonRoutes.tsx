@@ -1,17 +1,11 @@
 import React from "react";
-import { GeoJSON } from "react-leaflet";
+import { MapControl, GeoJSON, withLeaflet } from "react-leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-class GeoJsonRoutes extends React.Component<any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.clickhandler = this.clickhandler.bind(this);
-    this.mouseoutHandler = this.mouseoutHandler.bind(this);
-    this.mouseoverHandler = this.mouseoverHandler.bind(this);
-    this.addGeoJsonRoutes = this.addGeoJsonRoutes.bind(this);
-  }
+class GeoJsonRoutes extends MapControl<any, any> {
+  public createLeafletElement(props: any) {}
 
   public addGeoJsonRoutes = () => {
     const geoJsonArr: any = [];
@@ -32,7 +26,8 @@ class GeoJsonRoutes extends React.Component<any, any> {
   };
 
   public clickhandler = (e: any) => {
-    e.target._map.flyToBounds(
+    const { map } = this.props.leaflet;
+    map.flyToBounds(
       e.target.getBounds(),
       {
         paddingTopLeft: this.props.topLeftPadding,
@@ -70,7 +65,14 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   };
 };
 
+const mapStateToProps = (state: any) => ({
+  hoverColor: state.mapState.hoverColor,
+  zoomDuration: state.mapState.zoomDuration,
+  topLeftPadding: state.mapState.topLeftPadding,
+  bottomRightPadding: state.mapState.bottomRightPadding
+});
+
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
-)(GeoJsonRoutes);
+)(withLeaflet(GeoJsonRoutes));

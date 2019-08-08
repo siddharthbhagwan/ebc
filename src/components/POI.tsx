@@ -1,17 +1,12 @@
 import React from "react";
 import * as L from "leaflet";
-import { Marker } from "react-leaflet";
+import { MapControl, Marker, withLeaflet } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
 import { Dispatch } from "redux";
 import { connect } from "react-redux";
 
-class POI extends React.Component<any, any> {
-  public constructor(props: any) {
-    super(props);
-    this.addPOIs = this.addPOIs.bind(this);
-    this.clickhandler = this.clickhandler.bind(this);
-    this.mouseoverHandler = this.mouseoverHandler.bind(this);
-  }
+class POI extends MapControl<any, any> {
+  public createLeafletElement(props: any) {}
 
   public addPOIs = () => {
     const markerData = getMarkers();
@@ -36,8 +31,10 @@ class POI extends React.Component<any, any> {
   };
 
   public clickhandler = (e: any) => {
-    e.target._map.flyToBounds(
-      e.target.getBounds(),
+    const { map } = this.props.leaflet;
+    map.flyTo(
+      e.latlng,
+      this.props.markerZoom,
       {
         paddingTopLeft: this.props.topLeftPadding,
         paddingBottomRight: this.props.bottomRightPadding
@@ -69,7 +66,11 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
   };
 };
 
+const mapStateToProps = (state: any) => ({
+  markerZoom: state.mapState.markerZoom
+});
+
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
-)(POI);
+)(withLeaflet(POI));

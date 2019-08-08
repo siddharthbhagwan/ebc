@@ -55,13 +55,13 @@ class Dashboard extends MapControl<any, any> {
 }
 
 const mapStateToProps = (state: any) => ({
-  day: state.details.day,
-  name: state.details.name,
-  time: state.details.time,
-  end_alt: state.details.end_alt,
-  distance: state.details.distance,
-  peak_alt: state.details.peak_alt,
-  start_alt: state.details.start_alt
+  day: state.route.day,
+  name: state.route.name,
+  time: state.route.time,
+  end_alt: state.route.end_alt,
+  distance: state.route.distance,
+  peak_alt: state.route.peak_alt,
+  start_alt: state.route.start_alt
 });
 
 export default connect(mapStateToProps)(withLeaflet(Dashboard));
