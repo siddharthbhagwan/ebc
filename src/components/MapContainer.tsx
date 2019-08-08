@@ -140,7 +140,8 @@ class MapContainer extends React.Component<any, IState> {
           center={this.state.map.center}
           zoom={this.state.map.zoom}
         />
-        <Dashboard mapHandle={this.mapRef} day={this.state.dayProps} /> */}
+         */}
+        <Dashboard day={this.state.dayProps} />
         <Legend />
         <Polylines
           hoverColor={this.state.map.hoverColor}

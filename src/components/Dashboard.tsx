@@ -1,23 +1,19 @@
-import React from "react";
+import { MapControl, withLeaflet } from "react-leaflet";
 import * as L from "leaflet";
 import { getDashboardHtml } from "../utils/data";
-import { IDay } from "../interfaces/interfaces";
+// import { IDay } from "../interfaces/interfaces";
 
-interface IProps {
-  mapHandle: any;
-  day: IDay;
-}
+// interface IProps {
+//   day: IDay;
+// }
 
-interface IState {
-  dashboard: any;
-}
+// interface IState {
+//   dashboard: any;
+// }
 
-class Dashboard extends React.Component<IProps, IState> {
-  constructor(props: any) {
-    super(props);
-    this.state = { dashboard: null };
-    this.addDashboard = this.addDashboard.bind(this);
-  }
+class Dashboard extends MapControl<any> {
+  // @ts-ignore
+  public createLeafletElement(props: any) {}
 
   public addDashboard() {
     const that = this;
@@ -35,8 +31,10 @@ class Dashboard extends React.Component<IProps, IState> {
       this._div.innerHTML = getDashboardHtml(day);
     };
 
-    dashboard.addTo(this.props.mapHandle.current.leafletElement);
-    this.setState({ dashboard });
+    // @ts-ignore
+    const { map } = this.props.leaflet;
+    dashboard.addTo(map);
+    // this.setState({ dashboard });
   }
 
   componentDidMount() {
@@ -44,11 +42,11 @@ class Dashboard extends React.Component<IProps, IState> {
   }
 
   render() {
-    if (this.state.dashboard) {
-      this.state.dashboard.update(this.props.day);
-    }
+    // if (this.state.dashboard) {
+    //   this.state.dashboard.update(this.props.day);
+    // }
     return null;
   }
 }
 
-export default Dashboard;
+export default withLeaflet(Dashboard);
