@@ -208,7 +208,12 @@ const markers: IMarker[] = [
     // Airport
     point: [27.68725044382488, 86.73143742664253],
     icon: airportIcon,
-    size: [22, 22]
+    size: [22, 22],
+    properties: {
+      day: "0",
+      name: "Airport",
+      start_alt: "9,383"
+    }
   }
 ];
 const getMarkers = () => markers;
