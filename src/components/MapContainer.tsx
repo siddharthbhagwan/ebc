@@ -1,6 +1,7 @@
 import React from "react";
 import * as L from "leaflet";
 import Dashboard from "./Dashboard";
+import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import Polylines from "./Polylines";
 // import Reset from "./Reset";
@@ -144,6 +145,12 @@ class MapContainer extends React.Component<any, IState> {
         <Dashboard />
         <Legend />
         <Polylines
+          hoverColor={this.state.map.hoverColor}
+          zoomDuration={this.state.map.zoomDuration}
+          topLeftPadding={this.state.map.topLeftPadding}
+          bottomRightPadding={this.state.map.bottomRightPadding}
+        />
+        <GeoJsonRoutes
           hoverColor={this.state.map.hoverColor}
           zoomDuration={this.state.map.zoomDuration}
           topLeftPadding={this.state.map.topLeftPadding}
