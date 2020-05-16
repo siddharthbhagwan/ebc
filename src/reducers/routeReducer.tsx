@@ -1,4 +1,5 @@
 const initialState = {
+	icon: "",
 	day: "0",
 	name: "Fly from Kathmandu to Lukla",
 	time: "0h 00m",
@@ -14,12 +15,13 @@ export const routeReducer = (state = initialState, action: any) => {
 			return {
 				...state,
 				day: action.payload.layerDetails.day,
-				distance: action.payload.layerDetails.distance,
+				icon: action.payload.layerDetails.icon,
 				name: action.payload.layerDetails.name,
 				time: action.payload.layerDetails.time,
-				startAlt: action.payload.layerDetails.startAlt,
 				endAlt: action.payload.layerDetails.endAlt,
 				peakAlt: action.payload.layerDetails.peakAlt,
+				startAlt: action.payload.layerDetails.startAlt,
+				distance: action.payload.layerDetails.distance,
 			};
 
 		default:

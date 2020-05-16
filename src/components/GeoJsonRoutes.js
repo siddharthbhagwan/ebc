@@ -29,6 +29,7 @@ const GeoJsonRoutes = (props) => {
 				/>
 			);
 		});
+
 		return geoJsonArr;
 	};
 

@@ -16,9 +16,12 @@ const Reset = (props) => {
 
 	return (
 		<Control position="topleft">
-			<button onClick={resetZoom}>
-				<img src={resetIcon} width={"15px"} />
-			</button>
+			<img
+				width={"30px"}
+				src={resetIcon}
+				className={"icon"}
+				onClick={resetZoom}
+			/>
 		</Control>
 	);
 };

@@ -5,9 +5,12 @@ export interface IMarker {
 	icon: string;
 	size: [number, number];
 	properties?: {
-		day: String;
-		name: String;
-		startAlt: String;
+		day: string;
+		icon: string;
+		name: string;
+		startAlt: string;
+		direction: string;
+		offset?: any;
 	};
 }
 

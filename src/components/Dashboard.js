@@ -5,7 +5,7 @@ import Control from "react-leaflet-control";
 import "../resources/css/dashboard.css";
 
 const Dashboard = (props) => {
-	const { peakAlt, startAlt, endAlt, distance, time } = props;
+	const { peakAlt, startAlt, endAlt, distance, time, icon } = props;
 
 	const getStartAlt = (startAlt) => (startAlt ? `${startAlt} ft` : "");
 	const getPeakAlt = (peakAlt) => (peakAlt ? ` - ${peakAlt} ft` : "");
@@ -29,7 +29,12 @@ const Dashboard = (props) => {
 				<h5>EBC 3 Pass Trek, Nepal</h5>
 				<br />
 				<div class="dashboardDetails">
-					<div>Day {props.day}</div>
+					<div>
+						<span>
+							<img src={icon} width={"25px"} />{" "}
+						</span>
+						<span>Day {props.day}</span>
+					</div>
 					<br />
 					<div>
 						<span>{props.name}</span>
@@ -51,10 +56,11 @@ const mapStateToProps = (state) => ({
 	day: state.route.day,
 	name: state.route.name,
 	time: state.route.time,
+	icon: state.route.icon,
 	endAlt: state.route.endAlt,
-	distance: state.route.distance,
 	peakAlt: state.route.peakAlt,
 	startAlt: state.route.startAlt,
+	distance: state.route.distance,
 });
 
 export default connect(mapStateToProps)(withLeaflet(Dashboard));
