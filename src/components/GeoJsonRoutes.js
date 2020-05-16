@@ -2,6 +2,7 @@ import React from "react";
 import { GeoJSON, withLeaflet } from "react-leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { connect } from "react-redux";
+import { mapDispatchToProps } from "../utils/utils.js";
 
 const GeoJsonRoutes = (props) => {
 	const { map } = props.leaflet;
@@ -51,17 +52,6 @@ const GeoJsonRoutes = (props) => {
 		e.target.setStyle({ color: e.layer.feature.properties.color });
 
 	return addGeoJsonRoutes();
-};
-
-const mapDispatchToProps = (dispatch) => {
-	return {
-		dispatchLayerDetails: (layerDetails) => {
-			dispatch({
-				payload: { layerDetails },
-				type: "UPDATE_LAYER_DETAILS",
-			});
-		},
-	};
 };
 
 const mapStateToProps = (state) => ({
