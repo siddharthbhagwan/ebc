@@ -3,6 +3,7 @@ import * as L from "leaflet";
 import { Marker, withLeaflet } from "react-leaflet";
 import { getMarkers } from "../utils/markers";
 import { connect } from "react-redux";
+import { mapDispatchToProps } from "../utils/utils.js";
 
 const POI = (props) => {
 	const {
@@ -53,15 +54,6 @@ const POI = (props) => {
 
 	return addPOIs();
 };
-
-const mapDispatchToProps = (dispatch) => ({
-	dispatchLayerDetails: (layerDetails) => {
-		dispatch({
-			payload: { layerDetails },
-			type: "UPDATE_LAYER_DETAILS",
-		});
-	},
-});
 
 const mapStateToProps = (state) => ({
 	markerZoom: state.mapState.markerZoom,
