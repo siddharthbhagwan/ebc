@@ -3,9 +3,9 @@ const initialState = {
 	name: "Fly from Kathmandu to Lukla",
 	time: "0h 00m",
 	distance: "0 mi / 0 km",
-	start_alt: "0",
-	end_alt: "0",
-	peak_alt: "",
+	startAlt: "0",
+	endAlt: "0",
+	peakAlt: "",
 };
 
 export const routeReducer = (state = initialState, action: any) => {
@@ -17,9 +17,9 @@ export const routeReducer = (state = initialState, action: any) => {
 				distance: action.payload.layerDetails.distance,
 				name: action.payload.layerDetails.name,
 				time: action.payload.layerDetails.time,
-				start_alt: action.payload.layerDetails.start_alt,
-				end_alt: action.payload.layerDetails.end_alt,
-				peak_alt: action.payload.layerDetails.peak_alt,
+				startAlt: action.payload.layerDetails.startAlt,
+				endAlt: action.payload.layerDetails.endAlt,
+				peakAlt: action.payload.layerDetails.peakAlt,
 			};
 
 		default:
