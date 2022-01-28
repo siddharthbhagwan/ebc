@@ -8,6 +8,7 @@ import POI from './POI';
 import PolylineRoutes from './PolylineRoutes';
 import Info from './Info';
 import Reset from './Reset';
+import { isDesktop } from 'react-device-detect';
 
 const MapContainer = (props) => {
 	const { center, zoomSnap, zoom, style, url, attribution } = props;
@@ -16,15 +17,14 @@ const MapContainer = (props) => {
 		<Map
 			center={center}
 			zoomSnap={zoomSnap}
-			zoom={zoom}
+			zoom={isDesktop ? zoom : 10.7}
 			style={style}
-			onclick={(e) => console.log(e.latlng)}
 		>
 			<TileLayer url={url} attribution={attribution} />
 			<Reset />
 			<POI />
-			<Legend />
-			<Dashboard />
+			{isDesktop ? <Legend /> : null}
+			{isDesktop ? <Dashboard /> : null}
 			<GeoJsonRoutes />
 			<PolylineRoutes />
 		</Map>

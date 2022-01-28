@@ -149,7 +149,7 @@ const markers: IMarker[] = [
 			icon: tentIcon,
 			name: 'Marlung',
 			startAlt: '18,058',
-			direction: 'left',
+			direction: 'right',
 		},
 	},
 	{
