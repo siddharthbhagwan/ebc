@@ -1,0 +1,5 @@
+commit f3d969bf96f191534f58a19f562178a1ee14f734
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Mon Jan 26 22:15:25 2026 +0100
+
+    UI Polishing: Icon sizing, rest day visibility, and route selection enhancements

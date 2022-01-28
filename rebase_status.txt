@@ -1,0 +1,37 @@
+interactive rebase in progress; onto f3d969b
+Last command done (1 command done):
+   pick 8763750 # Added google analytics
+Next commands to do (23 remaining commands):
+   pick b2866ce # analytics updated
+   pick bd1a99f # analytics updated
+  (use "git rebase --edit-todo" to view and edit)
+You are currently rebasing branch 'fix/all-dependabot-security' on 'f3d969b'.
+  (fix conflicts and then run "git rebase --continue")
+  (use "git rebase --skip" to skip this patch)
+  (use "git rebase --abort" to check out the original branch)
+
+Unmerged paths:
+  (use "git restore --staged <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+	both modified:   public/index.html
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	all_branches.txt
+	base_main.txt
+	base_master.txt
+	branches.txt
+	current_branch.txt
+	default_branch.txt
+	log_fix.txt
+	log_main.txt
+	log_main_multi.txt
+	log_master.txt
+	log_master_multi.txt
+	log_polishing.txt
+	main_ahead.txt
+	master_ahead.txt
+	open_prs.txt
+	rebase_status.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

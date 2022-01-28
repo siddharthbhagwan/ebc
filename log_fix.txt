@@ -1,0 +1,33 @@
+commit de299392ccaf35f7c923313862df83b26f7e5f69
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 17:40:20 2026 +0100
+
+    fix: resolve core dependabot vulnerabilities
+
+commit 79617c7e85ff3605b0c2f9351b932546b03386db
+Merge: 698b99a 41bb4fa
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 15:26:30 2026 +0100
+
+    feat: resolve security vulnerabilities and update dependencies
+
+commit 41bb4fac40402c397557ce21307322b10020cafe
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 15:26:17 2026 +0100
+
+    chore: solve vulnerability issues by updating package.json and resolving conflicts
+
+commit 698b99ad83f7449856b2f992ac2243dee9b3354e
+Merge: 0e2f1c1 4f79b72
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 15:21:27 2026 +0100
+
+    Merge pull request #99 from siddharthbhagwan/Tools-UI
+    
+    Tools UI
+
+commit 4f79b72a10aa680d5b89abf9069c4c9b2a144659
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 15:19:10 2026 +0100
+
+    feat: Tools UI update with latest improvements and rebased on master
