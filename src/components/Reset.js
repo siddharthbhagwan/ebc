@@ -1,9 +1,9 @@
-import React from "react";
-import { withLeaflet } from "react-leaflet";
-import { connect } from "react-redux";
-import resetIcon from "../resources/images/map.svg";
-import "leaflet-easybutton";
-import Control from "react-leaflet-control";
+import React from 'react';
+import { withLeaflet } from 'react-leaflet';
+import { connect } from 'react-redux';
+import resetIcon from '../resources/images/map.svg';
+import 'leaflet-easybutton';
+import Control from 'react-leaflet-control';
 
 const Reset = (props) => {
 	const { center, zoom } = props;
@@ -16,9 +16,12 @@ const Reset = (props) => {
 
 	return (
 		<Control position="topleft">
-			<button onClick={resetZoom}>
-				<img src={resetIcon} width={"15px"} />
-			</button>
+			<img
+				width={'30px'}
+				src={resetIcon}
+				className={'icon'}
+				onClick={resetZoom}
+			/>
 		</Control>
 	);
 };

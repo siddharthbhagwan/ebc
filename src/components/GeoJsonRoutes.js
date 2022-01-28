@@ -1,8 +1,8 @@
-import React from "react";
-import { GeoJSON, withLeaflet } from "react-leaflet";
-import { getDayWiseDataG } from "../utils/geoJson";
-import { connect } from "react-redux";
-import { mapDispatchToProps } from "../utils/utils.js";
+import React from 'react';
+import { GeoJSON, withLeaflet } from 'react-leaflet';
+import { getDayWiseDataG } from '../utils/geoJson';
+import { connect } from 'react-redux';
+import { mapDispatchToProps } from '../utils/utils.js';
 
 const GeoJsonRoutes = (props) => {
 	const { map } = props.leaflet;
@@ -26,10 +26,16 @@ const GeoJsonRoutes = (props) => {
 					onclick={clickhandler}
 					onmouseout={mouseoutHandler}
 					onmouseover={mouseoverHandler}
+					onEachFeature={handleEachFeature}
 				/>
 			);
 		});
+
 		return geoJsonArr;
+	};
+
+	const handleEachFeature = (feature, layer) => {
+		console.log(feature, layer);
 	};
 
 	const clickhandler = (e) => {
@@ -44,12 +50,12 @@ const GeoJsonRoutes = (props) => {
 	};
 
 	const mouseoverHandler = (e) => {
-		e.target.setStyle({ color: hoverColor });
+		e.target.setStyle({ color: hoverColor, weight: 4 });
 		dispatchLayerDetails(e.layer.feature.properties);
 	};
 
 	const mouseoutHandler = (e) =>
-		e.target.setStyle({ color: e.layer.feature.properties.color });
+		e.target.setStyle({ color: e.layer.feature.properties.color, weight: 3 });
 
 	return addGeoJsonRoutes();
 };

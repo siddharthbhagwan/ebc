@@ -1,20 +1,71 @@
 .dashboard {
-  padding: 15px 15px;
-  font: 14px/16px Arial, Helvetica, sans-serif;
-  background: white;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  text-align: left;
-  color: #777;
-  text-align: center;
+	padding: 15px 15px;
+	font: 14px/16px;
+	background: white;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+	border-radius: 5px;
+	text-align: left;
+	text-align: center;
+	min-width: 400px;
+}
+
+.infoDashboard {
+	background: rgba(255, 255, 255, 0.95);
+}
+
+generic-dashboard {
+	background: rgba(255, 255, 255, 0.8);
 }
 
 .dashboard h5 {
-  margin: 0 0 5px;
+	margin: 0 0 5px;
 }
 
 .dashboardDetails {
-  font-size: 18px;
-  line-height: 23px;
+	font-size: 18px;
+	line-height: 23px;
+}
+
+.dashboardDetails .icon {
+	margin-bottom: 10px;
+}
+
+.icon {
+	border: 2px solid #dddddd;
+	border-radius: 2px;
+	padding: 3px;
+	cursor: pointer;
+}
+
+.infoSection {
+	font-size: 18px;
+}
+
+.okButton {
+	padding: 10px;
+}
+
+.tooltipLabel {
+	text-align: center;
+	box-shadow: none;
+	font-size: 10px;
+	background-color: transparent;
+	z-index: 100;
+	border: none;
+}
+
+.tooltipLabel:before {
+	border: none;
+}
+
+.labelDay {
+	font-size: 10px;
+}
+
+.leafletLeft-center {
+	position: fixed;
+	left: 50%;
+	top: 40%;
+	transform: translate(-50%, -50%);
+	background: rgba(255, 255, 255, 0.95);
 }

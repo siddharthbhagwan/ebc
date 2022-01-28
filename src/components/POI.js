@@ -1,11 +1,13 @@
-import React from "react";
-import * as L from "leaflet";
-import { Marker, withLeaflet } from "react-leaflet";
-import { getMarkers } from "../utils/markers";
-import { connect } from "react-redux";
-import { mapDispatchToProps } from "../utils/utils.js";
+import React from 'react';
+import * as L from 'leaflet';
+import { connect } from 'react-redux';
+import '../resources/css/dashboard.css';
+import { getMarkers } from '../utils/markers';
+import { mapDispatchToProps } from '../utils/utils.js';
+import { Marker, withLeaflet, Tooltip } from 'react-leaflet';
 
 const POI = (props) => {
+	const { map } = props.leaflet;
 	const {
 		markerZoom,
 		zoomDuration,
@@ -13,7 +15,6 @@ const POI = (props) => {
 		paddingBottomRight,
 		dispatchLayerDetails,
 	} = props;
-	const { map } = props.leaflet;
 
 	const addPOIs = () => {
 		const markerData = getMarkers();
@@ -31,7 +32,16 @@ const POI = (props) => {
 						iconSize: markerPoint.size,
 					})}
 					properties={markerPoint.properties}
-				/>
+				>
+					<Tooltip
+						permanent={true}
+						className={'tooltipLabel'}
+						direction={markerPoint.properties.direction}
+						// offset={markerPoint.properties.offset || [0, 0]}
+					>
+						<div>{markerPoint.properties.name}</div>
+					</Tooltip>
+				</Marker>
 			);
 		});
 		return arr;
