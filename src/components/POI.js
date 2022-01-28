@@ -1,10 +1,10 @@
-import React from "react";
-import * as L from "leaflet";
-import { connect } from "react-redux";
-import "../resources/css/dashboard.css";
-import { getMarkers } from "../utils/markers";
-import { mapDispatchToProps } from "../utils/utils.js";
-import { Marker, withLeaflet, Tooltip } from "react-leaflet";
+import React from 'react';
+import * as L from 'leaflet';
+import { connect } from 'react-redux';
+import '../resources/css/dashboard.css';
+import { getMarkers } from '../utils/markers';
+import { mapDispatchToProps } from '../utils/utils.js';
+import { Marker, withLeaflet, Tooltip } from 'react-leaflet';
 
 const POI = (props) => {
 	const { map } = props.leaflet;
@@ -35,15 +35,11 @@ const POI = (props) => {
 				>
 					<Tooltip
 						permanent={true}
-						className={"tooltipLabel"}
+						className={'tooltipLabel'}
 						direction={markerPoint.properties.direction}
-						offset={markerPoint.properties.offset || [0, 0]}
+						// offset={markerPoint.properties.offset || [0, 0]}
 					>
-						<div>
-							{markerPoint.properties.name}
-							<br />
-							<span>Day {markerPoint.properties.day}</span>
-						</div>
+						<div>{markerPoint.properties.name}</div>
 					</Tooltip>
 				</Marker>
 			);

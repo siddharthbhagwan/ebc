@@ -1,4 +1,4 @@
-import { LatLngExpression } from "leaflet";
+import { LatLngExpression } from 'leaflet';
 
 export interface IMarker {
 	point: LatLngExpression;
@@ -10,7 +10,7 @@ export interface IMarker {
 		name: string;
 		startAlt: string;
 		direction: string;
-		offset?: any;
+		background?: string;
 	};
 }
 

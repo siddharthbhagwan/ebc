@@ -28,7 +28,7 @@ const Dashboard = (props) => {
 			<div className={"dashboard"}>
 				<h5>EBC 3 Pass Trek, Nepal</h5>
 				<br />
-				<div class="dashboardDetails">
+				<div className={"dashboardDetails"}>
 					<div>
 						<span>
 							<img src={icon} width={"25px"} />{" "}

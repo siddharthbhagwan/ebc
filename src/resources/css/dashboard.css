@@ -47,6 +47,11 @@ generic-dashboard {
 
 .tooltipLabel {
 	text-align: center;
+	box-shadow: none;
+	font-size: 10px;
+	background-color: transparent;
+	z-index: 100;
+	border: none;
 }
 
 .tooltipLabel:before {

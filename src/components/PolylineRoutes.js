@@ -1,9 +1,9 @@
-import React from "react";
-import * as L from "leaflet";
-import { GeoJSON, withLeaflet } from "react-leaflet";
-import { getDayWiseDataP } from "../utils/polylines";
-import decodePolyline from "decode-google-map-polyline";
-import { connect } from "react-redux";
+import React from 'react';
+import * as L from 'leaflet';
+import { GeoJSON, withLeaflet } from 'react-leaflet';
+import { getDayWiseDataP } from '../utils/polylines';
+import decodePolyline from 'decode-google-map-polyline';
+import { connect } from 'react-redux';
 
 const PolylineRoutes = (props) => {
 	const { map } = props.leaflet;
@@ -50,12 +50,12 @@ const PolylineRoutes = (props) => {
 	};
 
 	const mouseoverHandler = (e) => {
-		e.target.setStyle({ color: hoverColor });
+		e.target.setStyle({ color: hoverColor, weight: 4 });
 		dispatchLayerDetails(e.layer.feature.properties);
 	};
 
 	const mouseoutHandler = (e) =>
-		e.target.setStyle({ color: e.layer.feature.properties.color });
+		e.target.setStyle({ color: e.layer.feature.properties.color, weight: 3 });
 
 	return addPolylines();
 };
@@ -64,7 +64,7 @@ const mapDispatchToProps = (dispatch) => ({
 	dispatchLayerDetails: (layerDetails) => {
 		dispatch({
 			payload: { layerDetails },
-			type: "UPDATE_LAYER_DETAILS",
+			type: 'UPDATE_LAYER_DETAILS',
 		});
 	},
 });

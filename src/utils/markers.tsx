@@ -1,22 +1,25 @@
-import tentIcon from "../resources/images/tent.svg";
-import summitIcon from "../resources/images/summit.svg";
-import airportIcon from "../resources/images/airport.svg";
-import passIcon from "../resources/images/pass.svg";
-import ebcIcon from "../resources/images/ebc.svg";
-import { IMarker } from "../interfaces/interfaces";
+import tentIcon from '../resources/images/tent.svg';
+import summitIcon from '../resources/images/summit.svg';
+import airportIcon from '../resources/images/airport.svg';
+import passIcon from '../resources/images/pass.svg';
+import ebcIcon from '../resources/images/ebc.svg';
+import oneIcon from '../resources/images/1.svg';
+import twoIcon from '../resources/images/2.svg';
+import { IMarker } from '../interfaces/interfaces';
 
 const markers: IMarker[] = [
 	{
 		// Phakding
 		point: [27.74004, 86.712555],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [20, 20],
 		properties: {
-			day: "1",
+			day: '1',
 			icon: tentIcon,
-			name: "Phakding",
-			startAlt: "8,563",
-			direction: "right",
+			name: 'Phakding',
+			startAlt: '8,563',
+			direction: 'right',
+			background: 'white',
 		},
 	},
 	{
@@ -25,12 +28,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "2 & 3",
+			day: '2 & 3',
 			icon: tentIcon,
-			name: "Namche Bazaar",
-			startAlt: "11,286",
-			direction: "right",
-			offset: [27.80664304, 86.71749007],
+			name: 'Namche Bazaar',
+			startAlt: '11,286',
+			direction: 'right',
 		},
 	},
 	{
@@ -39,11 +41,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "4",
+			day: '4',
 			icon: tentIcon,
-			name: "Tengboche",
-			startAlt: "12,644",
-			direction: "right",
+			name: 'Tengboche',
+			startAlt: '12,644',
+			direction: 'right',
 		},
 	},
 	{
@@ -52,11 +54,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "5",
+			day: '5',
 			icon: tentIcon,
-			name: "Dingboche",
-			startAlt: "14,470",
-			direction: "right",
+			name: 'Dingboche',
+			startAlt: '14,470',
+			direction: 'right',
 		},
 	},
 	{
@@ -65,11 +67,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "6 & 7",
+			day: '6 & 7',
 			icon: tentIcon,
-			name: "Chhukung",
-			startAlt: "15,535",
-			direction: "right",
+			name: 'Chhukung',
+			startAlt: '15,535',
+			direction: 'right',
 		},
 	},
 	{
@@ -78,11 +80,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "8 & 9",
+			day: '8 & 9',
 			icon: tentIcon,
-			name: "Lobuche",
-			startAlt: "16,210",
-			direction: "auto",
+			name: 'Lobuche',
+			startAlt: '16,210',
+			direction: 'auto',
 		},
 	},
 	{
@@ -91,11 +93,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "10, 11 & 12",
+			day: '10, 11 & 12',
 			icon: tentIcon,
-			name: "Gorak Shep",
-			startAlt: "16,942",
-			direction: "auto",
+			name: 'Gorak Shep',
+			startAlt: '16,942',
+			direction: 'right',
 		},
 	},
 	{
@@ -104,24 +106,24 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "13",
+			day: '13',
 			icon: tentIcon,
-			name: "Dzongla",
-			startAlt: "15,850",
-			direction: "auto",
+			name: 'Dzongla',
+			startAlt: '15,850',
+			direction: 'bottom',
 		},
 	},
 	{
-		//Thangnak
+		// Thangnak
 		point: [27.94058, 86.721246],
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "14",
+			day: '14',
 			icon: tentIcon,
-			name: "Thangnak",
-			startAlt: "15,420",
-			direction: "auto",
+			name: 'Thangnak',
+			startAlt: '15,420',
+			direction: 'bottom',
 		},
 	},
 	{
@@ -130,11 +132,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "15, 16 & 17",
+			day: '15, 16 & 17',
 			icon: tentIcon,
-			name: "Gokyo",
-			startAlt: "15,720",
-			direction: "auto",
+			name: 'Gokyo',
+			startAlt: '15,720',
+			direction: 'bottom',
 		},
 	},
 	{
@@ -143,11 +145,11 @@ const markers: IMarker[] = [
 		icon: tentIcon,
 		size: [15, 15],
 		properties: {
-			day: "19",
+			day: '19',
 			icon: tentIcon,
-			name: "Marlung",
-			startAlt: "18,058",
-			direction: "left",
+			name: 'Marlung',
+			startAlt: '18,058',
+			direction: 'left',
 		},
 	},
 	{
@@ -156,11 +158,11 @@ const markers: IMarker[] = [
 		icon: summitIcon,
 		size: [24, 24],
 		properties: {
-			day: "7",
+			day: '7',
 			icon: summitIcon,
-			name: "Chhukung Ri Summit",
-			startAlt: "18,058",
-			direction: "left",
+			name: 'Chhukung Ri Summit',
+			startAlt: '18,058',
+			direction: 'right',
 		},
 	},
 	{
@@ -169,11 +171,11 @@ const markers: IMarker[] = [
 		icon: ebcIcon,
 		size: [24, 24],
 		properties: {
-			day: "10",
+			day: '10',
 			icon: ebcIcon,
-			name: "Everest Base Camp",
-			startAlt: "17,600",
-			direction: "auto",
+			name: 'Everest Base Camp',
+			startAlt: '17,600',
+			direction: 'right',
 		},
 	},
 	{
@@ -182,11 +184,11 @@ const markers: IMarker[] = [
 		icon: summitIcon,
 		size: [24, 24],
 		properties: {
-			day: "12",
+			day: '12',
 			icon: summitIcon,
-			name: "Kala Patthar Sumnmit",
-			startAlt: "18,519",
-			direction: "auto",
+			name: 'Kala Patthar Sumnmit',
+			startAlt: '18,519',
+			direction: 'auto',
 		},
 	},
 	{
@@ -195,11 +197,11 @@ const markers: IMarker[] = [
 		icon: summitIcon,
 		size: [24, 24],
 		properties: {
-			day: "16",
+			day: '16',
 			icon: summitIcon,
-			name: "Gokyo Ri Summit",
-			startAlt: "17,989",
-			direction: "top",
+			name: 'Gokyo Ri Summit',
+			startAlt: '17,989',
+			direction: 'top',
 		},
 	},
 	{
@@ -208,11 +210,11 @@ const markers: IMarker[] = [
 		icon: passIcon,
 		size: [24, 24],
 		properties: {
-			day: "8",
+			day: '8',
 			icon: passIcon,
-			name: "Kongma La Pass",
-			startAlt: "18,058",
-			direction: "auto",
+			name: 'Kongma La Pass',
+			startAlt: '18,058',
+			direction: 'bottom',
 		},
 	},
 	{
@@ -221,11 +223,11 @@ const markers: IMarker[] = [
 		icon: passIcon,
 		size: [24, 24],
 		properties: {
-			day: "14",
+			day: '14',
 			icon: passIcon,
-			name: "Cho La Pass",
-			startAlt: "17,625",
-			direction: "auto",
+			name: 'Cho La Pass',
+			startAlt: '17,625',
+			direction: 'top',
 		},
 	},
 	{
@@ -234,11 +236,11 @@ const markers: IMarker[] = [
 		icon: passIcon,
 		size: [24, 24],
 		properties: {
-			day: "18",
+			day: '18',
 			icon: passIcon,
-			name: "Renjo La Pass",
-			startAlt: "17,680",
-			direction: "left",
+			name: 'Renjo La Pass',
+			startAlt: '17,680',
+			direction: 'left',
 		},
 	},
 	{
@@ -247,11 +249,11 @@ const markers: IMarker[] = [
 		icon: airportIcon,
 		size: [22, 22],
 		properties: {
-			day: "0",
+			day: '0',
 			icon: airportIcon,
-			name: "Airport",
-			startAlt: "9,383",
-			direction: "auto",
+			name: 'Airport',
+			startAlt: '9,383',
+			direction: 'auto',
 		},
 	},
 ];

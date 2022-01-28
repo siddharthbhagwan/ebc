@@ -1,13 +1,13 @@
-import React from "react";
-import { Map, TileLayer } from "react-leaflet";
-import { connect } from "react-redux";
-import Dashboard from "./Dashboard";
-import GeoJsonRoutes from "./GeoJsonRoutes";
-import Legend from "./Legend";
-import POI from "./POI";
-import PolylineRoutes from "./PolylineRoutes";
-import Info from "./Info";
-import Reset from "./Reset";
+import React from 'react';
+import { Map, TileLayer } from 'react-leaflet';
+import { connect } from 'react-redux';
+import Dashboard from './Dashboard';
+import GeoJsonRoutes from './GeoJsonRoutes';
+import Legend from './Legend';
+import POI from './POI';
+import PolylineRoutes from './PolylineRoutes';
+import Info from './Info';
+import Reset from './Reset';
 
 const MapContainer = (props) => {
 	const { center, zoomSnap, zoom, style, url, attribution } = props;
@@ -22,7 +22,6 @@ const MapContainer = (props) => {
 		>
 			<TileLayer url={url} attribution={attribution} />
 			<Reset />
-			<Info />
 			<POI />
 			<Legend />
 			<Dashboard />
