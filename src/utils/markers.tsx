@@ -7,12 +7,12 @@ import oneIcon from '../resources/images/1.svg';
 import twoIcon from '../resources/images/2.svg';
 import { IMarker } from '../interfaces/interfaces';
 
-const markers: IMarker[] = [
+const markers: any[] = [
 	{
 		// Phakding
 		point: [27.74004, 86.712555],
 		icon: tentIcon,
-		size: [20, 20],
+		size: [10, 10],
 		properties: {
 			day: '1',
 			icon: tentIcon,
@@ -26,7 +26,7 @@ const markers: IMarker[] = [
 		// Namche Bazaar
 		point: [27.8069, 86.714],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '2 & 3',
 			icon: tentIcon,
@@ -39,7 +39,7 @@ const markers: IMarker[] = [
 		// Tengboche
 		point: [27.8362, 86.7646],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '4',
 			icon: tentIcon,
@@ -52,7 +52,7 @@ const markers: IMarker[] = [
 		// Dingboche
 		point: [27.8923, 86.8314],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '5',
 			icon: tentIcon,
@@ -65,7 +65,7 @@ const markers: IMarker[] = [
 		// Chhukung
 		point: [27.9045, 86.8713],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '6 & 7',
 			icon: tentIcon,
@@ -78,7 +78,7 @@ const markers: IMarker[] = [
 		// Lobuche
 		point: [27.9485, 86.8104],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '8 & 9',
 			icon: tentIcon,
@@ -91,7 +91,7 @@ const markers: IMarker[] = [
 		// Gorak Shep
 		point: [27.9809, 86.8285],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '10, 11 & 12',
 			icon: tentIcon,
@@ -104,7 +104,7 @@ const markers: IMarker[] = [
 		// Dzongla
 		point: [27.9397, 86.7733],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '13',
 			icon: tentIcon,
@@ -117,7 +117,7 @@ const markers: IMarker[] = [
 		// Thangnak
 		point: [27.94058, 86.721246],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '14',
 			icon: tentIcon,
@@ -130,7 +130,7 @@ const markers: IMarker[] = [
 		// Gokyo
 		point: [27.9535, 86.6945],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '15, 16 & 17',
 			icon: tentIcon,
@@ -143,7 +143,7 @@ const markers: IMarker[] = [
 		// Marlung
 		point: [27.8877, 86.6365],
 		icon: tentIcon,
-		size: [15, 15],
+		size: [10, 10],
 		properties: {
 			day: '19',
 			icon: tentIcon,
@@ -159,6 +159,7 @@ const markers: IMarker[] = [
 		size: [24, 24],
 		properties: {
 			day: '7',
+			color: 'red',
 			icon: summitIcon,
 			name: 'Chhukung Ri Summit',
 			startAlt: '18,058',
