@@ -35,7 +35,7 @@ const GeoJsonRoutes = (props) => {
 	};
 
 	const handleEachFeature = (feature, layer) => {
-		console.log(feature, layer);
+		// console.log(feature, layer);
 	};
 
 	const clickhandler = (e) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Map, TileLayer } from 'react-leaflet';
 import { connect } from 'react-redux';
 import Dashboard from './Dashboard';
@@ -8,23 +8,24 @@ import POI from './POI';
 import PolylineRoutes from './PolylineRoutes';
 import Info from './Info';
 import Reset from './Reset';
+import { isDesktop } from 'react-device-detect';
 
 const MapContainer = (props) => {
 	const { center, zoomSnap, zoom, style, url, attribution } = props;
+	const [showLegend, setLegend] = useState(Boolean(isDesktop));
 
 	return (
 		<Map
 			center={center}
 			zoomSnap={zoomSnap}
-			zoom={zoom}
+			zoom={isDesktop ? zoom : 10.7}
 			style={style}
-			onclick={(e) => console.log(e.latlng)}
 		>
 			<TileLayer url={url} attribution={attribution} />
-			<Reset />
+			<Reset setLegend={setLegend} />
 			<POI />
-			<Legend />
-			<Dashboard />
+			{showLegend ? <Legend /> : null}
+			{isDesktop ? <Dashboard /> : null}
 			<GeoJsonRoutes />
 			<PolylineRoutes />
 		</Map>
