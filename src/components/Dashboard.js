@@ -2,65 +2,93 @@ import React from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import Control from "react-leaflet-control";
+import { isMobile } from "react-device-detect";
 import "../resources/css/dashboard.css";
 
 const Dashboard = (props) => {
-	const { peakAlt, startAlt, endAlt, distance, time, icon } = props;
+  const {
+    peakAlt = null,
+    startAlt = null,
+    endAlt = null,
+    distance,
+    time,
+    icon,
+  } = props;
 
-	const getStartAlt = (startAlt) => (startAlt ? `${startAlt} ft` : "");
-	const getPeakAlt = (peakAlt) => (peakAlt ? ` - ${peakAlt} ft` : "");
-	const getEndAlt = (endAlt) => (endAlt ? ` - ${endAlt} ft` : "");
-	const getTimeDist = (props) => {
-		if (distance && time)
-			return (
-				<div>
-					{distance}
-					<br />
-					{time}
-				</div>
-			);
+  //  no altitude data
+  const isPlace = startAlt === "0" && endAlt === "0";
+  const position = isMobile ? "topright" : "bottomright";
 
-		return "";
-	};
+  return (
+    <Control position={position}>
+      <div className={"dashboard"}>
+        <span style={{ fontSize: 13, textAlign: "left" }}>
+          EBC 3 Pass Trek, Nepal{" "}
+        </span>
 
-	return (
-		<Control position={"topright"}>
-			<div className={"dashboard"}>
-				<h5>EBC 3 Pass Trek, Nepal</h5>
-				<br />
-				<div className={"dashboardDetails"}>
-					<div>
-						<span>
-							<img src={icon} width={"25px"} />{" "}
-						</span>
-						<span>Day {props.day}</span>
-					</div>
-					<br />
-					<div>
-						<span>{props.name}</span>
-						<br />
-						{getStartAlt(startAlt)}
-						{getPeakAlt(peakAlt)}
-						{getEndAlt(endAlt)}
-						<br />
-					</div>
-					<br />
-					{getTimeDist(props)}
-				</div>
-			</div>
-		</Control>
-	);
+        {/* Day */}
+        <span className="desc" style={{ fontWeight: "bold" }}>
+          Day {props.day}
+        </span>
+
+        {!isMobile ? <br /> : null}
+        <div
+          className={"dashboardDetails container"}
+          style={{
+            fontSize: isMobile ? 15 : 17,
+            justifyContent: isPlace ? "center" : "space-evenly",
+            maxWidth: isMobile ? "320px" : "auto",
+            alignItems: "center",
+          }}
+        >
+          {!isPlace && distance && time ? (
+            <div
+              className={!isPlace ? "" : "column-30"}
+              style={{
+                flexDirection: isMobile ? "row" : "column",
+                display: "flex",
+              }}
+            >
+              {/* Time */}
+              <div className="item">{distance.split("/")[1]}</div>
+              <div className="item">{time}</div>
+            </div>
+          ) : null}
+
+          <div
+            className="column"
+            style={{
+              justifyContent: isPlace ? "center" : "space-evenly",
+            }}
+          >
+            {/* Place */}
+            <div style={{ textAlign: "center" }} className="item">
+              {props.name}
+            </div>
+            {/* Alt Details */}
+            {!isPlace ? (
+              <div className="">
+                {startAlt ? `${startAlt} ft` : ""}
+                {peakAlt ? ` - ${peakAlt} ft` : ""}
+                {endAlt ? ` - ${endAlt} ft` : ""}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </Control>
+  );
 };
 
 const mapStateToProps = (state) => ({
-	day: state.route.day,
-	name: state.route.name,
-	time: state.route.time,
-	icon: state.route.icon,
-	endAlt: state.route.endAlt,
-	peakAlt: state.route.peakAlt,
-	startAlt: state.route.startAlt,
-	distance: state.route.distance,
+  day: state.route.day,
+  name: state.route.name,
+  time: state.route.time,
+  icon: state.route.icon,
+  endAlt: state.route.endAlt,
+  peakAlt: state.route.peakAlt,
+  startAlt: state.route.startAlt,
+  distance: state.route.distance,
 });
 
 export default connect(mapStateToProps)(withLeaflet(Dashboard));
