@@ -4,7 +4,7 @@ import { getDayWiseDataG } from "../utils/geoJson";
 import { connect } from "react-redux";
 import { mapDispatchToProps } from "../utils/utils.js";
 
-const GeoJsonRoutes = (props) => {
+const TransparentGeoJson = (props) => {
   const { map } = props.leaflet;
   const {
     hoverColor,
@@ -21,7 +21,7 @@ const GeoJsonRoutes = (props) => {
       geoJsonArr.push(
         <GeoJSON
           data={route}
-          style={route.features[0].properties}
+          style={{ color: "white", weight: 25, opacity: 0.2 }}
           key={route.features[0].properties.day}
           onclick={clickhandler}
           onmouseout={mouseoutHandler}
@@ -65,4 +65,4 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withLeaflet(GeoJsonRoutes));
+)(withLeaflet(TransparentGeoJson));

@@ -10,6 +10,8 @@ import Info from "./Info";
 import Reset from "./Reset";
 import { isDesktop } from "react-device-detect";
 import ReactGA from "react-ga4";
+import TransparentPolylines from "./TransparentPolylines";
+import TransparentGeoJson from "./TransparentGeoJson";
 
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
@@ -30,9 +32,15 @@ const MapContainer = (props) => {
       <Reset setLegend={setLegend} />
       <POI />
       {showLegend ? <Legend /> : null}
-      {isDesktop ? <Dashboard /> : null}
+      <Dashboard />
+
       <GeoJsonRoutes />
+      <TransparentGeoJson />
+
       <PolylineRoutes />
+      <TransparentPolylines />
+
+      <Info />
     </Map>
   );
 };

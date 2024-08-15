@@ -5,7 +5,7 @@ import { getDayWiseDataP } from "../utils/polylines";
 import decodePolyline from "decode-google-map-polyline";
 import { connect } from "react-redux";
 
-const PolylineRoutes = (props) => {
+const TransparentPolylineRoutes = (props) => {
   const { map } = props.leaflet;
   const {
     hoverColor,
@@ -26,7 +26,7 @@ const PolylineRoutes = (props) => {
         polylineArr.push(
           <GeoJSON
             data={polyLine}
-            style={polyLine.properties}
+            style={{ color: "white", weight: 20, opacity: 0.2 }}
             key={polyLine.properties.day}
             onclick={clickhandler}
             onmouseout={mouseoutHandler}
@@ -55,7 +55,7 @@ const PolylineRoutes = (props) => {
   };
 
   const mouseoutHandler = (e) => {
-    e.target.setStyle({ color: e.layer.feature.properties.color, weight: 3 });
+    e.target.setStyle({ color: e.layer.feature.properties.color, weight: 4 });
   };
 
   return addPolylines();
@@ -80,4 +80,4 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withLeaflet(PolylineRoutes));
+)(withLeaflet(TransparentPolylineRoutes));
