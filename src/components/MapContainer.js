@@ -33,6 +33,7 @@ const MapContainer = (props) => {
       {isDesktop ? <Dashboard /> : null}
       <GeoJsonRoutes />
       <PolylineRoutes />
+      <Info />
     </Map>
   );
 };
