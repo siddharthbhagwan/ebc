@@ -10,7 +10,7 @@ const Info = () => {
 
   return (
     <>
-      <Control position={"topleft"} className={"icon infoIcon"}>
+      <Control position={"bottomleft"} className={"icon infoIcon"}>
         <div>
           <img src={InfoIconSvg} width="18px" onClick={toggleInfo} />
         </div>
