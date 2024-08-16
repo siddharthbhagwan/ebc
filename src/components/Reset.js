@@ -3,16 +3,14 @@ import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import resetIcon from "../resources/images/map.svg";
 import legendIcon from "../resources/images/legend.svg";
-import Control from "react-leaflet-control";
-import { isDesktop } from "react-device-detect";
 import "leaflet-easybutton";
+import Control from "react-leaflet-control";
 
 const Reset = (props) => {
   const { center, zoom, setLegend } = props;
   const { map } = props.leaflet;
 
-  const resetZoom = () =>
-    map.flyTo(center, isDesktop ? zoom : 10.7, { duration: 0.5 });
+  const resetZoom = () => map.flyTo(center, zoom, { duration: 0.5 });
 
   const toggleLegend = () => setLegend((legend) => !legend);
 

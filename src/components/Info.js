@@ -10,12 +10,11 @@ const Info = () => {
 
   return (
     <>
-      <Control position={"topleft"} className={"icon infoIcon"}>
+      <Control position={"topleft"} className={"icon"}>
         <div>
           <img src={InfoIconSvg} width="18px" onClick={toggleInfo} />
         </div>
       </Control>
-
       {!hidden && (
         <Control
           position={"topleft"}
