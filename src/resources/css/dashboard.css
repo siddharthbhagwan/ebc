@@ -23,7 +23,6 @@ generic-dashboard {
 .dashboardDetails {
   font-size: 18px;
   line-height: 23px;
-  width: 280px !important;
 }
 
 .dashboardDetails .icon {
@@ -104,6 +103,7 @@ generic-dashboard {
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+  padding: 0;
 }
 
 .column {

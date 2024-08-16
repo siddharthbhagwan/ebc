@@ -8,14 +8,24 @@ import POI from "./POI";
 import PolylineRoutes from "./PolylineRoutes";
 import Info from "./Info";
 import Reset from "./Reset";
-import { isDesktop } from "react-device-detect";
 import ReactGA from "react-ga4";
 import TransparentPolylines from "./TransparentPolylines";
 import TransparentGeoJson from "./TransparentGeoJson";
+import { useMobileOrientation, isDesktop } from "react-device-detect";
 
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
   const [showLegend, setLegend] = useState(Boolean(isDesktop));
+
+  const { isLandscape = false } = useMobileOrientation();
+  const ZOOM_DESKTOP = 11.4;
+  const ZOOM_MOBILE = 10.7;
+  const ZOOM_LANDSCAPE = 10.2;
+  const derivedZoom = isDesktop
+    ? ZOOM_DESKTOP
+    : isLandscape
+    ? ZOOM_LANDSCAPE
+    : ZOOM_MOBILE;
 
   useEffect(() => {
     ReactGA.send({ hitType: "pageview", page: window.location.pathname });
@@ -25,7 +35,7 @@ const MapContainer = (props) => {
     <Map
       center={center}
       zoomSnap={zoomSnap}
-      zoom={isDesktop ? zoom : 10.7}
+      zoom={derivedZoom || zoom}
       style={style}
     >
       <TileLayer url={url} attribution={attribution} />

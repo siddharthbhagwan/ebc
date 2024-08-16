@@ -16,13 +16,14 @@ const getSize = () => (isMobile ? MOBILE_SIZE : DESKTOP_SIZE);
 
 const Legend = () => {
   const { isLandscape = false } = useMobileOrientation();
+  const position = isDesktop || isLandscape ? "bottomright" : "topright";
 
   return (
-    <Control
-      position={isDesktop || isLandscape ? "bottomright" : "topright"}
-      style={{ marginTop: 0 }}
-    >
-      <div className={`legend ${isMobile ? "mapLegend-mobile" : ""}`}>
+    <Control position={position} style={{ marginTop: 0 }}>
+      <div
+        className={"legend mapLegend-mobile"}
+        style={{ width: isDesktop || isLandscape ? 360 : 320 }}
+      >
         <div className="legendItem">
           <img src={ebcIcon} width={MOBILE_SIZE} /> Base Camp
         </div>

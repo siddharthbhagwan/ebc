@@ -39,6 +39,7 @@ const Dashboard = (props) => {
             fontSize: isMobile ? 15 : 17,
             justifyContent: isPlace ? "center" : "space-evenly",
             alignItems: "center",
+            width: isDesktop || isLandscape ? 330 : 280,
           }}
         >
           {!isPlace && distance && time ? (
@@ -46,7 +47,7 @@ const Dashboard = (props) => {
               className={!isPlace ? "" : "column-30"}
               style={{
                 flexDirection: isMobile ? "row" : "column",
-                display: "flex",
+                display: "contents",
               }}
             >
               {/* Time */}
