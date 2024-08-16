@@ -1,11 +1,11 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "2af484f9e10dfc78da2434b76ddb85a6",
+    "revision": "6198c2ac2df3cb038b52e67a2295a0f3",
     "url": "/ebc-dashboard/index.html"
   },
   {
-    "revision": "c9d8fd57557100c22d87",
-    "url": "/ebc-dashboard/static/css/main.889e4bce.chunk.css"
+    "revision": "079eeae0a8051df60f42",
+    "url": "/ebc-dashboard/static/css/main.13a55230.chunk.css"
   },
   {
     "revision": "6872e119f58d4dd4fe72",
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/ebc-dashboard/static/js/2.13419232.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "c9d8fd57557100c22d87",
-    "url": "/ebc-dashboard/static/js/main.7595a1b3.chunk.js"
+    "revision": "079eeae0a8051df60f42",
+    "url": "/ebc-dashboard/static/js/main.5ac1096d.chunk.js"
   },
   {
     "revision": "77ad2995eeaf71d00c62",
