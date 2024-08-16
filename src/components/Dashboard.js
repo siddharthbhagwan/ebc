@@ -2,7 +2,7 @@ import React from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import Control from "react-leaflet-control";
-import { isMobile } from "react-device-detect";
+import { isDesktop, isMobile, useMobileOrientation } from "react-device-detect";
 import "../resources/css/dashboard.css";
 
 const Dashboard = (props) => {
@@ -12,12 +12,13 @@ const Dashboard = (props) => {
     endAlt = null,
     distance,
     time,
-    icon,
+    // icon,
   } = props;
 
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
-  const position = isMobile ? "topright" : "bottomright";
+  const { isLandscape = false } = useMobileOrientation();
+  const position = isDesktop || isLandscape ? "bottomright" : "topright";
 
   return (
     <Control position={position}>
