@@ -94,3 +94,33 @@ generic-dashboard {
   padding-right: 7px;
   padding-left: 7px;
 }
+
+.desc {
+  font-size: 14px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.column-30 {
+  width: 25%;
+}
+
+.column-70 {
+  width: 75%;
+}
+
+.item {
+  padding: 5px 0;
+  box-sizing: border-box;
+}

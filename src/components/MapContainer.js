@@ -30,7 +30,7 @@ const MapContainer = (props) => {
       <Reset setLegend={setLegend} />
       <POI />
       {showLegend ? <Legend /> : null}
-      {isDesktop ? <Dashboard /> : null}
+      <Dashboard />
       <GeoJsonRoutes />
       <PolylineRoutes />
       <Info />
