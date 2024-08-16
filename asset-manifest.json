@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/ebc-dashboard/static/css/main.13a55230.chunk.css",
-    "main.js": "/ebc-dashboard/static/js/main.5ac1096d.chunk.js",
-    "main.js.map": "/ebc-dashboard/static/js/main.5ac1096d.chunk.js.map",
+    "main.css": "/ebc-dashboard/static/css/main.4142c7c3.chunk.css",
+    "main.js": "/ebc-dashboard/static/js/main.86e30594.chunk.js",
+    "main.js.map": "/ebc-dashboard/static/js/main.86e30594.chunk.js.map",
     "runtime-main.js": "/ebc-dashboard/static/js/runtime-main.611b304f.js",
     "runtime-main.js.map": "/ebc-dashboard/static/js/runtime-main.611b304f.js.map",
     "static/js/2.13419232.chunk.js": "/ebc-dashboard/static/js/2.13419232.chunk.js",
     "static/js/2.13419232.chunk.js.map": "/ebc-dashboard/static/js/2.13419232.chunk.js.map",
     "index.html": "/ebc-dashboard/index.html",
-    "precache-manifest.adc1ec9c692fee7a756c346fe6481e6f.js": "/ebc-dashboard/precache-manifest.adc1ec9c692fee7a756c346fe6481e6f.js",
+    "precache-manifest.89f151bd2bc7231cbb0581eb1bc2858a.js": "/ebc-dashboard/precache-manifest.89f151bd2bc7231cbb0581eb1bc2858a.js",
     "service-worker.js": "/ebc-dashboard/service-worker.js",
-    "static/css/main.13a55230.chunk.css.map": "/ebc-dashboard/static/css/main.13a55230.chunk.css.map",
+    "static/css/main.4142c7c3.chunk.css.map": "/ebc-dashboard/static/css/main.4142c7c3.chunk.css.map",
     "static/js/2.13419232.chunk.js.LICENSE.txt": "/ebc-dashboard/static/js/2.13419232.chunk.js.LICENSE.txt",
     "static/media/airport.svg": "/ebc-dashboard/static/media/airport.a9339a65.svg",
     "static/media/ebc.svg": "/ebc-dashboard/static/media/ebc.3605fab2.svg",
@@ -24,7 +24,7 @@
   "entrypoints": [
     "static/js/runtime-main.611b304f.js",
     "static/js/2.13419232.chunk.js",
-    "static/css/main.13a55230.chunk.css",
-    "static/js/main.5ac1096d.chunk.js"
+    "static/css/main.4142c7c3.chunk.css",
+    "static/js/main.86e30594.chunk.js"
   ]
 }
