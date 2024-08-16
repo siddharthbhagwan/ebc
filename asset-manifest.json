@@ -1,0 +1,30 @@
+{
+  "files": {
+    "main.css": "/ebc-dashboard/static/css/main.05b4f018.chunk.css",
+    "main.js": "/ebc-dashboard/static/js/main.60c8b940.chunk.js",
+    "main.js.map": "/ebc-dashboard/static/js/main.60c8b940.chunk.js.map",
+    "runtime-main.js": "/ebc-dashboard/static/js/runtime-main.611b304f.js",
+    "runtime-main.js.map": "/ebc-dashboard/static/js/runtime-main.611b304f.js.map",
+    "static/js/2.890f9f0b.chunk.js": "/ebc-dashboard/static/js/2.890f9f0b.chunk.js",
+    "static/js/2.890f9f0b.chunk.js.map": "/ebc-dashboard/static/js/2.890f9f0b.chunk.js.map",
+    "index.html": "/ebc-dashboard/index.html",
+    "precache-manifest.168b3ed2d3495cae817b4b72e8575418.js": "/ebc-dashboard/precache-manifest.168b3ed2d3495cae817b4b72e8575418.js",
+    "service-worker.js": "/ebc-dashboard/service-worker.js",
+    "static/css/main.05b4f018.chunk.css.map": "/ebc-dashboard/static/css/main.05b4f018.chunk.css.map",
+    "static/js/2.890f9f0b.chunk.js.LICENSE.txt": "/ebc-dashboard/static/js/2.890f9f0b.chunk.js.LICENSE.txt",
+    "static/media/airport.svg": "/ebc-dashboard/static/media/airport.a9339a65.svg",
+    "static/media/ebc.svg": "/ebc-dashboard/static/media/ebc.3605fab2.svg",
+    "static/media/info.svg": "/ebc-dashboard/static/media/info.1be8a59f.svg",
+    "static/media/legend.svg": "/ebc-dashboard/static/media/legend.f2249ac1.svg",
+    "static/media/map.svg": "/ebc-dashboard/static/media/map.3f99a64d.svg",
+    "static/media/pass.svg": "/ebc-dashboard/static/media/pass.02888303.svg",
+    "static/media/summit.svg": "/ebc-dashboard/static/media/summit.f0d974ca.svg",
+    "static/media/tent.svg": "/ebc-dashboard/static/media/tent.3099eae7.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.611b304f.js",
+    "static/js/2.890f9f0b.chunk.js",
+    "static/css/main.05b4f018.chunk.css",
+    "static/js/main.60c8b940.chunk.js"
+  ]
+}
