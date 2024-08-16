@@ -1,8 +1,8 @@
 import React from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
-import resetIcon from "../resources/images/map.svg";
 import legendIcon from "../resources/images/legend.svg";
+import locationIcon from "../resources/images/location.svg";
 import Control from "react-leaflet-control";
 import { isDesktop } from "react-device-detect";
 import "leaflet-easybutton";
@@ -19,7 +19,7 @@ const Reset = (props) => {
   const mapButton = (
     <img
       width={"34px"}
-      src={resetIcon}
+      src={locationIcon}
       className={"icon"}
       onClick={resetZoom}
     />

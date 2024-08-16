@@ -9,7 +9,7 @@ const initialState = {
   style: { height: "100vh", width: "100%" },
   zoomDuration: 0.5,
   paddingTopLeft: [50, 70],
-  paddingBottomRight: [30, -50],
+  paddingBottomRight: [30, 0],
 };
 
 export const mapStateReducer = (state = initialState, action: any) => {
