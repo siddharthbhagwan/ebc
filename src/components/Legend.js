@@ -15,7 +15,10 @@ const MOBILE_SIZE = "15px";
 const getSize = () => (isMobile ? MOBILE_SIZE : DESKTOP_SIZE);
 
 const Legend = () => (
-  <Control position={isMobile ? "topright" : "bottomleft"}>
+  <Control
+    position={isMobile ? "topright" : "bottomleft"}
+    style={{ marginTop: 0 }}
+  >
     <div className={`legend ${isMobile ? "mapLegend-mobile" : ""}`}>
       <div className="legendItem">
         <img src={ebcIcon} width={MOBILE_SIZE} /> Base Camp

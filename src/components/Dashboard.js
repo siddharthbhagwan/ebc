@@ -37,7 +37,6 @@ const Dashboard = (props) => {
           style={{
             fontSize: isMobile ? 15 : 17,
             justifyContent: isPlace ? "center" : "space-evenly",
-            maxWidth: isMobile ? "75vw" : "auto",
             alignItems: "center",
           }}
         >

@@ -6,8 +6,6 @@
   border-radius: 5px;
   text-align: left;
   text-align: center;
-  min-width: 320px;
-  margin-bottom: 15px;
 }
 
 .infoDashboard {
@@ -25,6 +23,7 @@ generic-dashboard {
 .dashboardDetails {
   font-size: 18px;
   line-height: 23px;
+  width: 280px !important;
 }
 
 .dashboardDetails .icon {
@@ -123,4 +122,8 @@ generic-dashboard {
 .item {
   padding: 5px;
   box-sizing: border-box;
+}
+
+.legend {
+  width: 320x !important;
 }
