@@ -1,5 +1,4 @@
 .dashboard {
-  padding: 15px 15px;
   font: 14px/16px;
   background: white;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
@@ -125,5 +124,5 @@ generic-dashboard {
 }
 
 .legend {
-  width: 320x !important;
+  width: 320px !important;
 }

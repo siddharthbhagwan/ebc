@@ -18,32 +18,47 @@ const Dashboard = (props) => {
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
   const { isLandscape = false } = useMobileOrientation();
-  const position = isDesktop || isLandscape ? "bottomright" : "topright";
+  const position = isDesktop ? "bottomright" : "topright";
+
+  const day = (
+    <>
+      {/* Day */}
+      <span className="desc" style={{ fontWeight: "bold" }}>
+        Day {props.day}
+      </span>
+    </>
+  );
 
   return (
     <Control position={position}>
       <div className={"dashboard"}>
-        <span style={{ fontSize: 13, textAlign: "left" }}>
-          EBC 3 Pass Trek, Nepal{" "}
-        </span>
-
-        {/* Day */}
-        <span className="desc" style={{ fontWeight: "bold" }}>
-          Day {props.day}
-        </span>
+        {!isLandscape ? (
+          <>
+            <span style={{ fontSize: 13, textAlign: "left" }}>
+              EBC 3 Pass Trek, Nepal{" "}
+            </span>
+          </>
+        ) : null}
 
         {!isMobile ? <br /> : null}
         <div
           className={"dashboardDetails container"}
           style={{
-            fontSize: isMobile ? 15 : 17,
+            fontSize: isMobile ? 14 : 17,
             justifyContent: isPlace ? "center" : "space-evenly",
             alignItems: "center",
-            width: isDesktop || isLandscape ? 330 : 280,
+            width: isDesktop ? 330 : isLandscape ? "100vw" : 280,
           }}
         >
+          {isLandscape ? (
+            <>
+              {/* Day */}
+              {/* {day} */}
+            </>
+          ) : null}
+
           {!isPlace && distance && time ? (
-            <div
+            <span
               className={!isPlace ? "" : "column-30"}
               style={{
                 flexDirection: isMobile ? "row" : "column",
@@ -51,30 +66,23 @@ const Dashboard = (props) => {
               }}
             >
               {/* Time */}
-              <div className="item">{distance.split("/")[1]}</div>
-              <div className="item">{time}</div>
-            </div>
+              <span className="item">{distance.split("/")[1]}</span>
+              <span className="item">{time}</span>
+            </span>
           ) : null}
 
-          <div
-            className="column"
-            style={{
-              justifyContent: isPlace ? "center" : "space-evenly",
-            }}
-          >
-            {/* Place */}
-            <div style={{ textAlign: "center" }} className="item">
-              {props.name}
-            </div>
-            {/* Alt Details */}
-            {!isPlace ? (
-              <div className="">
-                {startAlt ? `${startAlt} ft` : ""}
-                {peakAlt ? ` - ${peakAlt} ft` : ""}
-                {endAlt ? ` - ${endAlt} ft` : ""}
-              </div>
-            ) : null}
-          </div>
+          {/* Place */}
+          <span style={{ textAlign: "center" }} className="item">
+            {props.name}
+          </span>
+          {/* Alt Details */}
+          {!isPlace ? (
+            <span className="">
+              {startAlt ? `${startAlt} ft` : ""}
+              {peakAlt ? ` - ${peakAlt} ft` : ""}
+              {endAlt ? ` - ${endAlt} ft` : ""}
+            </span>
+          ) : null}
         </div>
       </div>
     </Control>

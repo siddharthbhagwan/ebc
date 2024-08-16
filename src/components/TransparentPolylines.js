@@ -26,7 +26,7 @@ const TransparentPolylineRoutes = (props) => {
         polylineArr.push(
           <GeoJSON
             data={polyLine}
-            style={{ color: "white", weight: 20, opacity: 0.2 }}
+            style={{ color: "white", weight: 20, opacity: 0.35 }}
             key={polyLine.properties.day}
             onclick={clickhandler}
             onmouseout={mouseoutHandler}

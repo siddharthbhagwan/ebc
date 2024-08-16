@@ -13,16 +13,16 @@ import TransparentPolylines from "./TransparentPolylines";
 import TransparentGeoJson from "./TransparentGeoJson";
 import { useMobileOrientation, isDesktop } from "react-device-detect";
 
+const ZOOM_MOBILE = 10.7;
+const ZOOM_LANDSCAPE = 10.2;
+
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
   const [showLegend, setLegend] = useState(Boolean(isDesktop));
-
   const { isLandscape = false } = useMobileOrientation();
-  const ZOOM_DESKTOP = 11.4;
-  const ZOOM_MOBILE = 10.7;
-  const ZOOM_LANDSCAPE = 10.2;
+
   const derivedZoom = isDesktop
-    ? ZOOM_DESKTOP
+    ? zoom
     : isLandscape
     ? ZOOM_LANDSCAPE
     : ZOOM_MOBILE;
@@ -32,12 +32,7 @@ const MapContainer = (props) => {
   }, []);
 
   return (
-    <Map
-      center={center}
-      zoomSnap={zoomSnap}
-      zoom={derivedZoom || zoom}
-      style={style}
-    >
+    <Map center={center} zoomSnap={zoomSnap} zoom={derivedZoom} style={style}>
       <TileLayer url={url} attribution={attribution} />
       <Reset setLegend={setLegend} />
       <POI />

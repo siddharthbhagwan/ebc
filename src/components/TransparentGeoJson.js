@@ -21,7 +21,7 @@ const TransparentGeoJson = (props) => {
       geoJsonArr.push(
         <GeoJSON
           data={route}
-          style={{ color: "white", weight: 25, opacity: 0.2 }}
+          style={{ color: "white", weight: 25, opacity: 0.35 }}
           key={route.features[0].properties.day}
           onclick={clickhandler}
           onmouseout={mouseoutHandler}

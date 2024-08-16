@@ -1,13 +1,13 @@
 import { isDesktop, isMobile, useMobileOrientation } from "react-device-detect";
 
 const CENTER_DESKTOP = 27.840457443855108;
-const CENTER_MOBILE = 27.840457443855108;
-const center = isMobile ? CENTER_MOBILE : CENTER_DESKTOP;
+const CENTER_MOBILE = 27.875457443855108;
+const x = isMobile ? CENTER_MOBILE : CENTER_DESKTOP;
 
 const initialState = {
   url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   attribution: '<a href="http://osm.org/copyright">OpenStreetMap</a>',
-  center: [center, 86.76420972837559],
+  center: [x, 86.76420972837559],
   zoom: 11.4,
   zoomSnap: 0.1,
   hoverColor: "#1EBBD7",

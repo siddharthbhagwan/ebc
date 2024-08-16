@@ -16,7 +16,7 @@ const getSize = () => (isMobile ? MOBILE_SIZE : DESKTOP_SIZE);
 
 const Legend = () => {
   const { isLandscape = false } = useMobileOrientation();
-  const position = isDesktop || isLandscape ? "bottomright" : "topright";
+  const position = isDesktop ? "bottomright" : "topright";
 
   return (
     <Control position={position} style={{ marginTop: 0 }}>

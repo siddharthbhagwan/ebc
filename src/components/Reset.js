@@ -4,15 +4,24 @@ import { connect } from "react-redux";
 import legendIcon from "../resources/images/legend.svg";
 import locationIcon from "../resources/images/location.svg";
 import Control from "react-leaflet-control";
-import { isDesktop } from "react-device-detect";
+import { useMobileOrientation, isDesktop } from "react-device-detect";
 import "leaflet-easybutton";
+
+const ZOOM_MOBILE = 10.7;
+const ZOOM_LANDSCAPE = 10;
 
 const Reset = (props) => {
   const { center, zoom, setLegend } = props;
   const { map } = props.leaflet;
 
-  const resetZoom = () =>
-    map.flyTo(center, isDesktop ? zoom : 10.7, { duration: 0.5 });
+  const { isLandscape = false } = useMobileOrientation();
+  const derivedZoom = isDesktop
+    ? zoom
+    : isLandscape
+    ? ZOOM_LANDSCAPE
+    : ZOOM_MOBILE;
+
+  const resetZoom = () => map.flyTo(center, derivedZoom, { duration: 0.5 });
 
   const toggleLegend = () => setLegend((legend) => !legend);
 
