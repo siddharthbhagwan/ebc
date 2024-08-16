@@ -20,41 +20,36 @@ const Dashboard = (props) => {
   const { isLandscape = false } = useMobileOrientation();
   const position = isDesktop ? "bottomright" : "topright";
 
-  const day = (
-    <>
-      {/* Day */}
-      <span className="desc" style={{ fontWeight: "bold" }}>
-        Day {props.day}
-      </span>
-    </>
-  );
-
   return (
     <Control position={position}>
       <div className={"dashboard"}>
-        {!isLandscape ? (
-          <>
-            <span style={{ fontSize: 13, textAlign: "left" }}>
+        {isDesktop || (isMobile && !isLandscape) ? (
+          <span>
+            <span style={{ fontSize: 13, textAlign: "left", marginBottom: 5 }}>
               EBC 3 Pass Trek, Nepal{" "}
             </span>
-          </>
+
+            {/* Day */}
+            <span className="desc" style={{ fontWeight: "bold" }}>
+              Day {props.day}
+            </span>
+          </span>
         ) : null}
 
         {!isMobile ? <br /> : null}
         <div
           className={"dashboardDetails container"}
           style={{
-            fontSize: isMobile ? 14 : 17,
+            fontSize: isMobile ? 15 : 17,
             justifyContent: isPlace ? "center" : "space-evenly",
             alignItems: "center",
             width: isDesktop ? 330 : isLandscape ? "100vw" : 280,
           }}
         >
-          {isLandscape ? (
-            <>
-              {/* Day */}
-              {/* {day} */}
-            </>
+          {isMobile && isLandscape ? (
+            <span className="desc" style={{ fontWeight: "bold" }}>
+              Day {props.day}
+            </span>
           ) : null}
 
           {!isPlace && distance && time ? (
