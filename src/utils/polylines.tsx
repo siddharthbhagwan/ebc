@@ -19,7 +19,7 @@ const lukla_to_phakding_1 = {
 const phakding_to_namache_bazaar_2 = {
   properties: {
     weight: 3,
-    day: "2",
+    day: 2,
     name: "Phakding - Namache Bazaar",
     distance: "6.72 mi / 10.81 km",
     time: "5h 30m",
@@ -37,7 +37,7 @@ const phakding_to_namache_bazaar_2 = {
 const namache_bazaar_to_tyengboche_4 = {
   properties: {
     weight: 3,
-    day: "4",
+    day: 4,
     name: "Namache Bazaar - Tengboche",
     distance: "5.95 mi / 9.57 km",
     time: "5h 30m",
@@ -55,7 +55,7 @@ const namache_bazaar_to_tyengboche_4 = {
 const tyenboche_to_dingboche_5 = {
   properties: {
     weight: 3,
-    day: "5",
+    day: 5,
     name: "Tengboche - Dingboche",
     distance: "6.71 mi / 10.8 km",
     time: "5h 30m",
@@ -73,7 +73,7 @@ const tyenboche_to_dingboche_5 = {
 const dingboche_to_chukung_6 = {
   properties: {
     weight: 3,
-    day: "6",
+    day: 6,
     name: "Dingboche - Chhukung",
     distance: "2.80 mi / 10.41 km",
     time: "4h 00m",
@@ -91,7 +91,7 @@ const dingboche_to_chukung_6 = {
 const lobuche_to_dzongla_13 = {
   properties: {
     weight: 3,
-    day: "13",
+    day: 13,
     name: "Lobuche - Dzongla",
     distance: "3.91 mi / 6.29 km",
     time: "4h 00m",

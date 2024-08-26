@@ -40,10 +40,10 @@ const MapContainer = (props) => {
       <Dashboard />
 
       <GeoJsonRoutes />
-      <TransparentGeoJson />
+      {/* <TransparentGeoJson /> */}
 
       <PolylineRoutes />
-      <TransparentPolylines />
+      {/* <TransparentPolylines /> */}
 
       <Info />
     </Map>

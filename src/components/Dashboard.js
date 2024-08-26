@@ -3,15 +3,21 @@ import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import Control from "react-leaflet-control";
 import { isDesktop, isMobile, useMobileOrientation } from "react-device-detect";
+import arrowIcon from "../resources/images/leftArrow.svg";
+
 import "../resources/css/dashboard.css";
+import { mapDispatchToProps } from "../utils/utils";
+import useDays from "../hooks/useDays";
 
 const Dashboard = (props) => {
   const {
+    dispatchLayerDetails,
     peakAlt = null,
     startAlt = null,
     endAlt = null,
     distance,
     time,
+    day,
     // icon,
   } = props;
 
@@ -20,36 +26,62 @@ const Dashboard = (props) => {
   const { isLandscape = false } = useMobileOrientation();
   const position = isDesktop ? "bottomright" : "topright";
 
+  const { nextDay, prevDay } = useDays(day, dispatchLayerDetails);
+
+  const NextArrow = (
+    <img
+      src={arrowIcon}
+      width={"30px"}
+      className="rightIcon navIcon"
+      onClick={() => nextDay()}
+    />
+  );
+
+  const PrevArrow = (
+    <span onClick={() => prevDay()} className="navIcon">
+      <img src={arrowIcon} width={"30px"} />
+    </span>
+  );
+
+  const NavigationLine = (
+    <div className="dashboardHeader">
+      {PrevArrow}
+      {/* Base Camp */}
+      EBC 3 Pass Trek, Nepal
+      <span className="desc" style={{ fontWeight: "bold" }}>
+        Day {props.day}
+      </span>
+      {NextArrow}
+    </div>
+  );
+
   return (
     <Control position={position}>
       <div className={"dashboard"}>
-        {isDesktop || (isMobile && !isLandscape) ? (
-          <span>
-            <span style={{ fontSize: 13, textAlign: "left", marginBottom: 5 }}>
-              EBC 3 Pass Trek, Nepal{" "}
-            </span>
+        {isMobile && !isLandscape ? NavigationLine : null}
 
-            {/* Day */}
-            <span className="desc" style={{ fontWeight: "bold" }}>
-              Day {props.day}
-            </span>
-          </span>
-        ) : null}
-
-        {!isMobile ? <br /> : null}
         <div
           className={"dashboardDetails container"}
           style={{
             fontSize: isMobile ? 15 : 17,
-            justifyContent: isPlace ? "center" : "space-evenly",
+            justifyContent:
+              isPlace && !isLandscape
+                ? "center"
+                : isMobile && isLandscape
+                ? "space-between"
+                : "space-evenly",
             alignItems: "center",
-            width: isDesktop ? 330 : isLandscape ? "100vw" : 280,
+            padding: 10,
+            width: isDesktop ? 360 : isLandscape ? "110vw" : 280,
           }}
         >
           {isMobile && isLandscape ? (
-            <span className="desc" style={{ fontWeight: "bold" }}>
-              Day {props.day}
-            </span>
+            <>
+              {PrevArrow}
+              <span className="desc" style={{ fontWeight: "bold" }}>
+                Day {props.day}
+              </span>
+            </>
           ) : null}
 
           {!isPlace && distance && time ? (
@@ -70,6 +102,7 @@ const Dashboard = (props) => {
           <span style={{ textAlign: "center" }} className="item">
             {props.name}
           </span>
+
           {/* Alt Details */}
           {!isPlace ? (
             <span className="">
@@ -78,7 +111,11 @@ const Dashboard = (props) => {
               {endAlt ? ` - ${endAlt} ft` : ""}
             </span>
           ) : null}
+
+          {isMobile && isLandscape ? NextArrow : null}
         </div>
+
+        {isDesktop ? NavigationLine : null}
       </div>
     </Control>
   );
@@ -95,4 +132,7 @@ const mapStateToProps = (state) => ({
   distance: state.route.distance,
 });
 
-export default connect(mapStateToProps)(withLeaflet(Dashboard));
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withLeaflet(Dashboard));

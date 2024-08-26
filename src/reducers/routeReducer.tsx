@@ -1,6 +1,6 @@
 const initialState = {
   icon: "",
-  day: "0",
+  day: 0,
   name: "Kathmandu - Lukla",
   time: "0h 00m",
   distance: "0 mi / 0 km",

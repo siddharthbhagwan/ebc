@@ -123,3 +123,17 @@ generic-dashboard {
   padding: 5px;
   box-sizing: border-box;
 }
+
+.rightIcon {
+  transform: rotate(180deg);
+}
+
+.navIcon {
+  cursor: pointer;
+}
+
+.dashboardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
