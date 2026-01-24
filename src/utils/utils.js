@@ -5,4 +5,14 @@ export const mapDispatchToProps = (dispatch) => ({
 			type: "UPDATE_LAYER_DETAILS",
 		});
 	},
+	toggleLegend: () => {
+		dispatch({
+			type: "TOGGLE_LEGEND",
+		});
+	},
+	toggleInfo: () => {
+		dispatch({
+			type: "TOGGLE_INFO",
+		});
+	},
 });

@@ -2,21 +2,14 @@ import React from "react";
 import ReactGA from "react-ga4";
 import MapContainer from "./components/MapContainer";
 
-ReactGA.initialize("G-0D6NC98JBF", {
-  gaOptions: {
-    debug_mode: true,
-  },
-  gtagOptions: {
-    debug_mode: true,
-  },
-});
-
-const App = () => {
-  return (
-    <div>
-      <MapContainer />
-    </div>
-  );
-};
+class App extends React.Component {
+  render() {
+    return (
+      <div style={{ height: "100%", width: "100%" }}>
+        <MapContainer />
+      </div>
+    );
+  }
+}
 
 export default App;

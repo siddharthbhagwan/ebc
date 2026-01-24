@@ -4,12 +4,12 @@ import { connect } from "react-redux";
 import Dashboard from "./Dashboard";
 import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
+import Info from "./Info";
 import POI from "./POI";
 import { isDesktop } from "react-device-detect";
 
 const MapContainer = (props) => {
-  const { center, zoomSnap, zoom, style, url, attribution } = props;
-  const showLegend = Boolean(isDesktop);
+  const { center, zoomSnap, zoom, style, url, attribution, showLegend, showInfo } = props;
 
   return (
     <Map
@@ -24,6 +24,7 @@ const MapContainer = (props) => {
       <POI />
       <Dashboard />
       <Legend showLegend={showLegend} />
+      <Info showInfo={showInfo} />
       <GeoJsonRoutes />
     </Map>
   );
@@ -41,6 +42,8 @@ const mapStateToProps = (state) => ({
   zoomDuration: state.mapState.zoomDuration,
   topLeftPadding: state.mapState.topLeftPadding,
   bottomRightPadding: state.mapState.bottomRightPadding,
+  showLegend: state.mapState.showLegend,
+  showInfo: state.mapState.showInfo,
 });
 
 export default connect(mapStateToProps)(MapContainer);

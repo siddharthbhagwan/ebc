@@ -1,0 +1,4 @@
+./README.md:6:It uses React, Redux and TypeScript and is hosted on [http://coderbear.com/ebc-dashboard](http://coderbear.com/ebc-dashboard) via GitHub Pages.
+./package-lock.json:2:  "name": "ebc-dashboard",
+./package-lock.json:8:      "name": "ebc-dashboard",
+./package.json:2:  "name": "ebc-dashboard",

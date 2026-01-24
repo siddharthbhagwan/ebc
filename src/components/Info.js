@@ -1,37 +1,49 @@
-import React, { useState } from "react";
+import React from "react";
 import { withLeaflet } from "react-leaflet";
 import Control from "react-leaflet-control";
-import { isDesktop } from "react-device-detect";
-import InfoIconSvg from "../resources/images/info.svg";
+import { connect } from "react-redux";
 import "../resources/css/dashboard.css";
+import { mapDispatchToProps } from "../utils/utils";
 
-const Info = () => {
-  const [hidden, setHidden] = useState(true);
-  const toggleInfo = () => setHidden(!hidden);
+const Info = (props) => {
+	const { showInfo, toggleInfo } = props;
 
 	return (
 		<>
-			<Control position={"topleft"} className={"icon infoIcon"}>
-				<div>
-					<img src={InfoIconSvg} width="18px" onClick={toggleInfo} />
-				</div>
-			</Control>
-			{!hidden && (
+			{showInfo && (
 				<Control
 					position={"topleft"}
 					className={"dashboard infoDashboard leafletLeft-center"}
 				>
-					<div className={"infoSection"}>
-						Hey! This is map-blog for the Everest Base 3 Pass Trek I undertook
+					<div className={"infoSection"} style={{ padding: "15px", fontSize: "14px", lineHeight: "1.6" }}>
+						Hey! This is a map-blog for the Everest Base 3 Pass Trek I undertook
 						in May 2016.
 						<br />
 						Thanks for checking it out!
+						<br />
+						<br />
+						Twitter: <a href="https://twitter.com/siddhartha_b" target="_blank" rel="noopener noreferrer">@siddhartha_b</a>
 					</div>
-					<br />
-					<div>
-						<button onClick={toggleInfo}>
-							<span className={"okButton"}>Ok</span>
-						</button>
+					<div style={{ padding: "0 15px 15px 15px", textAlign: "center" }}>
+						<div 
+							onClick={toggleInfo} 
+							style={{ 
+								cursor: "pointer", 
+								display: "inline-flex", 
+								alignItems: "center", 
+								justifyContent: "center",
+								width: "32px",
+								height: "32px",
+								borderRadius: "50%",
+								background: "#f5f5f5",
+								border: "1px solid #eee",
+								color: "#7f8c8d",
+								fontSize: "18px",
+								fontWeight: "bold"
+							}}
+						>
+							✕
+						</div>
 					</div>
 				</Control>
 			)}
@@ -39,4 +51,8 @@ const Info = () => {
 	);
 };
 
-export default withLeaflet(Info);
+const mapStateToProps = (state) => ({
+	showInfo: state.mapState.showInfo,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withLeaflet(Info));
