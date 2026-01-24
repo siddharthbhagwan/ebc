@@ -3,7 +3,7 @@ import * as L from 'leaflet';
 import { connect } from 'react-redux';
 import '../resources/css/dashboard.css';
 import { getMarkers } from '../utils/markers';
-import { mapDispatchToProps } from '../utils/utils.js';
+import { mapDispatchToProps } from '../utils/utils';
 import { Marker, withLeaflet, Tooltip } from 'react-leaflet';
 
 const POI = (props) => {

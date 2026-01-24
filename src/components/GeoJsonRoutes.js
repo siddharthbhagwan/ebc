@@ -3,7 +3,7 @@ import { Polyline, withLeaflet } from "react-leaflet";
 import L from "leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { connect } from "react-redux";
-import { mapDispatchToProps } from "../utils/utils.js";
+import { mapDispatchToProps } from "../utils/utils";
 import { createGradientSegments } from "../utils/heightGradient";
 
 const GeoJsonRoutes = (props) => {
@@ -81,5 +81,5 @@ const mapStateToProps = (state) => ({
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 )(withLeaflet(GeoJsonRoutes));

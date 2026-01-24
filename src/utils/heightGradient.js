@@ -3,7 +3,7 @@
  * Simple elevation-based color assignment
  */
 
-const GRADIENT_COLORS = [
+export const GRADIENT_COLORS = [
   "#1a4d00",
   "#226600",
   "#2a7f00",
@@ -32,9 +32,6 @@ const GRADIENT_COLORS = [
   "#661111",
 ];
 
-/**
- * Get color based on normalized elevation (0-1)
- */
 const getColorFromNormalized = (normalizedElevation) => {
   const clipped = Math.max(0, Math.min(1, normalizedElevation));
   const colorIndex = Math.round(clipped * (GRADIENT_COLORS.length - 1));
@@ -173,10 +170,12 @@ export const createGradientSegments = (coordinates) => {
   return segments;
 };
 
-export default {
+const heightGradient = {
   getFeatureColor,
   getFeatureStyle,
   getColorForElevation,
   createGradientSegments,
   GRADIENT_COLORS,
 };
+
+export default heightGradient;
