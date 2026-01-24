@@ -1,0 +1,32 @@
+TODO
+
+- analytics
+- mobile dashboard
+- altitude code
+- add leaflet mobile
+- color icons - teal and blue 
+
+- Issues
+
+
+Fun possibilities!
+- direction arrows
+- Double arrows
+- cursor
+- Info section
+- heartbeat
+- altitude graph
+- move css to media queries
+- add info section
+- remove bootstrap
+
+Make Sense of
+
+- center info div
+- elevation data
+
+
+- Done
+1. Toggle Legend
+2. Reduce Icon size
+3. Add labels
