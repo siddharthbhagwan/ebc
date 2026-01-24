@@ -1,21 +1,20 @@
 {
   "files": {
     "main.css": "/ebc-dashboard/static/css/main.983efdef.chunk.css",
-    "main.js": "/ebc-dashboard/static/js/main.7a1ebd8c.chunk.js",
-    "main.js.map": "/ebc-dashboard/static/js/main.7a1ebd8c.chunk.js.map",
+    "main.js": "/ebc-dashboard/static/js/main.6a3c7c51.chunk.js",
+    "main.js.map": "/ebc-dashboard/static/js/main.6a3c7c51.chunk.js.map",
     "runtime-main.js": "/ebc-dashboard/static/js/runtime-main.611b304f.js",
     "runtime-main.js.map": "/ebc-dashboard/static/js/runtime-main.611b304f.js.map",
-    "static/js/2.91b05510.chunk.js": "/ebc-dashboard/static/js/2.91b05510.chunk.js",
-    "static/js/2.91b05510.chunk.js.map": "/ebc-dashboard/static/js/2.91b05510.chunk.js.map",
+    "static/js/2.ccd3df23.chunk.js": "/ebc-dashboard/static/js/2.ccd3df23.chunk.js",
+    "static/js/2.ccd3df23.chunk.js.map": "/ebc-dashboard/static/js/2.ccd3df23.chunk.js.map",
     "index.html": "/ebc-dashboard/index.html",
-    "precache-manifest.7533afaf47f76e7e81e3c145547a4ac6.js": "/ebc-dashboard/precache-manifest.7533afaf47f76e7e81e3c145547a4ac6.js",
+    "precache-manifest.503ee840019a3a73de2e82e4c028774f.js": "/ebc-dashboard/precache-manifest.503ee840019a3a73de2e82e4c028774f.js",
     "service-worker.js": "/ebc-dashboard/service-worker.js",
     "static/css/main.983efdef.chunk.css.map": "/ebc-dashboard/static/css/main.983efdef.chunk.css.map",
-    "static/js/2.91b05510.chunk.js.LICENSE.txt": "/ebc-dashboard/static/js/2.91b05510.chunk.js.LICENSE.txt",
+    "static/js/2.ccd3df23.chunk.js.LICENSE.txt": "/ebc-dashboard/static/js/2.ccd3df23.chunk.js.LICENSE.txt",
     "static/media/airport.svg": "/ebc-dashboard/static/media/airport.a9339a65.svg",
     "static/media/ebc.svg": "/ebc-dashboard/static/media/ebc.3605fab2.svg",
     "static/media/leftArrow.svg": "/ebc-dashboard/static/media/leftArrow.90e02024.svg",
-    "static/media/legend.svg": "/ebc-dashboard/static/media/legend.f2249ac1.svg",
     "static/media/location.svg": "/ebc-dashboard/static/media/location.08b347be.svg",
     "static/media/pass.svg": "/ebc-dashboard/static/media/pass.02888303.svg",
     "static/media/summit.svg": "/ebc-dashboard/static/media/summit.f0d974ca.svg",
@@ -23,8 +22,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.611b304f.js",
-    "static/js/2.91b05510.chunk.js",
+    "static/js/2.ccd3df23.chunk.js",
     "static/css/main.983efdef.chunk.css",
-    "static/js/main.7a1ebd8c.chunk.js"
+    "static/js/main.6a3c7c51.chunk.js"
   ]
 }
