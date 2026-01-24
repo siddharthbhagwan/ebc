@@ -5,6 +5,7 @@ import Dashboard from "./Dashboard";
 import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import POI from "./POI";
+import Info from "./Info";
 import Reset from "./Reset";
 import { isDesktop } from "react-device-detect";
 
@@ -22,8 +23,9 @@ const MapContainer = (props) => {
       <TileLayer url={url} attribution={attribution} />
       <Reset setLegend={setLegend} />
       <POI />
+      <Info />
       {showLegend ? <Legend /> : null}
-      {!isDesktop ? <Dashboard /> : null}
+      <Dashboard />
       <GeoJsonRoutes />
     </Map>
   );
