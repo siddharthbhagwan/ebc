@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/ebc-dashboard/static/css/main.983efdef.chunk.css",
-    "main.js": "/ebc-dashboard/static/js/main.2607c10f.chunk.js",
-    "main.js.map": "/ebc-dashboard/static/js/main.2607c10f.chunk.js.map",
+    "main.js": "/ebc-dashboard/static/js/main.7a1ebd8c.chunk.js",
+    "main.js.map": "/ebc-dashboard/static/js/main.7a1ebd8c.chunk.js.map",
     "runtime-main.js": "/ebc-dashboard/static/js/runtime-main.611b304f.js",
     "runtime-main.js.map": "/ebc-dashboard/static/js/runtime-main.611b304f.js.map",
     "static/js/2.91b05510.chunk.js": "/ebc-dashboard/static/js/2.91b05510.chunk.js",
     "static/js/2.91b05510.chunk.js.map": "/ebc-dashboard/static/js/2.91b05510.chunk.js.map",
     "index.html": "/ebc-dashboard/index.html",
-    "precache-manifest.cdf4c36a0deafe29792d274351e1762d.js": "/ebc-dashboard/precache-manifest.cdf4c36a0deafe29792d274351e1762d.js",
+    "precache-manifest.7533afaf47f76e7e81e3c145547a4ac6.js": "/ebc-dashboard/precache-manifest.7533afaf47f76e7e81e3c145547a4ac6.js",
     "service-worker.js": "/ebc-dashboard/service-worker.js",
     "static/css/main.983efdef.chunk.css.map": "/ebc-dashboard/static/css/main.983efdef.chunk.css.map",
     "static/js/2.91b05510.chunk.js.LICENSE.txt": "/ebc-dashboard/static/js/2.91b05510.chunk.js.LICENSE.txt",
@@ -25,6 +25,6 @@
     "static/js/runtime-main.611b304f.js",
     "static/js/2.91b05510.chunk.js",
     "static/css/main.983efdef.chunk.css",
-    "static/js/main.2607c10f.chunk.js"
+    "static/js/main.7a1ebd8c.chunk.js"
   ]
 }
