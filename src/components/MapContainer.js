@@ -1,23 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Map, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
 import Dashboard from "./Dashboard";
 import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import POI from "./POI";
-import PolylineRoutes from "./PolylineRoutes";
-import Info from "./Info";
-import Reset from "./Reset";
 import { isDesktop } from "react-device-detect";
-import ReactGA from "react-ga4";
 
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
-  const [showLegend, setLegend] = useState(Boolean(isDesktop));
-
-  useEffect(() => {
-    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
-  }, []);
+  const showLegend = Boolean(isDesktop);
 
   return (
     <Map
@@ -25,15 +17,14 @@ const MapContainer = (props) => {
       zoomSnap={zoomSnap}
       zoom={isDesktop ? zoom : 10.7}
       style={style}
+      zoomControl={false}
+      attributionControl={false}
     >
       <TileLayer url={url} attribution={attribution} />
-      <Reset setLegend={setLegend} />
       <POI />
-      {showLegend ? <Legend /> : null}
       <Dashboard />
+      <Legend showLegend={showLegend} />
       <GeoJsonRoutes />
-      <PolylineRoutes />
-      <Info />
     </Map>
   );
 };

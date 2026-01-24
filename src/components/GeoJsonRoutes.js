@@ -1,73 +1,85 @@
-import React from 'react';
-import { GeoJSON, withLeaflet } from 'react-leaflet';
-import { getDayWiseDataG } from '../utils/geoJson';
-import { connect } from 'react-redux';
-import { mapDispatchToProps } from '../utils/utils.js';
+import React from "react";
+import { Polyline, withLeaflet } from "react-leaflet";
+import L from "leaflet";
+import { getDayWiseDataG } from "../utils/geoJson";
+import { connect } from "react-redux";
+import { mapDispatchToProps } from "../utils/utils.js";
+import { createGradientSegments } from "../utils/heightGradient";
 
 const GeoJsonRoutes = (props) => {
-	const { map } = props.leaflet;
-	const {
-		hoverColor,
-		zoomDuration,
-		paddingTopLeft,
-		paddingBottomRight,
-		dispatchLayerDetails,
-	} = props;
+  const { map } = props.leaflet;
+  const {
+    zoomDuration,
+    paddingTopLeft,
+    paddingBottomRight,
+    dispatchLayerDetails,
+  } = props;
 
-	const addGeoJsonRoutes = () => {
-		const geoJsonArr = [];
-		const routes = getDayWiseDataG();
-		Object.values(routes).forEach((route) => {
-			geoJsonArr.push(
-				<GeoJSON
-					data={route}
-					style={route.features[0].properties}
-					key={route.features[0].properties.day}
-					onclick={clickhandler}
-					onmouseout={mouseoutHandler}
-					onmouseover={mouseoverHandler}
-					onEachFeature={handleEachFeature}
-				/>
-			);
-		});
+  const polylineArr = [];
+  const routes = getDayWiseDataG();
 
-		return geoJsonArr;
-	};
+  if (!routes) {
+    return null;
+  }
 
-	const handleEachFeature = (feature, layer) => {
-		// console.log(feature, layer);
-	};
+  Object.values(routes).forEach((route) => {
+    if (!route || !route.features || !route.features[0]) {
+      return;
+    }
 
-	const clickhandler = (e) => {
-		map.flyToBounds(
-			e.target.getBounds(),
-			{
-				paddingTopLeft,
-				paddingBottomRight,
-			},
-			{ duration: zoomDuration }
-		);
-	};
+    const feature = route.features[0];
+    if (
+      !feature ||
+      !feature.geometry ||
+      feature.geometry.type !== "MultiLineString"
+    ) {
+      return;
+    }
 
-	const mouseoverHandler = (e) => {
-		e.target.setStyle({ color: hoverColor, weight: 4 });
-		dispatchLayerDetails(e.layer.feature.properties);
-	};
+    const { geometry, properties } = feature;
+    const segments = createGradientSegments(geometry.coordinates);
 
-	const mouseoutHandler = (e) =>
-		e.target.setStyle({ color: e.layer.feature.properties.color, weight: 3 });
+    segments.forEach((segment, segIdx) => {
+      polylineArr.push(
+        <Polyline
+          key={properties.day + "-" + segIdx}
+          positions={segment.latlngs}
+          color={segment.color}
+          weight={3}
+          opacity={0.8}
+          lineCap="round"
+          lineJoin="round"
+          onmouseover={() => {
+            dispatchLayerDetails(properties);
+          }}
+          onclick={() => {
+            dispatchLayerDetails(properties);
+            const allSegments = createGradientSegments(geometry.coordinates);
+            const allLatlngs = allSegments.flatMap((s) => s.latlngs);
+            if (allLatlngs.length > 0) {
+              const bounds = L.latLngBounds(allLatlngs);
+              map.flyToBounds(bounds, {
+                paddingTopLeft,
+                paddingBottomRight,
+                duration: zoomDuration,
+              });
+            }
+          }}
+        />,
+      );
+    });
+  });
 
-	return addGeoJsonRoutes();
+  return polylineArr;
 };
 
 const mapStateToProps = (state) => ({
-	hoverColor: state.mapState.hoverColor,
-	zoomDuration: state.mapState.zoomDuration,
-	paddingTopLeft: state.mapState.paddingTopLeft,
-	paddingBottomRight: state.mapState.paddingBottomRight,
+  zoomDuration: state.mapState.zoomDuration,
+  paddingTopLeft: state.mapState.paddingTopLeft,
+  paddingBottomRight: state.mapState.paddingBottomRight,
 });
 
 export default connect(
-	mapStateToProps,
-	mapDispatchToProps
+  mapStateToProps,
+  mapDispatchToProps,
 )(withLeaflet(GeoJsonRoutes));
