@@ -3,9 +3,6 @@ import summitIcon from '../resources/images/summit.svg';
 import airportIcon from '../resources/images/airport.svg';
 import passIcon from '../resources/images/pass.svg';
 import ebcIcon from '../resources/images/ebc.svg';
-import oneIcon from '../resources/images/1.svg';
-import twoIcon from '../resources/images/2.svg';
-import { IMarker } from '../interfaces/interfaces';
 
 const markers: any[] = [
 	{

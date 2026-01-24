@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { withLeaflet } from "react-leaflet";
 import Control from "react-leaflet-control";
+import { isDesktop } from "react-device-detect";
 import InfoIconSvg from "../resources/images/info.svg";
 import "../resources/css/dashboard.css";
 
@@ -10,9 +11,9 @@ const Info = () => {
 
 	return (
 		<>
-			<Control position={"topleft"} className={"icon"}>
+			<Control position={"topleft"} className={"icon infoIcon"}>
 				<div>
-					<img src={InfoIconSvg} width="20px" onClick={toggleInfo} />
+					<img src={InfoIconSvg} width="18px" onClick={toggleInfo} />
 				</div>
 			</Control>
 			{!hidden && (

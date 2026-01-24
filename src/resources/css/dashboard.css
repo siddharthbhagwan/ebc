@@ -1,71 +1,138 @@
 .dashboard {
-	padding: 15px 15px;
-	font: 14px/16px;
-	background: white;
-	box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-	border-radius: 5px;
-	text-align: left;
-	text-align: center;
-	min-width: 400px;
+  font: 14px;
+  background: white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  text-align: left;
+  text-align: center;
+  padding: 10px 0;
 }
 
 .infoDashboard {
-	background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 generic-dashboard {
-	background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .dashboard h5 {
-	margin: 0 0 5px;
+  margin: 0 0 5px;
 }
 
 .dashboardDetails {
-	font-size: 18px;
-	line-height: 23px;
+  font-size: 18px;
+  line-height: 23px;
 }
 
 .dashboardDetails .icon {
-	margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .icon {
-	border: 2px solid #dddddd;
-	border-radius: 2px;
-	padding: 3px;
-	cursor: pointer;
+  border: 2px solid #dddddd;
+  border-radius: 2px;
+  padding: 6px;
+  cursor: pointer;
 }
 
 .infoSection {
-	font-size: 18px;
+  font-size: 18px;
 }
 
 .okButton {
-	padding: 10px;
+  padding: 5px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
 }
 
 .tooltipLabel {
-	text-align: center;
-	box-shadow: none;
-	font-size: 10px;
-	background-color: transparent;
-	z-index: 100;
-	border: none;
+  text-align: center;
+  box-shadow: none;
+  font-size: 10px;
+  background-color: transparent;
+  z-index: 100;
+  border: none;
 }
 
 .tooltipLabel:before {
-	border: none;
+  border: none;
 }
 
 .labelDay {
-	font-size: 10px;
+  font-size: 10px;
 }
 
 .leafletLeft-center {
-	position: fixed;
-	left: 50%;
-	top: 40%;
-	transform: translate(-50%, -50%);
-	background: rgba(255, 255, 255, 0.95);
+  position: fixed;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.mapLegend-mobile {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 11px !important;
+  padding: 8px !important;
+}
+
+.mapLegend > div {
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+.infoIcon {
+  background-color: white;
+}
+
+.legendItem {
+  padding-right: 7px;
+  padding-left: 7px;
+}
+
+.desc {
+  font-size: 14px;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  padding: 0;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.column-30 {
+  width: 25%;
+}
+
+.column-70 {
+  width: 75%;
+}
+
+.item {
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.rightIcon {
+  transform: rotate(180deg);
+}
+
+.navIcon {
+  cursor: pointer;
+}
+
+.dashboardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
