@@ -1,32 +1,32 @@
 {
   "files": {
     "main.css": "./static/css/main.48a06c31.chunk.css",
-    "main.js": "./static/js/main.adc8a7a3.chunk.js",
-    "main.js.map": "./static/js/main.adc8a7a3.chunk.js.map",
+    "main.js": "./static/js/main.c7002f27.chunk.js",
+    "main.js.map": "./static/js/main.c7002f27.chunk.js.map",
     "runtime-main.js": "./static/js/runtime-main.ab05a215.js",
     "runtime-main.js.map": "./static/js/runtime-main.ab05a215.js.map",
-    "static/js/2.1d87b833.chunk.js": "./static/js/2.1d87b833.chunk.js",
-    "static/js/2.1d87b833.chunk.js.map": "./static/js/2.1d87b833.chunk.js.map",
+    "static/js/2.ed827ee3.chunk.js": "./static/js/2.ed827ee3.chunk.js",
+    "static/js/2.ed827ee3.chunk.js.map": "./static/js/2.ed827ee3.chunk.js.map",
     "index.html": "./index.html",
-    "precache-manifest.d6cdbab4f6db057cc821cd02f7000ac5.js": "./precache-manifest.d6cdbab4f6db057cc821cd02f7000ac5.js",
+    "precache-manifest.312065b2657f75ba2a42ea9908bb9601.js": "./precache-manifest.312065b2657f75ba2a42ea9908bb9601.js",
     "service-worker.js": "./service-worker.js",
     "static/css/main.48a06c31.chunk.css.map": "./static/css/main.48a06c31.chunk.css.map",
-    "static/js/2.1d87b833.chunk.js.LICENSE.txt": "./static/js/2.1d87b833.chunk.js.LICENSE.txt",
+    "static/js/2.ed827ee3.chunk.js.LICENSE.txt": "./static/js/2.ed827ee3.chunk.js.LICENSE.txt",
     "static/media/airport.svg": "./static/media/airport.a9339a65.svg",
     "static/media/ebc.svg": "./static/media/ebc.3605fab2.svg",
     "static/media/info.svg": "./static/media/info.1be8a59f.svg",
     "static/media/leftArrow.svg": "./static/media/leftArrow.90e02024.svg",
     "static/media/legend.svg": "./static/media/legend.f2249ac1.svg",
     "static/media/location.svg": "./static/media/location.08b347be.svg",
-    "static/media/map.svg": "./static/media/map.3f99a64d.svg",
     "static/media/pass.svg": "./static/media/pass.02888303.svg",
+    "static/media/settings.svg": "./static/media/settings.06813161.svg",
     "static/media/summit.svg": "./static/media/summit.f0d974ca.svg",
     "static/media/tent.svg": "./static/media/tent.3099eae7.svg"
   },
   "entrypoints": [
     "static/js/runtime-main.ab05a215.js",
-    "static/js/2.1d87b833.chunk.js",
+    "static/js/2.ed827ee3.chunk.js",
     "static/css/main.48a06c31.chunk.css",
-    "static/js/main.adc8a7a3.chunk.js"
+    "static/js/main.c7002f27.chunk.js"
   ]
 }
