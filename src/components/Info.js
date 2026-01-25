@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { isDesktop } from "react-device-detect";
 import "../resources/css/dashboard.css";
 import "../resources/css/info.css";
 import { mapDispatchToProps } from "../utils/utils";
