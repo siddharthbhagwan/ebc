@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4a8da5a643e10cb42c3901df98b39621",
+    "revision": "0b530ea99f9cfac953b614c988545827",
     "url": "/ebc/index.html"
   },
   {
-    "revision": "e44d06f65d0f6a1f4aa9",
+    "revision": "575b754a3a5372f94c57",
     "url": "/ebc/static/css/main.6a15c846.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/ebc/static/js/2.5d8c82d7.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "e44d06f65d0f6a1f4aa9",
-    "url": "/ebc/static/js/main.7ff1118d.chunk.js"
+    "revision": "575b754a3a5372f94c57",
+    "url": "/ebc/static/js/main.399f0fd8.chunk.js"
   },
   {
     "revision": "7af66a348fa1185f116c",
@@ -56,8 +56,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/ebc/static/media/settings.06813161.svg"
   },
   {
-    "revision": "40ae304375e718c242647a0b2cc3ed2c",
-    "url": "/ebc/static/media/summit.40ae3043.svg"
+    "revision": "06d48717f1561b101c854c30db11a36d",
+    "url": "/ebc/static/media/summit.06d48717.svg"
   },
   {
     "revision": "ce2662e74a4c95db00bf4a53a45cbef4",
