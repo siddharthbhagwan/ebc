@@ -1,27 +1,43 @@
 import React from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
-import resetIcon from "../resources/images/map.svg";
 import legendIcon from "../resources/images/legend.svg";
+import locationIcon from "../resources/images/location.svg";
 import Control from "react-leaflet-control";
-import { isDesktop } from "react-device-detect";
+import { useMobileOrientation, isDesktop } from "react-device-detect";
 import "leaflet-easybutton";
+
+const ZOOM_MOBILE = 10.7;
+const ZOOM_LANDSCAPE = 10;
 
 const Reset = (props) => {
   const { center, zoom, setLegend } = props;
   const { map } = props.leaflet;
 
-  const resetZoom = () =>
-    map.flyTo(center, isDesktop ? zoom : 10.7, { duration: 0.5 });
+  const { isLandscape = false } = useMobileOrientation();
+  const derivedZoom = isDesktop
+    ? zoom
+    : isLandscape
+      ? ZOOM_LANDSCAPE
+      : ZOOM_MOBILE;
+
+  const resetZoom = () => {
+    const mobileOffset = 0.022;
+    const desktopOffset = 0.008;
+    const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+    const initialCenter = [center[0] - currentOffset, center[1]];
+    map.flyTo(initialCenter, derivedZoom, { duration: 0.5 });
+  };
 
   const toggleLegend = () => setLegend((legend) => !legend);
 
   const mapButton = (
     <img
       width={"34px"}
-      src={resetIcon}
+      src={locationIcon}
       className={"icon"}
       onClick={resetZoom}
+      alt="Reset Zoom"
     />
   );
 
@@ -31,16 +47,19 @@ const Reset = (props) => {
       src={legendIcon}
       className={"icon"}
       onClick={toggleLegend}
+      alt="Toggle Legend"
     />
   );
 
   return (
-    <Control position="topleft">
-      <div style={{ marginBottom: 3, backgroundColor: "white" }}>
-        {mapButton}
-      </div>
-      <div style={{ backgroundColor: "white" }}>{legendButton}</div>
-    </Control>
+    <>
+      <Control position="topleft">
+        <div style={{ backgroundColor: "white" }}>{mapButton}</div>
+      </Control>
+      <Control position="topright">
+        <div style={{ backgroundColor: "white" }}>{legendButton}</div>
+      </Control>
+    </>
   );
 };
 

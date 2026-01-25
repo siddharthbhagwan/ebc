@@ -1,7 +1,7 @@
 import React from "react";
-import { withLeaflet } from "react-leaflet";
-import { isMobile } from "react-device-detect";
-import Control from "react-leaflet-control";
+import { connect } from "react-redux";
+import { isDesktop } from "react-device-detect";
+import { mapDispatchToProps } from "../utils/utils";
 
 import ebcIcon from "../resources/images/ebc.svg";
 import tentIcon from "../resources/images/tent.svg";
@@ -9,28 +9,204 @@ import summitIcon from "../resources/images/summit.svg";
 import passIcon from "../resources/images/pass.svg";
 import "../resources/css/legend.css";
 
-const DESKTOP_SIZE = "20px";
-const MOBILE_SIZE = "15px";
+const Legend = (props) => {
+  const { showLegend } = props;
 
-const getSize = () => (isMobile ? MOBILE_SIZE : DESKTOP_SIZE);
+  if (!showLegend) return null;
 
-const Legend = () => (
-  <Control position={isMobile ? "topright" : "bottomleft"}>
-    <div className={`legend ${isMobile ? "mapLegend-mobile" : ""}`}>
-      <div className="legendItem">
-        <img src={ebcIcon} width={MOBILE_SIZE} /> Base Camp
-      </div>
-      <div className="legendItem">
-        <img src={summitIcon} width={getSize()} /> Summit <br />
-      </div>
-      <div className="legendItem">
-        <img src={passIcon} width={getSize()} /> Pass
-      </div>
-      <div className="legendItem">
-        <img src={tentIcon} width={MOBILE_SIZE} /> Lodging
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0, // Move to top
+        right: isDesktop ? "10px" : "0",
+        left: isDesktop ? "auto" : "0",
+        zIndex: 9999,
+        display: "flex",
+        justifyContent: "center",
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        className={"legend mapLegend-mobile"}
+        style={{
+          width: isDesktop ? "auto" : "100%",
+          margin: "0",
+          borderRadius: isDesktop ? "0 0 8px 8px" : "0", // Rounded bottom corners
+          boxSizing: "border-box",
+          pointerEvents: "auto",
+          background: "rgba(255, 255, 255, 0.95)",
+          boxShadow: "none",
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          padding: isDesktop ? "1px 8px" : "0px 4px",
+          gap: isDesktop ? "2px" : "1px",
+          border: "none",
+          borderTop: "none",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          className="legendItem"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "2px 6px",
+          }}
+        >
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={ebcIcon}
+              className="ebc-marker-icon"
+              width={"12px"}
+              alt="Base Camp"
+            />
+          </div>
+          <span
+            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+          >
+            Base Camp
+          </span>
+        </div>
+        <div
+          className="legendItem"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "2px 6px",
+          }}
+        >
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={summitIcon}
+              className="summit-marker-icon"
+              width={"12px"}
+              alt="Summit"
+            />
+          </div>
+          <span
+            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+          >
+            Summit
+          </span>
+        </div>
+        <div
+          className="legendItem"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "2px 6px",
+          }}
+        >
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={passIcon}
+              className="flag-marker-icon"
+              width={"12px"}
+              alt="Pass"
+            />
+          </div>
+          <span
+            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+          >
+            Pass
+          </span>
+        </div>
+        <div
+          className="legendItem"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            padding: "2px 6px",
+          }}
+        >
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img src={tentIcon} width={"12px"} alt="Lodging" />
+          </div>
+          <span
+            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+          >
+            Lodging
+          </span>
+        </div>
+        <div
+          className="legendItem"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "2px 6px",
+          }}
+        >
+          <span
+            style={{
+              fontSize: "10.5px",
+              fontWeight: "600",
+              color: "#34495e",
+              fontStyle: "italic",
+              paddingLeft: "4px",
+              borderLeft: "1px solid #eee",
+              marginLeft: "4px",
+            }}
+          >
+            * YMMV
+          </span>
+        </div>
       </div>
     </div>
-  </Control>
-);
+  );
+};
 
-export default withLeaflet(Legend);
+const mapStateToProps = (state) => ({
+  showLegend: state.mapState.showLegend,
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Legend);

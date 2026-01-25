@@ -1,8 +1,8 @@
 {
-  "name": "ebc-dashboard",
+  "name": "ebc",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://siddharthbhagwan.github.io/ebc-dashboard/",
+  "homepage": "https://coderbear.com/ebc",
   "dependencies": {
     "decode-google-map-polyline": "^1.0.1",
     "gh-pages": "^2.0.1",
@@ -17,8 +17,7 @@
     "react-leaflet-control": "^2.1.2",
     "react-redux": "^7.1.0",
     "react-scripts": "^3.4.1",
-    "redux": "^4.0.4",
-    "typescript": "3.5.2"
+    "redux": "^4.0.4"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
@@ -44,18 +43,6 @@
     ]
   },
   "devDependencies": {
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
-    "@svgr/webpack": "^8.1.0",
-    "@types/enzyme": "^3.10.3",
-    "@types/enzyme-adapter-react-16": "^1.0.5",
-    "@types/geojson": "^7946.0.7",
-    "@types/jest": "24.0.15",
-    "@types/leaflet": "^1.5.0",
-    "@types/node": "12.0.10",
-    "@types/react": "16.8.22",
-    "@types/react-dom": "16.8.4",
-    "@types/react-leaflet": "^2.2.1",
-    "@types/react-redux": "^7.1.0",
     "ajv": "^6.10.2",
     "cjs": "^0.0.11",
     "enzyme": "^3.10.0",
