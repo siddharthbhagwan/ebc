@@ -29,6 +29,9 @@ export const GRADIENT_COLORS = [
   "#5e0000", // Deepest Maroon (High Altitude Peak)
 ];
 
+/**
+ * Get color based on normalized elevation (0-1)
+ */
 const getColorFromNormalized = (normalizedElevation) => {
   const clipped = Math.max(0, Math.min(1, normalizedElevation));
   const colorIndex = Math.round(clipped * (GRADIENT_COLORS.length - 1));

@@ -21,11 +21,13 @@ body {
   background-color: #f8f9fa;
 }
 
-/* Global shadow removal for all components and Leaflet controls */
+/* Global shadow removal and focus prevention */
 * {
   box-shadow: none !important;
   -webkit-box-shadow: none !important;
   -moz-box-shadow: none !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .leaflet-control,
@@ -41,4 +43,29 @@ body {
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* Landscape orientation Lock */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+  #root {
+    display: none !important;
+  }
+  body::before {
+    content: "Landscape mode is not supported. Please rotate your device to portrait mode.";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    z-index: 99999;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
 }

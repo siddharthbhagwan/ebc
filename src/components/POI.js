@@ -70,7 +70,24 @@ const POI = (props) => {
       }
     };
 
+    // Determine start coordinate of current day to identify "start of day" house
+    const getStartCoord = (route) => {
+      if (!route || !route.features || !route.features.length) return null;
+      // Get the first feature to find the starts
+      const feature = route.features[0];
+      const coords = feature.geometry.coordinates;
+      if (feature.geometry.type === "MultiLineString") {
+        const firstLine = coords[0];
+        return firstLine[0];
+      } else if (feature.geometry.type === "Point") {
+        return coords;
+      } else {
+        return coords[0];
+      }
+    };
+
     const destCoord = getDestinationCoord(currentRoute);
+    const startCoord = getStartCoord(currentRoute);
 
     const arr = [];
     markerData.forEach((markerPoint) => {
@@ -81,11 +98,17 @@ const POI = (props) => {
       const isSummit = markerPoint.icon === summitIcon;
 
       // Check if this marker is at the destination coordinate
-      // Increased threshold to 0.0015 to account for slight GPS/marker mismatches (e.g. Gorak Shep)
+      // Increased threshold to 0.005 to account for slight GPS/marker mismatches (e.g. Gorak Shep, Namche)
       const isDest =
         destCoord &&
-        Math.abs(markerPoint.point[0] - destCoord[1]) < 0.0015 &&
-        Math.abs(markerPoint.point[1] - destCoord[0]) < 0.0015;
+        Math.abs(markerPoint.point[0] - destCoord[1]) < 0.005 &&
+        Math.abs(markerPoint.point[1] - destCoord[0]) < 0.005;
+
+      // Check if this marker is at the start coordinate
+      const isStart =
+        startCoord &&
+        Math.abs(markerPoint.point[0] - startCoord[1]) < 0.005 &&
+        Math.abs(markerPoint.point[1] - startCoord[0]) < 0.005;
 
       // Check if this marker matches the current day
       const isDayMatch = markerPoint.properties.day
@@ -94,7 +117,8 @@ const POI = (props) => {
         .includes(currentDay);
 
       // Filter out markers that aren't relevant to the current day when zoomed in
-      if (isZoomedIn && !isDayMatch && !isDest) {
+      // We keep: dest, matches day, or matches start of route
+      if (isZoomedIn && !isDayMatch && !isDest && !isStart) {
         return;
       }
 
@@ -138,11 +162,13 @@ const POI = (props) => {
           imgStyle = `width: ${imgSize * 0.9}px; height: ${imgSize * 0.9}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
         }
 
+        const pulseClass = isSingleDayView ? "pulsating-circle" : "";
+
         icon = L.divIcon({
           className: "dest-circle-wrapper",
           iconSize: [wrapSize, wrapSize],
           iconAnchor: [wrapSize / 2, wrapSize / 2],
-          html: `<div class="rest-day-circle" style="border-color: ${borderColor}; border-width: 1.5px; width: 100%; height: 100%;">
+          html: `<div class="rest-day-circle ${pulseClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: 100%; height: 100%;">
                   <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
                  </div>`,
           shadowUrl: null,
@@ -159,18 +185,31 @@ const POI = (props) => {
           imgStyle = "width: 90%; height: 90%; margin: 5%;";
         }
 
+        // Feature: Underscore/Underline for Starting House in Zoomed View
+        // Only show if it's the start, it's zoomed in, and not already circled (which would be dest)
+        const showUnderscore = isStart && isZoomedIn && !shouldCircle;
+
         icon = L.divIcon({
           className: "standard-poi-wrapper",
           iconSize: markerPoint.size,
           iconAnchor: [markerPoint.size[0] / 2, markerPoint.size[1] / 2],
-          html: `<img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />`,
+          html: `
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
+               <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
+               ${
+                 showUnderscore
+                   ? `<div style="position: absolute; bottom: -7px; width: 140%; height: 3.5px; background: #000; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>`
+                   : ""
+               }
+            </div>`,
           shadowUrl: null,
         });
       }
 
-      // Tooltip visibility: Only permanent if it belongs to the current day or is the destination
-      // This prevents the map from becoming unreadable while still showing all markers
-      const isTooltipPermanent = isDayMatch || isDest;
+      // Tooltip visibility: Permanent in Overview mode OR if it belongs to current day/start/dest
+      // This ensures names are always visible in Overview and for relevant POIs in Zoomed view
+      const isTooltipPermanent =
+        !isSingleDayView || isDayMatch || isDest || isStart;
 
       arr.push(
         <Marker
@@ -181,6 +220,7 @@ const POI = (props) => {
           onmouseover={mouseoverHandler}
           icon={icon}
           properties={markerPoint.properties}
+          keyboard={false} // Disable keyboard focus to prevent overlap with throb effect
         >
           {isTooltipPermanent && (
             <Tooltip
@@ -213,7 +253,26 @@ const POI = (props) => {
   };
 
   const clickHandler = (e) => {
-    dispatchLayerDetails(e.target.options.properties);
+    const markerProps = e.target.options.properties;
+    const markerDays = (markerProps.day || "")
+      .split(/[,&]/)
+      .map((d) => d.trim())
+      .filter((d) => d !== "");
+
+    // Logic: Identify which single numeric day to switch to.
+    // If the marker has multiple days, and our current day is NOT one of them,
+    // or our current day is a composite string, pick the first day from the marker.
+    let targetDay = currentDay;
+    const currentDayStr = String(currentDay);
+
+    if (!markerDays.includes(currentDayStr) || currentDayStr.includes(",") || currentDayStr.includes("&")) {
+      targetDay = markerDays[0] || currentDay;
+    }
+
+    // Crucial: Update the payload to use the single numeric targetDay 
+    // instead of the composite string "2, 3, 19 & 20"
+    const updatedProps = { ...markerProps, day: String(targetDay) };
+    dispatchLayerDetails(updatedProps);
     setSingleDayView(true); // Switch to Single Day View on selection
 
     const effectivePaddingTopLeft = [
@@ -232,8 +291,27 @@ const POI = (props) => {
     });
   };
 
-  const mouseoverHandler = (e) =>
-    dispatchLayerDetails(e.target.options.properties);
+  const mouseoverHandler = (e) => {
+    const markerProps = e.target.options.properties;
+    const markerDays = (markerProps.day || "")
+      .split(/[,&]/)
+      .map((d) => d.trim())
+      .filter((d) => d !== "");
+
+    let targetDay = currentDay;
+    const currentDayStr = String(currentDay);
+
+    if (
+      !markerDays.includes(currentDayStr) ||
+      currentDayStr.includes(",") ||
+      currentDayStr.includes("&")
+    ) {
+      targetDay = markerDays[0] || currentDay;
+    }
+
+    const updatedProps = { ...markerProps, day: String(targetDay) };
+    dispatchLayerDetails(updatedProps);
+  };
 
   return addPOIs();
 };
