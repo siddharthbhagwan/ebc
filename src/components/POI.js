@@ -141,8 +141,14 @@ const POI = (props) => {
       // Precision threshold: 0.0015 (~150m) to avoid multiple highlights in villages like Namche
       const isDest =
         destCoord &&
-        Math.abs(markerPoint.point[0] - destCoord[1]) < 0.0015 &&
-        Math.abs(markerPoint.point[1] - destCoord[0]) < 0.0015;
+        Math.abs(markerPoint.point[0] - destCoord[1]) < 0.005 &&
+        Math.abs(markerPoint.point[1] - destCoord[0]) < 0.005;
+
+      // Check if this marker is at the start coordinate
+      const isStart =
+        startCoord &&
+        Math.abs(markerPoint.point[0] - startCoord[1]) < 0.005 &&
+        Math.abs(markerPoint.point[1] - startCoord[0]) < 0.005;
 
       // Check if this marker is at the start coordinate
       const isStart =
@@ -252,6 +258,8 @@ const POI = (props) => {
         if (isSummit) {
           imgStyle = `width: ${imgSize * 0.9}px; height: ${imgSize * 0.9}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
         }
+
+        const pulseClass = isSingleDayView ? "pulsating-circle" : "";
 
         icon = L.divIcon({
           className: "dest-circle-wrapper",

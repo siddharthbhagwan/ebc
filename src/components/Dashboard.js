@@ -856,13 +856,14 @@ const Dashboard = (props) => {
                             <div
                               style={{
                                 display: "flex",
-                                gap: "4px",
+                                gap: isDesktop ? "4px" : "2px",
                                 alignItems: "center",
+                                whiteSpace: "nowrap",
                               }}
                             >
                               <svg
-                                width={isDesktop ? "14" : "12"}
-                                height={isDesktop ? "14" : "12"}
+                                width={isDesktop ? "14" : "14"}
+                                height={isDesktop ? "14" : "14"}
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="#95a5a6"
