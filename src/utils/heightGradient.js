@@ -3,33 +3,30 @@
  * Simple elevation-based color assignment
  */
 
+// Artistically curated palette: Mid Green -> Dark Green -> Mustard -> Orange -> Deep Red
 export const GRADIENT_COLORS = [
-  "#1a4d00",
-  "#226600",
-  "#2a7f00",
-  "#339900",
-  "#44aa11",
-  "#55bb22",
-  "#66cc33",
-  "#77dd44",
-  "#88ee55",
-  "#dd9922",
-  "#ffaa44",
-  "#ffaa33",
-  "#ff9922",
-  "#ff8811",
-  "#ff7700",
-  "#ff6600",
-  "#ff5511",
-  "#ff4422",
-  "#ff3333",
-  "#ee2211",
-  "#dd1111",
-  "#cc1111",
-  "#bb1111",
-  "#991111",
-  "#771111",
-  "#661111",
+  "#4caf50", // Mid Green (Start - 2600m)
+  "#43a047",
+  "#388e3c",
+  "#2e7d32",
+  "#1b5e20", // Dark Forest Green
+  "#33691e", // Olive Transition
+  "#558b2f", // Light Olive
+  "#827717", // Dark Mustard
+  "#9e9d24", // Mustard Yellow
+  "#afb42b",
+  "#c0ca33", // Lime Yellow
+  "#d4e157", // Bright Mustard/Lime
+  "#fbc02d", // Gold
+  "#ffc107", // Amber
+  "#ffb300",
+  "#ffa000",
+  "#ff9100", // Highlight Orange
+  "#ff6d00", // Vivid Orange
+  "#e64a19", // Red-Orange
+  "#c62828", // Intense Red
+  "#8E0000", // Dark Maroon
+  "#5e0000", // Deepest Maroon (High Altitude Peak)
 ];
 
 const getColorFromNormalized = (normalizedElevation) => {
@@ -145,23 +142,44 @@ export const createGradientSegments = (coordinates) => {
 
   // Handle MultiLineString format: [[[lon, lat, elev], ...], ...]
   for (let lineString of coordinates) {
-    if (Array.isArray(lineString)) {
-      // Process consecutive pairs of points to create segments
-      for (let i = 0; i < lineString.length - 1; i++) {
-        const currentCoord = lineString[i];
-        const nextCoord = lineString[i + 1];
+    if (Array.isArray(lineString) && lineString.length > 0) {
+      let currentSegmentLatlngs = [];
+      let currentSegmentColor = null;
 
-        // Extract coordinates - GeoJSON format is [lon, lat, elev], convert to [lat, lon] for Leaflet
-        const currentLatlng = [currentCoord[1], currentCoord[0]]; // [lat, lon]
-        const nextLatlng = [nextCoord[1], nextCoord[0]]; // [lat, lon]
-
-        // Get elevation of current point
-        const elevation = currentCoord[2];
+      for (let i = 0; i < lineString.length; i++) {
+        const coord = lineString[i];
+        const latlng = [coord[1], coord[0]];
+        const elevation = coord[2];
         const color = getColorForElevation(elevation);
 
+        if (currentSegmentColor === null) {
+          // First point of the lineString
+          currentSegmentColor = color;
+          currentSegmentLatlngs.push(latlng);
+        } else if (color === currentSegmentColor) {
+          // Same color, just add to current segment
+          currentSegmentLatlngs.push(latlng);
+        } else {
+          // Color changed! Finish current segment and start new one
+          // The new segment must start at the end of the previous one for continuity
+          const lastLatlngOfPrev =
+            currentSegmentLatlngs[currentSegmentLatlngs.length - 1];
+
+          segments.push({
+            latlngs: currentSegmentLatlngs,
+            color: currentSegmentColor,
+          });
+
+          currentSegmentColor = color;
+          currentSegmentLatlngs = [lastLatlngOfPrev, latlng];
+        }
+      }
+
+      // Add the last segment
+      if (currentSegmentLatlngs.length > 1) {
         segments.push({
-          latlngs: [currentLatlng, nextLatlng],
-          color: color,
+          latlngs: currentSegmentLatlngs,
+          color: currentSegmentColor,
         });
       }
     }

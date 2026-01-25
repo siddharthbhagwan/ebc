@@ -1,15 +1,14 @@
 .dashboard {
-  font: 14px;
+  font-size: 16px;
   background: white;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
   border-radius: 5px;
   text-align: left;
   text-align: center;
-  padding: 10px 0;
 }
 
 .infoDashboard {
-  background: rgba(255, 255, 255, 0.95);
+  background: white;
   z-index: 10000;
 }
 
@@ -22,8 +21,8 @@ generic-dashboard {
 }
 
 .dashboardDetails {
-  font-size: 18px;
-  line-height: 23px;
+  font-size: 20px;
+  line-height: 25px;
 }
 
 .dashboardDetails .icon {
@@ -31,10 +30,16 @@ generic-dashboard {
 }
 
 .icon {
-  border: 2px solid #dddddd;
+  border: none;
   border-radius: 2px;
   padding: 6px;
   cursor: pointer;
+}
+
+.icon.active {
+  background: #e0e0e0 !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  filter: contrast(1.1);
 }
 
 .infoSection {
@@ -43,13 +48,14 @@ generic-dashboard {
 
 .okButton {
   padding: 5px 20px;
-  border: 1px solid #dddddd;
+  border: none;
+  background: #f5f5f5;
   border-radius: 5px;
 }
 
 .tooltipLabel {
   text-align: center;
-  box-shadow: none;
+  box-shadow: none !important;
   font-size: 10px;
   background-color: transparent;
   z-index: 100;
@@ -69,14 +75,14 @@ generic-dashboard {
   left: 50%;
   top: 40%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
+  background: white;
 }
 
 .mapLegend-mobile {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  font-size: 11px !important;
+  font-size: 13px !important;
   padding: 8px !important;
 }
 
@@ -87,6 +93,18 @@ generic-dashboard {
 
 .infoIcon {
   background-color: white;
+}
+
+.ebc-marker-icon {
+  /* Prussian Blue handled in SVG */
+}
+
+.flag-marker-icon {
+  /* Prussian Blue handled in SVG */
+}
+
+.summit-marker-icon {
+  /* Sober look: No filter, handled in SVG */
 }
 
 .legendItem {
@@ -136,4 +154,35 @@ generic-dashboard {
   display: flex;
   align-items: center;
   justify-content: space-around;
+}
+
+/* Remove default Leaflet control margins for the dashboard corner */
+.leaflet-bottom.leaflet-right .leaflet-control {
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Aggressively remove shadows from all dashboard elements and icons */
+.dashboard,
+.dashboard *,
+.icon,
+.icon *,
+.leaflet-control {
+  box-shadow: none !important;
+}
+
+.rest-day-border-only {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.rest-day-circle {
+  width: 100%;
+  height: 100%;
+  border: 1px solid;
+  border-radius: 50%;
+  box-sizing: border-box;
+  background: white; /* Add white background to make the icon stand out */
+  position: relative;
 }

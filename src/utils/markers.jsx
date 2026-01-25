@@ -1,10 +1,10 @@
-import tentIcon from '../resources/images/tent.svg';
-import summitIcon from '../resources/images/summit.svg';
-import airportIcon from '../resources/images/airport.svg';
-import passIcon from '../resources/images/pass.svg';
-import ebcIcon from '../resources/images/ebc.svg';
+import tentIcon from "../resources/images/tent.svg";
+import summitIcon from "../resources/images/summit.svg";
+import airportIcon from "../resources/images/airport.svg";
+import passIcon from "../resources/images/pass.svg";
+import ebcIcon from "../resources/images/ebc.svg";
 
-const markers: any[] = [
+const markers = [
   {
     // Phakding
     point: [27.74004, 86.712555],
@@ -25,7 +25,7 @@ const markers: any[] = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "2 & 3",
+      day: "2, 3, 19 & 20",
       icon: tentIcon,
       name: "Namche Bazaar",
       startAlt: "11,286",
@@ -77,7 +77,7 @@ const markers: any[] = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "8 & 9",
+      day: "8, 9, 10, 11, 12 & 13",
       icon: tentIcon,
       name: "Lobuche",
       startAlt: "16,210",
@@ -142,10 +142,10 @@ const markers: any[] = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "19",
+      day: "18 & 19",
       icon: tentIcon,
       name: "Marlung",
-      startAlt: "18,058",
+      startAlt: "13,566",
       direction: "right",
     },
   },
@@ -184,7 +184,7 @@ const markers: any[] = [
     properties: {
       day: "12",
       icon: summitIcon,
-      name: "Kala Patthar Sumnmit",
+      name: "Kala Patthar Summit",
       startAlt: "18,519",
       direction: "auto",
     },
@@ -245,11 +245,11 @@ const markers: any[] = [
     // Airport
     point: [27.68725044382488, 86.73143742664253],
     icon: airportIcon,
-    size: [22, 22],
+    size: [12, 12],
     properties: {
-      day: "0",
+      day: "0 & 20",
       icon: airportIcon,
-      name: "Lukla",
+      name: "Lukla Airport",
       startAlt: "9,383",
       direction: "auto",
     },

@@ -15,4 +15,15 @@ export const mapDispatchToProps = (dispatch) => ({
 			type: "TOGGLE_INFO",
 		});
 	},
+	toggleUnit: () => {
+		dispatch({
+			type: "TOGGLE_UNIT",
+		});
+	},
+	setSingleDayView: (isSingle) => {
+		dispatch({
+			type: "SET_SINGLE_DAY_VIEW",
+			payload: isSingle,
+		});
+	},
 });

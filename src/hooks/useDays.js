@@ -9,9 +9,11 @@ const DAYS = Object.keys(routes)
 const useDays = (currentDay, dispatcher) => {
   const currentDayInt = parseInt(currentDay);
   const initialIndex = DAYS.indexOf(currentDayInt);
-  const [dayIndex, setDayIndex] = useState(initialIndex !== -1 ? initialIndex : 0);
 
-  // Update dayIndex if currentDay changes externally (e.g. from clicking map polyline)
+  const [dayIndex, setDayIndex] = useState(
+    initialIndex !== -1 ? initialIndex : 0,
+  );
+
   if (DAYS[dayIndex] !== currentDayInt && initialIndex !== -1) {
     setDayIndex(initialIndex);
   }
@@ -21,13 +23,11 @@ const useDays = (currentDay, dispatcher) => {
     if (newIndex >= DAYS.length) {
       newIndex = 0;
     }
-
     const targetDay = DAYS[newIndex];
-    const targetRoute = routes[targetDay];
-    const targetProps = targetRoute.features[0].properties;
-
-    dispatcher(targetProps);
+    const targetFeature = routes[targetDay].features[0];
     setDayIndex(newIndex);
+    dispatcher(targetFeature.properties);
+    return targetFeature;
   };
 
   const prevDay = () => {
@@ -35,13 +35,11 @@ const useDays = (currentDay, dispatcher) => {
     if (newIndex < 0) {
       newIndex = DAYS.length - 1;
     }
-
     const targetDay = DAYS[newIndex];
-    const targetRoute = routes[targetDay];
-    const targetProps = targetRoute.features[0].properties;
-
-    dispatcher(targetProps);
+    const targetFeature = routes[targetDay].features[0];
     setDayIndex(newIndex);
+    dispatcher(targetFeature.properties);
+    return targetFeature;
   };
 
   return { nextDay, prevDay };

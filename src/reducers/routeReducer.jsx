@@ -1,15 +1,17 @@
 const initialState = {
   icon: "",
-  day: "0",
-  name: "Kathmandu - Lukla",
-  time: "0h 00m",
-  distance: "0 mi / 0 km",
-  startAlt: "0",
-  endAlt: "0",
-  peakAlt: "0",
+  day: "1",
+  name: "Lukla - Phakding",
+  time: "3h 30m",
+  distance: "4.66 mi / 7.5 km",
+  startAlt: "9,373",
+  endAlt: "8,563",
+  peakAlt: "",
+  total_climb: "0",
+  descent: "814",
 };
 
-export const routeReducer = (state = initialState, action: any) => {
+export const routeReducer = (state = initialState, action) => {
   switch (action.type) {
     case "UPDATE_LAYER_DETAILS":
       return {
@@ -22,6 +24,8 @@ export const routeReducer = (state = initialState, action: any) => {
         peakAlt: action.payload.layerDetails.peakAlt,
         startAlt: action.payload.layerDetails.startAlt,
         distance: action.payload.layerDetails.distance,
+        total_climb: action.payload.layerDetails.total_climb,
+        descent: action.payload.layerDetails.descent,
       };
 
     default:

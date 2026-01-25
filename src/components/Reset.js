@@ -21,7 +21,13 @@ const Reset = (props) => {
       ? ZOOM_LANDSCAPE
       : ZOOM_MOBILE;
 
-  const resetZoom = () => map.flyTo(center, derivedZoom, { duration: 0.5 });
+  const resetZoom = () => {
+    const mobileOffset = 0.022;
+    const desktopOffset = 0.008;
+    const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+    const initialCenter = [center[0] - currentOffset, center[1]];
+    map.flyTo(initialCenter, derivedZoom, { duration: 0.5 });
+  };
 
   const toggleLegend = () => setLegend((legend) => !legend);
 
