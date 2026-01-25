@@ -1,7 +1,7 @@
 const initialState = {
   url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   attribution:
-    '<a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> | <a href="https://leafletjs.com/">Leaflet</a>',
   center: [27.840457443855108, 86.76420972837559],
   zoom: 11.3,
   zoomSnap: 0.1,

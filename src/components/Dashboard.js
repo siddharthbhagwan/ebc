@@ -49,6 +49,28 @@ const Dashboard = (props) => {
 
   const { nextDay, prevDay } = useDays(day, dispatchLayerDetails);
 
+  const getFeatureBounds = (feature) => {
+    if (!feature || !feature.geometry) return null;
+
+    if (feature.geometry.type === "Point") {
+      const [lng, lat] = feature.geometry.coordinates;
+      const offset = 0.005;
+      return L.latLngBounds(
+        [lat - offset, lng - offset],
+        [lat + offset, lng + offset],
+      );
+    }
+
+    try {
+      const layer = L.geoJSON(feature);
+      return layer.getBounds();
+    } catch (e) {
+      const allSegments = createGradientSegments(feature.geometry.coordinates);
+      const allLatlngs = allSegments.flatMap((s) => s.latlngs);
+      return allLatlngs.length > 0 ? L.latLngBounds(allLatlngs) : null;
+    }
+  };
+
   const handleNavigation = (direction) => {
     const targetFeature = direction === "next" ? nextDay() : prevDay();
 
@@ -56,30 +78,7 @@ const Dashboard = (props) => {
     setIsToolsOpen(false);
 
     if (isSingleDayView && targetFeature && targetFeature.geometry) {
-      let bounds;
-
-      if (targetFeature.bbox) {
-        bounds = L.latLngBounds(
-          [targetFeature.bbox[1], targetFeature.bbox[0]],
-          [targetFeature.bbox[3], targetFeature.bbox[2]],
-        );
-      } else if (targetFeature.geometry.type === "Point") {
-        const [lng, lat] = targetFeature.geometry.coordinates;
-        // Create a 1km x 1km box around the point for zooming
-        const offset = 0.005;
-        bounds = L.latLngBounds(
-          [lat - offset, lng - offset],
-          [lat + offset, lng + offset],
-        );
-      } else {
-        const allSegments = createGradientSegments(
-          targetFeature.geometry.coordinates,
-        );
-        const allLatlngs = allSegments.flatMap((s) => s.latlngs);
-        if (allLatlngs.length > 0) {
-          bounds = L.latLngBounds(allLatlngs);
-        }
-      }
+      const bounds = getFeatureBounds(targetFeature);
 
       if (bounds) {
         map.flyToBounds(bounds, {
@@ -122,14 +121,11 @@ const Dashboard = (props) => {
       ? ZOOM_LANDSCAPE
       : ZOOM_MOBILE;
 
-  const effectivePaddingTopLeft = [
-    props.paddingTopLeft[0],
-    isDesktop ? props.paddingTopLeft[1] + 30 : props.paddingTopLeft[1] + 60,
-  ];
+  const effectivePaddingTopLeft = isDesktop ? [40, 40] : [20, 20];
 
   const effectivePaddingBottomRight = isDesktop
-    ? [props.paddingBottomRight[0] + 525, props.paddingBottomRight[1] + 160]
-    : [props.paddingBottomRight[0], props.paddingBottomRight[1] + 130];
+    ? [40, 180] 
+    : [20, 160];
 
   // Initial setup - do not auto-zoom to Day 1 on load
   useEffect(() => {}, []);
@@ -164,37 +160,13 @@ const Dashboard = (props) => {
         const feature = targetDay.features[0];
         dispatchLayerDetails(feature.properties);
 
-        if (feature.geometry) {
-          let bounds;
-          if (feature.bbox) {
-            bounds = L.latLngBounds(
-              [feature.bbox[1], feature.bbox[0]],
-              [feature.bbox[3], feature.bbox[2]],
-            );
-          } else if (feature.geometry.type === "Point") {
-            const [lng, lat] = feature.geometry.coordinates;
-            const offset = 0.005;
-            bounds = L.latLngBounds(
-              [lat - offset, lng - offset],
-              [lat + offset, lng + offset],
-            );
-          } else {
-            const allSegments = createGradientSegments(
-              feature.geometry.coordinates,
-            );
-            const allLatlngs = allSegments.flatMap((s) => s.latlngs);
-            if (allLatlngs.length > 0) {
-              bounds = L.latLngBounds(allLatlngs);
-            }
-          }
-
-          if (bounds) {
-            map.flyToBounds(bounds, {
-              paddingTopLeft: effectivePaddingTopLeft,
-              paddingBottomRight: effectivePaddingBottomRight,
-              duration: props.zoomDuration,
-            });
-          }
+        const bounds = getFeatureBounds(feature);
+        if (bounds) {
+          map.flyToBounds(bounds, {
+            paddingTopLeft: effectivePaddingTopLeft,
+            paddingBottomRight: effectivePaddingBottomRight,
+            duration: props.zoomDuration,
+          });
         }
       }
     }
@@ -208,9 +180,9 @@ const Dashboard = (props) => {
       if (name.length > 22) return "16.5px";
       return "18px";
     } else {
-      if (name.length > 30) return "13px";
-      if (name.length > 22) return "15px";
-      return "17px";
+      if (name.length > 30) return "15.5px";
+      if (name.length > 22) return "17.5px";
+      return "19.5px";
     }
   };
 
@@ -221,68 +193,12 @@ const Dashboard = (props) => {
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: isDesktop
-          ? `${iconBaseWidth}px ${iconBaseWidth}px`
-          : `${iconBaseWidth}px`,
+        gridTemplateColumns: `${iconBaseWidth}px`,
         gap: "2px",
         padding: "0 2px",
       }}
     >
-      {/* Col 1: Zoom group */}
-      {isDesktop && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-          <div
-            className="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              zoomIn();
-            }}
-            style={{
-              padding: "0",
-              background: "white",
-              borderRadius: "4px 4px 0 0",
-              border: "1px solid #e2e8f0",
-              width: "100%",
-              height: `${iconHeight}px`,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: isDesktop ? "20px" : "16px",
-              color: "#2c3e50",
-            }}
-          >
-            +
-          </div>
-          <div
-            className="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              zoomOut();
-            }}
-            style={{
-              padding: "0",
-              background: "white",
-              borderRadius: "0 0 4px 4px",
-              border: "1px solid #e2e8f0",
-              borderTop: "none",
-              width: "100%",
-              height: `${iconHeight}px`,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              cursor: "pointer",
-              fontWeight: "bold",
-              fontSize: isDesktop ? "20px" : "16px",
-              color: "#2c3e50",
-            }}
-          >
-            -
-          </div>
-        </div>
-      )}
-      {/* Col 2: Reset & Tools */}
+      {/* Reset & Tools */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
         <img
           src={locationIcon}
@@ -347,105 +263,39 @@ const Dashboard = (props) => {
   return (
     <Control position="bottomright">
       <div
-        className="dashboard"
+        className="dashboard-container"
         style={{
           width: isDesktop ? "600px" : "100vw",
-          margin: "0",
-          borderRadius: isDesktop ? "12px" : "0",
-          height: isDesktop ? "130px" : "108px",
-          pointerEvents: "auto",
-          overflow: "hidden",
-          display: "flex",
-          flexDirection: "column",
+          height: isDesktop ? "130px" : "132px",
           paddingBottom: isDesktop ? "0" : "env(safe-area-inset-bottom)",
-          background: "white",
-          boxSizing: "border-box",
-          boxShadow: isDesktop
-            ? "0 4px 20px rgba(0,0,0,0.1)"
-            : "0 -1px 4px rgba(0,0,0,0.05)",
-          border: isDesktop ? "1px solid #e2e8f0" : "1px solid #eee",
-          borderBottom: "none",
-          zIndex: 1000,
         }}
       >
         {/* Top Section: Main content row */}
-        <div
-          style={{
-            display: "flex",
-            flex: 1,
-            width: "100%",
-            alignItems: "stretch",
-            overflow: "hidden",
-          }}
-        >
+        <div className="dashboard-top-section">
           {/* Left Arrow Slab */}
           <div
             onClick={(e) => {
               e.stopPropagation();
               handleNavigation("prev");
             }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: isDesktop ? "60px" : "52px",
-              border: "none",
-              background: "#f5f5f5",
-              cursor: "pointer",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#e9e9e9")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#f5f5f5")}
+            className="navigation-slab"
           >
             <img
               src={arrowIcon}
               width={isDesktop ? "33px" : "31px"}
-              className="leftIcon"
-              style={{ opacity: 0.8 }}
+              className="navigation-icon"
               alt="Previous"
             />
           </div>
 
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              background: "white",
-              minWidth: 0,
-            }}
-          >
+          <div className="dashboard-main-content">
             {/* Top Content (Metrics or Tools) */}
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "stretch",
-                overflow: "hidden",
-              }}
-            >
+            <div className="dashboard-view-wrapper">
               {isToolsOpen ? (
                 /* Tools View */
-                <div
-                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
-                >
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "0 10px",
-                      position: "relative",
-                    }}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        gap: "10px",
-                        alignItems: "center",
-                      }}
-                    >
+                <div className="tools-view">
+                  <div className="tools-row">
+                    <div className="tools-icons-container">
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
@@ -597,18 +447,20 @@ const Dashboard = (props) => {
                   {/* Branding Strip (ONLY visible in Toolbar mode) */}
                   <div
                     style={{
-                      height: isDesktop ? "24px" : "20px",
-                      borderTop: "none",
+                      height: isDesktop ? "36px" : "32px",
+                      borderTop: "1px solid #f0f0f0",
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
                       width: "100%",
                       background: "white",
+                      gap: isDesktop ? "2px" : "1px",
                     }}
                   >
                     <div
                       style={{
-                        fontSize: isDesktop ? "11px" : "11px",
+                        fontSize: isDesktop ? "10px" : "9px",
                         color: "#7f8c8d",
                         fontWeight: "900",
                         textTransform: "uppercase",
@@ -618,6 +470,18 @@ const Dashboard = (props) => {
                     >
                       Everest Base Camp 3 Pass Trek, Nepal
                     </div>
+                    {props.attribution && (
+                      <div
+                        style={{
+                          fontSize: isDesktop ? "9.5px" : "8.5px",
+                          color: "#95a5a6",
+                          letterSpacing: "0.2px",
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: props.attribution,
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
               ) : (
@@ -627,7 +491,7 @@ const Dashboard = (props) => {
                     flex: 1,
                     display: "flex",
                     flexDirection: "column",
-                    padding: isDesktop ? "8px 25px" : "4px 10px",
+                    padding: isDesktop ? "8px 25px" : "10px 15px",
                     minWidth: 0,
                     justifyContent: "center",
                     background: "white",
@@ -637,37 +501,48 @@ const Dashboard = (props) => {
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: isDesktop ? "20px" : "12px",
+                      flexDirection:
+                        isDesktop && (props.name || "").length <= 30
+                          ? "row"
+                          : "column",
+                      justifyContent:
+                        isDesktop && (props.name || "").length <= 30
+                          ? "space-between"
+                          : "center",
+                      alignItems:
+                        isDesktop && (props.name || "").length <= 30
+                          ? "center"
+                          : "flex-start",
+                      gap: isDesktop ? "20px" : "2px",
+                      width: "100%",
                     }}
                   >
                     {/* Left Side: Trek Name */}
                     <div
                       style={{
-                        flex: 1,
+                        flex:
+                          isDesktop && (props.name || "").length <= 30
+                            ? 1
+                            : "none",
                         minWidth: 0,
                         cursor: "pointer",
+                        width:
+                          isDesktop && (props.name || "").length <= 30
+                            ? "auto"
+                            : "100%",
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!isSingleDayView) {
                           toggleViewMode();
                         } else {
-                          // If already in single view, re-zoom to ensure focus
+                          // If already in single view, re-zoom (recalculated)
                           const routes = getDayWiseDataG();
-                          const targetDayKey = day;
-                          const targetDay = routes[targetDayKey];
+                          const targetDay = routes[day];
                           if (targetDay && targetDay.features[0]) {
-                            const feature = targetDay.features[0];
-                            const allSegments = createGradientSegments(
-                              feature.geometry.coordinates,
-                            );
-                            const allLatlngs = allSegments.flatMap(
-                              (s) => s.latlngs,
-                            );
-                            if (allLatlngs.length > 0) {
-                              map.flyToBounds(L.latLngBounds(allLatlngs), {
+                            const bounds = getFeatureBounds(targetDay.features[0]);
+                            if (bounds) {
+                              map.flyToBounds(bounds, {
                                 paddingTopLeft: effectivePaddingTopLeft,
                                 paddingBottomRight: effectivePaddingBottomRight,
                                 duration: props.zoomDuration,
@@ -685,7 +560,10 @@ const Dashboard = (props) => {
                           color: "#2c3e50",
                           whiteSpace: "normal",
                           overflow: "visible",
-                          textAlign: "left",
+                          textAlign:
+                            isDesktop && (props.name || "").length <= 30
+                              ? "left"
+                              : "center",
                           lineHeight: "1.15",
                           display: "block",
                         }}
@@ -699,12 +577,19 @@ const Dashboard = (props) => {
                       style={{
                         display: "flex",
                         flexDirection: "column",
-                        alignItems: "flex-end",
+                        alignItems:
+                          isDesktop && (props.name || "").length <= 30
+                            ? "flex-end"
+                            : "center",
                         flexShrink: 0,
                         minWidth: "fit-content",
-                        maxWidth: isDesktop ? "200px" : "150px",
+                        maxWidth: isDesktop ? "200px" : "100%",
                         justifyContent: "center",
                         alignSelf: "center",
+                        width:
+                          isDesktop && (props.name || "").length <= 30
+                            ? "auto"
+                            : "100%",
                       }}
                     >
                       {/* Elevations Row */}
@@ -713,18 +598,24 @@ const Dashboard = (props) => {
                           style={{
                             display: "flex",
                             flexDirection: "column",
-                            alignItems: "flex-end",
+                            alignItems:
+                              isDesktop && (props.name || "").length <= 30
+                                ? "flex-end"
+                                : "center",
                             width: "100%",
                             justifyContent: "center",
                           }}
                         >
                           <div
                             style={{
-                              fontSize: isDesktop ? "15.5px" : "13px",
+                              fontSize: isDesktop ? "15.5px" : "15.5px",
                               color: "#2c3e50",
                               fontWeight: "bold",
                               letterSpacing: "-0.2px",
-                              textAlign: "right",
+                              textAlign:
+                                isDesktop && (props.name || "").length <= 30
+                                  ? "right"
+                                  : "center",
                               lineHeight: "1.2",
                               whiteSpace: "normal", // Allow wrapping if extremely narrow
                             }}
@@ -743,11 +634,16 @@ const Dashboard = (props) => {
                             (total_climb || descent) && (
                               <div
                                 style={{
-                                  fontSize: isDesktop ? "15px" : "13.5px",
+                                  fontSize: isDesktop ? "15px" : "15px",
                                   marginTop: "2px",
                                   display: "flex",
-                                  gap: isDesktop ? "8px" : "4px",
+                                  gap: isDesktop ? "8px" : "6px",
                                   lineHeight: "1.1",
+                                  justifyContent:
+                                    isDesktop && (props.name || "").length <= 30
+                                      ? "flex-end"
+                                      : "center",
+                                  width: "100%",
                                 }}
                               >
                                 {total_climb && (
@@ -762,7 +658,7 @@ const Dashboard = (props) => {
                                   >
                                     <span
                                       style={{
-                                        fontSize: isDesktop ? "10px" : "9px",
+                                        fontSize: isDesktop ? "10px" : "10px",
                                       }}
                                     >
                                       ▲
@@ -782,7 +678,7 @@ const Dashboard = (props) => {
                                   >
                                     <span
                                       style={{
-                                        fontSize: isDesktop ? "10px" : "9px",
+                                        fontSize: isDesktop ? "10px" : "10px",
                                       }}
                                     >
                                       ▼
@@ -802,7 +698,7 @@ const Dashboard = (props) => {
                     style={{
                       display: "flex",
                       flexDirection: "column",
-                      marginTop: isDesktop ? "12px" : "5px",
+                      marginTop: isDesktop ? "12px" : "12px",
                       borderTop: "none",
                       paddingTop: "0px",
                     }}
@@ -820,7 +716,7 @@ const Dashboard = (props) => {
                           <span
                             style={{
                               fontWeight: "800",
-                              fontSize: isDesktop ? "13px" : "11px",
+                              fontSize: isDesktop ? "13px" : "13.5px",
                               color: "#34495e",
                               display: "flex",
                               alignItems: "center",
@@ -828,8 +724,8 @@ const Dashboard = (props) => {
                             }}
                           >
                             <svg
-                              width={isDesktop ? "11" : "9.5"}
-                              height={isDesktop ? "11" : "9.5"}
+                              width={isDesktop ? "11" : "11"}
+                              height={isDesktop ? "11" : "11"}
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="#7f8c8d"
@@ -850,7 +746,33 @@ const Dashboard = (props) => {
                               <line x1="8" y1="2" x2="8" y2="6"></line>
                               <line x1="3" y1="10" x2="21" y2="10"></line>
                             </svg>
-                            DAY {props.day}
+                            <span
+                              style={{
+                                display: "flex",
+                                alignItems: "baseline",
+                                gap: "1px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: isDesktop ? "10px" : "10px",
+                                  fontWeight: "700",
+                                  color: "#7f8c8d",
+                                }}
+                              >
+                                DAY
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: isDesktop ? "16px" : "16px",
+                                  fontWeight: "900",
+                                  color: "#2c3e50",
+                                  lineHeight: "1",
+                                }}
+                              >
+                                {props.day}
+                              </span>
+                            </span>
                           </span>
                         </div>
 
@@ -864,13 +786,14 @@ const Dashboard = (props) => {
                             <div
                               style={{
                                 display: "flex",
-                                gap: "4px",
+                                gap: isDesktop ? "4px" : "2px",
                                 alignItems: "center",
+                                whiteSpace: "nowrap",
                               }}
                             >
                               <svg
-                                width={isDesktop ? "14" : "12"}
-                                height={isDesktop ? "14" : "12"}
+                                width={isDesktop ? "14" : "14"}
+                                height={isDesktop ? "14" : "14"}
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="#95a5a6"
@@ -883,7 +806,7 @@ const Dashboard = (props) => {
                               </svg>
                               <span
                                 style={{
-                                  fontSize: isDesktop ? "16px" : "13.5px",
+                                  fontSize: isDesktop ? "16px" : "16px",
                                   color: "#2c3e50",
                                   fontWeight: "700",
                                 }}
@@ -896,13 +819,14 @@ const Dashboard = (props) => {
                             <div
                               style={{
                                 display: "flex",
-                                gap: "4px",
+                                gap: isDesktop ? "4px" : "2px",
                                 alignItems: "center",
+                                whiteSpace: "nowrap",
                               }}
                             >
                               <svg
-                                width={isDesktop ? "14" : "12"}
-                                height={isDesktop ? "14" : "12"}
+                                width={isDesktop ? "14" : "14"}
+                                height={isDesktop ? "14" : "14"}
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="#95a5a6"
@@ -916,12 +840,12 @@ const Dashboard = (props) => {
                               </svg>
                               <span
                                 style={{
-                                  fontSize: isDesktop ? "16px" : "13.5px",
+                                  fontSize: isDesktop ? "16px" : "16px",
                                   color: "#2c3e50",
                                   fontWeight: "700",
                                 }}
                               >
-                                {time}
+                                {time}*
                               </span>
                             </div>
                           )}
@@ -958,29 +882,14 @@ const Dashboard = (props) => {
                 e.stopPropagation();
                 handleNavigation("next");
               }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: isDesktop ? "60px" : "52px",
-                border: "none",
-                background: "#f5f5f5",
-                cursor: "pointer",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "#e9e9e9")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "#f5f5f5")
-              }
+              className="navigation-slab"
             >
               <img
                 src={arrowIcon}
                 width={isDesktop ? "33px" : "31px"}
-                className="rightIcon"
+                className="navigation-icon"
                 alt="Next"
-                style={{ transform: "rotate(180deg)", opacity: 0.8 }}
+                style={{ transform: "rotate(180deg)" }}
               />
             </div>
           </div>
@@ -1008,6 +917,7 @@ const mapStateToProps = (state) => ({
   paddingTopLeft: state.mapState.paddingTopLeft,
   paddingBottomRight: state.mapState.paddingBottomRight,
   isSingleDayView: state.mapState.isSingleDayView,
+  attribution: state.mapState.attribution,
 });
 
 export default connect(
