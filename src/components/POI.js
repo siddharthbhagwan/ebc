@@ -28,6 +28,7 @@ const POI = (props) => {
     currentDay,
     isSingleDayView,
     setSingleDayView,
+    showLegend,
   } = props;
 
   const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
@@ -164,7 +165,17 @@ const POI = (props) => {
         return;
       }
 
-      // On acclimatization days (Rest Days), only show the destination house
+      // Snap to route coordinates if it's the start or end of the current day
+      let snappedPoint = markerPoint.point;
+      if (isZoomedIn) {
+        if (isDest && destCoord) {
+          snappedPoint = [destCoord[1], destCoord[0]];
+        } else if (isStart && startCoord) {
+          snappedPoint = [startCoord[1], startCoord[0]];
+        }
+      }
+
+      // On acclimatization days (Rest Days), only show the circled house
       if (isZoomedIn && isCurrentDayRestDay) {
         if (!isDest || !isHouse) {
           return;
@@ -194,43 +205,12 @@ const POI = (props) => {
 
       let icon;
       if (shouldCircle) {
-        // Active (pulsating/rippling) markers should be small to avoid clutter.
-        // Static circled markers (in overview) should be bigger as requested.
-        // When zoomed into a single route, make active houses even larger
-        const isZoomedInSingleRoute = isSingleDayView && isZoomedIn;
-
-        let wrapSize = isPulsatingOnly
-          ? isDesktop
-            ? 17
-            : 15
-          : isActive
-            ? isDesktop
-              ? isZoomedInSingleRoute
-                ? 24
-                : 20
-              : isZoomedInSingleRoute
-                ? 22
-                : 18
-            : isDesktop
-              ? 17
-              : 15;
-
-        const imgSize = isHouse
-          ? isDesktop
-            ? isPulsatingOnly
-              ? 11
-              : isActive
-                ? isZoomedInSingleRoute
-                  ? 19
-                  : 16
-                : 11
-            : isPulsatingOnly
-              ? 8
-              : isActive
-                ? isZoomedInSingleRoute
-                  ? 15
-                  : 12
-                : 8
+        // Destination Circle Wrapper
+        // Decrease circle size by 1px for non-rest days, iconSize remains same
+        const wrapSize = isHouse
+          ? isCurrentDayRestDay
+            ? 19
+            : 18
           : isAirport
             ? isDesktop
               ? isActive
@@ -313,9 +293,9 @@ const POI = (props) => {
 
       arr.push(
         <Marker
-          position={markerPoint.point}
+          position={snappedPoint}
           style={markerPoint.properties}
-          key={markerPoint.point.toString() + markerPoint.properties.day}
+          key={snappedPoint.toString() + markerPoint.properties.day}
           onclick={clickHandler}
           onmouseover={mouseoverHandler}
           icon={icon}
@@ -380,14 +360,32 @@ const POI = (props) => {
     dispatchLayerDetails(updatedProps);
     setSingleDayView(true); // Switch to Single Day View on selection
 
-    const effectivePaddingTopLeft = [
-      paddingTopLeft[0],
-      isDesktop ? paddingTopLeft[1] + 30 : paddingTopLeft[1] + 60,
-    ];
-    const effectivePaddingBottomRight = isDesktop
-      ? [paddingBottomRight[0] + 525, paddingBottomRight[1] + 160]
-      : [paddingBottomRight[0], paddingBottomRight[1] + 130];
+    // Recalculate bounds based on the full day's route collection
+    const routesData = getDayWiseDataG();
+    const targetRoute = routesData[targetDay];
+    
+    const effectivePaddingTopLeft = isDesktop
+      ? [120, showLegend ? 180 : 120]
+      : [40, 110];
 
+    const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
+
+    if (targetRoute) {
+      // Create bounds from all features in the day
+      const layer = L.geoJSON(targetRoute);
+      const bounds = layer.getBounds();
+      
+      if (bounds.isValid()) {
+        map.flyToBounds(bounds, {
+          paddingTopLeft: effectivePaddingTopLeft,
+          paddingBottomRight: effectivePaddingBottomRight,
+          duration: props.zoomDuration,
+        });
+        return;
+      }
+    }
+
+    // Fallback to marker position if route bounds aren't available
     map.flyToBounds(L.latLngBounds(e.latlng, e.latlng), {
       paddingTopLeft: effectivePaddingTopLeft,
       paddingBottomRight: effectivePaddingBottomRight,
@@ -430,6 +428,7 @@ const mapStateToProps = (state) => ({
   unit: state.mapState.unit,
   currentDay: state.route.day,
   isSingleDayView: state.mapState.isSingleDayView,
+  showLegend: state.mapState.showLegend,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withLeaflet(POI));

@@ -12,15 +12,13 @@ const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
 
   // Use a southern offset to clear space for the dashboard at the bottom
-  // Reduced further from 0.015 to 0.012 to push trek up towards legend
-  const mobileOffset = 0.012;
+  const mobileOffset = 0.024;
   const desktopOffset = 0.008;
   const currentOffset = isDesktop ? desktopOffset : mobileOffset;
   const initialCenter = [center[0] - currentOffset, center[1]];
 
   // Calculate the derived zoom for mobile/landscape
-  // Reverted to 10.5 for a wider view
-  const ZOOM_MOBILE = 10.5;
+  const ZOOM_MOBILE = 10.9;
   const derivedZoom = isDesktop ? zoom : ZOOM_MOBILE;
   const initialZoom = derivedZoom; // Start zoomed out as requested
 

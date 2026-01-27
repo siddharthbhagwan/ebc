@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Polyline, withLeaflet, Marker } from "react-leaflet";
+import React, { useMemo, useState, useEffect } from "react";
+import { GeoJSON, withLeaflet } from "react-leaflet";
 import L from "leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
@@ -24,53 +24,31 @@ const GeoJsonRoutes = (props) => {
     paddingBottomRight,
     dispatchLayerDetails,
     currentDay,
+    zoom: reduxZoom,
     isSingleDayView,
     showLegend,
     setSingleDayView,
-    zoom,
+    showLegend,
   } = props;
 
-  const { isLandscape = false } = useMobileOrientation();
-  const derivedZoom = isDesktop
-    ? zoom
-    : isLandscape
-      ? ZOOM_LANDSCAPE
-      : ZOOM_MOBILE;
-
-  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
+  // Local state to track zoom for reactivity, since Redux zoom is static
+  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
 
   useEffect(() => {
-    if (!map) return;
-
-    const handleZoom = () => {
-      const newZoom = map.getZoom();
-      // Use a smaller threshold to ensure consistency with the UI state
-      const wasZoomedIn = currentZoom > derivedZoom + 0.1;
-      const isNowZoomedIn = newZoom > derivedZoom + 0.1;
-
-      // Only re-render if we cross the zoom threshold to keep it performant
-      if (wasZoomedIn !== isNowZoomedIn) {
-        setCurrentZoom(newZoom);
-      }
+    const onZoom = () => {
+      setCurrentZoom(map.getZoom());
     };
+    map.on("zoomend", onZoom);
+    return () => map.off("zoomend", onZoom);
+  }, [map]);
 
-    map.on("zoom", handleZoom);
-    return () => {
-      map.off("zoom", handleZoom);
-    };
-  }, [map, currentZoom, derivedZoom]);
+  // Adjust padding for mobile and desktop to account for UI elements
+  // TopLeft: [left, top], BottomRight: [right, bottom]
+  const effectivePaddingTopLeft = isDesktop
+    ? [120, showLegend ? 180 : 120]
+    : [40, 110];
 
-  // Adjust padding for mobile and desktop to account for the legend at the top and dashboard at the bottom
-  const effectivePaddingTopLeft = [
-    paddingTopLeft[0],
-    isDesktop
-      ? paddingTopLeft[1] + (showLegend ? 30 : 0)
-      : paddingTopLeft[1] + (showLegend ? 35 : 0), // Further reduced from 40 to 35
-  ];
-
-  const effectivePaddingBottomRight = isDesktop
-    ? [paddingBottomRight[0] + 625, paddingBottomRight[1] + 160]
-    : [paddingBottomRight[0], paddingBottomRight[1] + 150]; // Increased from 130 to compensate for shift
+  const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
 
   const routes = getDayWiseDataG();
 
@@ -110,11 +88,18 @@ const GeoJsonRoutes = (props) => {
     return null;
   }
 
-  // Check if we're zoomed in (more than 0.1 above the derived zoom)
-  const isZoomedIn = currentZoom > derivedZoom + 0.1;
+  const isZoomedIn = isSingleDayView;
 
-  const polylines = [];
-  const tapTargets = [];
+  // Additional check: If manually zoomed in deep even in Overview, hide the tube
+  const isDeepZoom = currentZoom > 12.2;
+
+  // On acclimatization days (Rest Days), hide all routes when zoomed in
+  if (isZoomedIn && isCurrentDayRestDay) {
+    return null;
+  }
+
+  const routeLayers = [];
+  const highlightedLayers = [];
 
   Object.entries(memoizedRoutes).forEach(([day, features]) => {
     features.forEach((featureData, featIdx) => {
@@ -188,6 +173,11 @@ const GeoJsonRoutes = (props) => {
         return;
       }
 
+      const isHighlighted =
+        properties.day === currentDay &&
+        currentDay !== "0" &&
+        !isCurrentDayRestDay;
+
       const clickHandler = () => {
         if (properties.day === "20") return;
         dispatchLayerDetails(properties);
@@ -217,103 +207,226 @@ const GeoJsonRoutes = (props) => {
         }
       };
 
-      // Render gradient segments (visible part)
-      segments.forEach((segment, segIdx) => {
-        // Highlighting logic detection
-        const isHighlighted =
-          !isZoomedIn &&
-          properties.day === currentDay &&
-          currentDay !== "0" &&
-          !isCurrentDayRestDay;
+      // Only show the pronounced "Tube" highlight in the Overview view when a route is selected/hovered.
+      // In Single Day view, we show the clean, raw gradient segments as requested.
+      // Added isDeepZoom check to ensure manual zooming also hides the tube.
+      const isShowTube = !isZoomedIn && isHighlighted && !isDeepZoom;
 
-        // Base weight for non-zoomed view
-        let weight = 2.5;
+      // In Zoomed In view, we only want to show the current day's route clearly.
+      // Filter out other routes unless we are in overview.
+      const isActiveDayInZoom = isZoomedIn && properties.day === currentDay;
+      const isOtherDayInZoom = isZoomedIn && properties.day !== currentDay;
 
-        // If zoomed in, make it much thicker
-        if (isZoomedIn) {
-          weight = 6;
-        }
+      // Skip rendering other days in zoom view to keep it clean, or keep them with minimal opacity
+      if (isOtherDayInZoom) {
+        return; // For now, just hide other days in zoom view
+      }
 
-        // Apply 20% increase for desktop default lines
-        if (isDesktop) {
-          weight *= 1.2;
-        }
+      if (isShowTube) {
+        // Adjusted weights to make the "Tube" lines closer and more precise
+        const outerWeight = isDesktop
+          ? isZoomedIn
+            ? 9.5
+            : 8.5
+          : isZoomedIn
+            ? 8.5
+            : 7.5;
+        const innerWeight = isDesktop
+          ? isZoomedIn
+            ? 5.5
+            : 5
+          : isZoomedIn
+            ? 5
+            : 4.5;
 
-        if (isHighlighted) {
-          // Bottom Layer: Thick Colored path - provides the main visibility
-          polylines.push(
-            <Polyline
-              key={day + "-" + featIdx + "-" + segIdx + "-base"}
-              positions={segment.latlngs}
-              color={segment.color}
-              weight={isDesktop ? 8 : 7}
-              opacity={1}
-              lineCap="round"
-              lineJoin="round"
-              smoothFactor={2}
-              interactive={false} // Interactive handled by tap-target
-              className="route-highlight-main"
+        const highlightColor = segments[0]?.color || "#2c3e50";
+
+        // PASS 1: The "Depth" (Deep, wide shadow)
+        highlightedLayers.push(
+          <GeoJSON
+            key={`depth-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            data={geometry}
+            className="pulsating-path"
+            style={{
+              color: "#000",
+              weight: outerWeight + 6,
+              opacity: 0.12,
+              lineCap: "round",
+              lineJoin: "round",
+            }}
+            smoothFactor={isZoomedIn ? 0 : 4}
+            noClip={isZoomedIn}
+            interactive={false}
+          />,
+        );
+
+        // PASS 2: The "Inner Shadow" (Slightly darker version of the path color)
+        highlightedLayers.push(
+          <GeoJSON
+            key={`border-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            data={geometry}
+            className="pulsating-path"
+            style={{
+              color: "#2c3e50", // Charcoal contrast
+              weight: outerWeight + 1.5,
+              opacity: 0.4,
+              lineCap: "round",
+              lineJoin: "round",
+            }}
+            smoothFactor={isZoomedIn ? 0 : 4}
+            noClip={isZoomedIn}
+            interactive={false}
+          />,
+        );
+
+        // PASS 3: The "Glass Tube" (Semi-transparent Body)
+        highlightedLayers.push(
+          <GeoJSON
+            key={`outer-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            data={geometry}
+            className="pulsating-path"
+            style={{
+              color: highlightColor,
+              weight: outerWeight,
+              opacity: 0.8,
+              lineCap: "round",
+              lineJoin: "round",
+            }}
+            smoothFactor={isZoomedIn ? 0 : 4}
+            noClip={isZoomedIn}
+            interactive={properties.day !== "20"}
+            onEachFeature={(feature, layer) => {
+              layer.on({
+                mouseover: () => {
+                  if (properties.day !== "20") {
+                    dispatchLayerDetails(properties);
+                  }
+                },
+                click: clickHandler,
+              });
+            }}
+          />,
+        );
+
+        // PASS 4: The "Sunlight" (Thin, offset-feeling white highlight)
+        highlightedLayers.push(
+          <GeoJSON
+            key={`inner-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            data={geometry}
+            className="pulsating-path"
+            style={{
+              color: "white",
+              weight: innerWeight * 0.7,
+              opacity: 0.9,
+              lineCap: "round",
+              lineJoin: "round",
+            }}
+            smoothFactor={isZoomedIn ? 0 : 4}
+            noClip={isZoomedIn}
+            interactive={false}
+          />,
+        );
+      } else {
+        // Render standard gradient segments for background routes using GeoJSON
+        segments.forEach((segment, segIdx) => {
+          // Increase weight and opacity for the focused route in Single Day view
+          // User requested a "thick" plain line for zoomed in view
+          let weight = isZoomedIn ? (isDesktop ? 6.5 : 5.5) : 1.8;
+          if (isDesktop && !isZoomedIn) {
+            weight *= 1.15;
+          }
+
+          // Convert segment.latlngs to GeoJSON LineString
+          const segmentGeoJSON = {
+            type: "LineString",
+            coordinates: segment.latlngs.map((ll) => [ll[1], ll[0]]),
+          };
+
+          routeLayers.push(
+            <GeoJSON
+              key={
+                day +
+                "-" +
+                featIdx +
+                "-" +
+                segIdx +
+                "-" +
+                isZoomedIn +
+                "-" +
+                isDeepZoom +
+                "-" +
+                reduxZoom +
+                "-" +
+                showLegend
+              }
+              data={segmentGeoJSON}
+              style={{
+                color: segment.color,
+                weight: weight,
+                opacity: isZoomedIn ? 1 : 0.65,
+                lineCap: "round",
+                lineJoin: "round",
+              }}
+              smoothFactor={isZoomedIn ? 0 : 4}
+              noClip={isZoomedIn}
+              interactive={properties.day !== "20"}
+              onEachFeature={(feature, layer) => {
+                layer.on({
+                  mouseover: () => {
+                    if (properties.day !== "20") {
+                      dispatchLayerDetails(properties);
+                    }
+                  },
+                  click: clickHandler,
+                });
+              }}
             />,
           );
+        });
+      }
 
-          // Top Layer: Thin White Core - creates a "tube" effect for high contrast on all maps
-          polylines.push(
-            <Polyline
-              key={day + "-" + featIdx + "-" + segIdx + "-core"}
-              positions={segment.latlngs}
-              color="white"
-              weight={isDesktop ? 2.5 : 2}
-              opacity={0.8}
-              lineCap="round"
-              lineJoin="round"
-              smoothFactor={2}
-              interactive={false}
-            />,
-          );
-        } else {
-          // Standard/Dimmed Route - Lower opacity to push them to background
-          polylines.push(
-            <Polyline
-              key={day + "-" + featIdx + "-" + segIdx}
-              positions={segment.latlngs}
-              color={segment.color}
-              weight={weight}
-              opacity={isZoomedIn ? 1.0 : 0.8}
-              lineCap="round"
-              lineJoin="round"
-              smoothFactor={isZoomedIn ? 0 : 3}
-              interactive={false} // Interactive handled by tap-target
-              className="non-highlighted-route"
-            />,
-          );
-        }
-      });
-
-      // Prepare invisible wider Polyline for easier clicking/tapping
-      // We collect these separately to render them on top of all visible segments
-      tapTargets.push(
-        <Polyline
-          key={"tap-target-" + day + "-" + featIdx}
-          positions={geometry.coordinates.flatMap((line) =>
-            line.map((coord) => [coord[1], coord[0]]),
-          )}
-          color="transparent"
-          weight={isDesktop ? 25 : 35} // Wider target on mobile
-          opacity={0}
-          interactive={properties.day !== "20"}
-          onmouseover={() => {
-            if (properties.day !== "20") {
-              dispatchLayerDetails(properties);
-            }
+      // Render invisible wider GeoJSON for easier clicking/tapping
+      routeLayers.push(
+        <GeoJSON
+          key={
+            "tap-target-" +
+            day +
+            "-" +
+            featIdx +
+            "-" +
+            isZoomedIn +
+            "-" +
+            isDeepZoom +
+            "-" +
+            reduxZoom +
+            "-" +
+            showLegend
+          }
+          data={geometry}
+          style={{
+            color: "transparent",
+            weight: 25,
+            opacity: 0,
           }}
-          onclick={clickHandler}
-          style={{ cursor: "pointer" }}
+          smoothFactor={isZoomedIn ? 0 : 4}
+          noClip={isZoomedIn}
+          interactive={properties.day !== "20"}
+          onEachFeature={(feature, layer) => {
+            layer.on({
+              mouseover: () => {
+                if (properties.day !== "20") {
+                  dispatchLayerDetails(properties);
+                }
+              },
+              click: clickHandler,
+            });
+          }}
         />,
       );
     });
   });
 
-  return [...polylines, ...tapTargets];
+  return [...routeLayers, ...highlightedLayers];
 };
 
 const mapStateToProps = (state) => ({
