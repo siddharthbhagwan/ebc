@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { GeoJSON, withLeaflet } from "react-leaflet";
+import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
 import L from "leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
@@ -26,7 +26,6 @@ const GeoJsonRoutes = (props) => {
     currentDay,
     zoom: reduxZoom,
     isSingleDayView,
-    showLegend,
     setSingleDayView,
     showLegend,
   } = props;
@@ -120,7 +119,7 @@ const GeoJsonRoutes = (props) => {
         const elevation = geometry.coordinates[2];
         const color = getColorForElevation(elevation);
 
-        polylines.push(
+        routeLayers.push(
           <Marker
             key={"rest-day-" + properties.day + "-" + featIdx}
             position={pointLatlng}

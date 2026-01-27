@@ -10,12 +10,13 @@ import toolsIcon from "../resources/images/settings.svg";
 import legendIcon from "../resources/images/legend.svg";
 import infoIcon from "../resources/images/info.svg";
 
-import "../resources/css/dashboard.css";
 import { mapDispatchToProps } from "../utils/utils";
 import useDays from "../hooks/useDays";
 import { createGradientSegments } from "../utils/heightGradient";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
+
+import "../resources/css/dashboard.css";
 
 const ZOOM_MOBILE = 10.4;
 const ZOOM_LANDSCAPE = 10.3;
@@ -47,14 +48,25 @@ const Dashboard = (props) => {
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
+  const [lastZoomedState, setLastZoomedState] = useState(null);
+  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
+
+  useEffect(() => {
+    if (!map) return;
+    const handleZoom = () => setCurrentZoom(map.getZoom());
+    map.on("zoomend", handleZoom);
+    return () => map.off("zoomend", handleZoom);
+  }, [map]);
 
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
   const { isLandscape = false } = useMobileOrientation();
 
-  const toggleViewMode = () => {
-    setSingleDayView(!isSingleDayView);
-  };
+  const derivedZoom = isDesktop
+    ? zoom
+    : isLandscape
+      ? ZOOM_LANDSCAPE
+      : ZOOM_MOBILE;
 
   const { nextDay, prevDay } = useDays(day, dispatchLayerDetails);
 
@@ -125,6 +137,123 @@ const Dashboard = (props) => {
 
   const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
 
+  const resetZoom = () => {
+    if (!map) return;
+
+    // Use a slight timeout to ensure no conflicts with current interactions
+    setTimeout(() => {
+      map.invalidateSize();
+
+      if (isSingleDayView && day && day !== "0") {
+        const routes = getDayWiseDataG();
+        const targetDay = routes[day];
+
+        if (targetDay) {
+          const bounds = getFeatureBounds(targetDay, day);
+          if (bounds) {
+            map.flyToBounds(bounds, {
+              paddingTopLeft: effectivePaddingTopLeft,
+              paddingBottomRight: effectivePaddingBottomRight,
+              duration: 1,
+            });
+          }
+        }
+      } else {
+        // Overview mode: Reset to initial world center
+        const mobileOffset = 0.024;
+        const desktopOffset = 0.008;
+        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+
+        // Safety check for center
+        const lat = Array.isArray(center) ? center[0] : center.lat;
+        const lng = Array.isArray(center) ? center[1] : center.lng;
+
+        const initialCenter = [lat - currentOffset, lng];
+        map.flyTo(initialCenter, derivedZoom, { duration: 1 });
+      }
+    }, 10);
+  };
+
+  // Target button: Toggle between overview and Day 1
+  const toggleTargetView = () => {
+    if (!map) return;
+
+    setTimeout(() => {
+      if (isSingleDayView) {
+        // Switch to overview
+        setSingleDayView(false);
+        const routes = getDayWiseDataG();
+        if (routes && routes["0"]) {
+          dispatchLayerDetails(routes["0"].features[0].properties);
+        }
+        const mobileOffset = 0.024;
+        const desktopOffset = 0.008;
+        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+        const lat = Array.isArray(center) ? center[0] : center.lat;
+        const lng = Array.isArray(center) ? center[1] : center.lng;
+        const initialCenter = [lat - currentOffset, lng];
+        map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
+      } else {
+        // Switch to Day 1
+        setSingleDayView(true);
+        const routes = getDayWiseDataG();
+        const targetDay = routes["1"];
+        if (targetDay) {
+          dispatchLayerDetails(targetDay.features[0].properties);
+          const bounds = getFeatureBounds(targetDay, "1");
+          if (bounds) {
+            map.flyToBounds(bounds, {
+              paddingTopLeft: effectivePaddingTopLeft,
+              paddingBottomRight: effectivePaddingBottomRight,
+              duration: 1,
+            });
+          }
+        }
+      }
+    }, 10);
+  };
+
+  // Track map state for icon highlights (zoom and center)
+  const [isAtInitialState, setIsAtInitialState] = useState(true);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const checkState = () => {
+      const currentMapZoom = map.getZoom();
+      const currentMapCenter = map.getCenter();
+
+      if (isSingleDayView && day && day !== "0") {
+        // In day view, check if zoom matches roughly (could be more complex but zoom is a good proxy)
+        setIsAtInitialState(
+          Math.abs(
+            currentMapZoom -
+              map.getBoundsZoom(getFeatureBounds(getDayWiseDataG()[day], day)),
+          ) < 0.2,
+        );
+      } else {
+        const mobileOffset = 0.024;
+        const desktopOffset = 0.008;
+        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+
+        const lat = Array.isArray(center) ? center[0] : center.lat;
+        const lng = Array.isArray(center) ? center[1] : center.lng;
+        const targetLat = lat - currentOffset;
+
+        const isZoomed = Math.abs(currentMapZoom - derivedZoom) > 0.1;
+        const isPanned =
+          Math.abs(currentMapCenter.lat - targetLat) > 0.002 ||
+          Math.abs(currentMapCenter.lng - lng) > 0.002;
+
+        setIsAtInitialState(!isZoomed && !isPanned);
+      }
+    };
+
+    map.on("zoomend moveend", checkState);
+    checkState(); // initial check
+    return () => map.off("zoomend moveend", checkState);
+  }, [map, isSingleDayView, day, center, derivedZoom, isDesktop]);
+
   // Re-apply bounds when padding-affecting states change or view mode changes
   useEffect(() => {
     if (isSingleDayView && day && day !== "0") {
@@ -190,6 +319,9 @@ const Dashboard = (props) => {
     }
   };
 
+  const zoomIn = () => map.zoomIn();
+  const zoomOut = () => map.zoomOut();
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -215,12 +347,6 @@ const Dashboard = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day, map, isSingleDayView]); // dependencies to ensure handleNavigation has latest context
 
-  const derivedZoom = isDesktop
-    ? zoom
-    : isLandscape
-      ? ZOOM_LANDSCAPE
-      : ZOOM_MOBILE;
-
   // Initial setup - do not auto-zoom to Day 1 on load
   useEffect(() => {}, []);
 
@@ -233,13 +359,12 @@ const Dashboard = (props) => {
       setSingleDayView(false);
 
       // Zoom out to the exact initial center
-      const mobileOffset = 0.022;
+      const mobileOffset = 0.024;
       const desktopOffset = 0.008;
       const currentOffset = isDesktop ? desktopOffset : mobileOffset;
       const initialCenter = [center[0] - currentOffset, center[1]];
 
       // Reset to Day 0 (Default page)
-      const routes = getDayWiseDataG();
       if (routes && routes["0"]) {
         dispatchLayerDetails(routes["0"].features[0].properties);
       }
@@ -292,8 +417,6 @@ const Dashboard = (props) => {
       }
     }
   };
-  const zoomIn = () => map.zoomIn();
-  const zoomOut = () => map.zoomOut();
 
   const getTitleFontSize = (name) => {
     if (isDesktop) {
@@ -322,45 +445,55 @@ const Dashboard = (props) => {
     >
       {/* Reset & Tools */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-        <img
-          src={locationIcon}
-          width={"100%"}
-          className={`icon ${currentZoom > derivedZoom + 0.1 ? "active" : ""}`}
+        <div
           onClick={(e) => {
             e.stopPropagation();
-            resetZoom();
+            toggleTargetView();
           }}
-          alt="Reset"
+          className={`icon ${isSingleDayView ? "active" : ""}`}
           style={{
             padding: isDesktop ? "6px" : "4px",
             background: "white",
             borderRadius: "4px 4px 0 0",
-            border: "none",
             height: `${iconHeight}px`,
             boxSizing: "border-box",
             cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
-        <img
-          src={toolsIcon}
-          width={"100%"}
-          className="icon"
+        >
+          <img
+            src={locationIcon}
+            style={{ width: "100%", height: "auto" }}
+            alt="Reset"
+          />
+        </div>
+        <div
           onClick={(e) => {
             e.stopPropagation();
             setIsToolsOpen((prev) => !prev);
           }}
-          alt="Tools"
+          className="icon"
           style={{
             padding: isDesktop ? "6px" : "4px",
             background: "white",
             borderRadius: "0 0 4px 4px",
-            border: "none",
-            borderTop: "none",
             height: `${iconHeight}px`,
             boxSizing: "border-box",
             cursor: "pointer",
+            borderTop: "1px solid #f0f0f0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-        />
+        >
+          <img
+            src={toolsIcon}
+            style={{ width: "100%", height: "auto" }}
+            alt="Tools"
+          />
+        </div>
       </div>
     </div>
   );
@@ -393,14 +526,14 @@ const Dashboard = (props) => {
         }}
       >
         {/* Top Section: Main content row */}
-        <div 
+        <div
           className="dashboard-top-section"
-          style={{ 
-            display: "flex", 
-            alignItems: "stretch", 
-            width: "100%", 
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            width: "100%",
             height: "100%",
-            position: "relative"
+            position: "relative",
           }}
         >
           {/* Left Arrow Slab */}
@@ -420,24 +553,24 @@ const Dashboard = (props) => {
             />
           </div>
 
-          <div 
-            className="dashboard-main-content" 
-            style={{ 
-              flex: 1, 
-              display: "flex", 
+          <div
+            className="dashboard-main-content"
+            style={{
+              flex: 1,
+              display: "flex",
               flexDirection: "column",
               position: "relative",
-              minWidth: 0
+              minWidth: 0,
             }}
           >
             {/* Top Content (Metrics or Tools) */}
-            <div 
+            <div
               className="dashboard-view-wrapper"
               style={{
                 flex: 1,
                 display: "flex",
                 flexDirection: "column",
-                width: "100%"
+                width: "100%",
               }}
             >
               {isToolsOpen ? (
@@ -963,10 +1096,10 @@ const Dashboard = (props) => {
                 </div>
               )}
             </div>
-            
+
             {/* NEW Fixed Metrics Row for Mobile */}
             {!isDesktop && (
-              <div 
+              <div
                 style={{
                   height: "28px",
                   background: "#fdfdfd",
@@ -976,37 +1109,100 @@ const Dashboard = (props) => {
                   justifyContent: "center",
                   gap: "15px",
                   padding: "0 10px",
-                  flexShrink: 0
+                  flexShrink: 0,
                 }}
               >
-                  {/* Day indicator */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#95a5a6" }}>DAY</span>
-                    <span style={{ fontSize: "14px", fontWeight: "900", color: "#34495e" }}>{props.day}</span>
-                  </div>
+                {/* Day indicator */}
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "3px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "8px",
+                      fontWeight: "700",
+                      color: "#95a5a6",
+                    }}
+                  >
+                    DAY
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "900",
+                      color: "#34495e",
+                    }}
+                  >
+                    {props.day}
+                  </span>
+                </div>
 
-                  {!isPlace && distance && time && distance !== "0 mi / 0 km" && (
-                    <>
-                      <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#95a5a6" strokeWidth="3">
-                          <path d="M13 18l6-6-6-6M5 12h14" />
-                        </svg>
-                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#34495e" }}>{displayDistance()}</span>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#95a5a6" strokeWidth="3">
-                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#34495e" }}>{time}</span>
-                      </div>
-                    </>
-                  )}
+                {!isPlace && distance && time && distance !== "0 mi / 0 km" && (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "3px",
+                      }}
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#95a5a6"
+                        strokeWidth="3"
+                      >
+                        <path d="M13 18l6-6-6-6M5 12h14" />
+                      </svg>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          color: "#34495e",
+                        }}
+                      >
+                        {displayDistance()}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "3px",
+                      }}
+                    >
+                      <svg
+                        width="10"
+                        height="10"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#95a5a6"
+                        strokeWidth="3"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "700",
+                          color: "#34495e",
+                        }}
+                      >
+                        {time}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
 
           {/* Right Side: Toolbar and Next Arrow (Slab) */}
-          <div style={{ display: "flex", alignItems: "stretch", flexShrink: 0 }}>
+          <div
+            style={{ display: "flex", alignItems: "stretch", flexShrink: 0 }}
+          >
             {/* Toolbar Area */}
             {!isToolsOpen && (
               <div
@@ -1017,7 +1213,6 @@ const Dashboard = (props) => {
                   alignItems: "center",
                   background: "white",
                 }}
-                onClick={(e) => e.stopPropagation()}
               >
                 {ControlIcons}
               </div>
