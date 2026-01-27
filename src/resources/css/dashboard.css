@@ -558,15 +558,13 @@ generic-dashboard {
   background: white;
 }
 
-/* Route Highlighting Classes */
-.route-highlight-casing {
-  pointer-events: none;
+/* Pulsating effect for highlighted route */
+@keyframes routePulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }
 
-.route-highlight-main {
-  /* Sharp look, no animation */
-}
-
-.non-highlighted-route {
-  transition: opacity 0.3s ease;
+.pulsating-path {
+  animation: routePulse 2.5s infinite ease-in-out;
 }

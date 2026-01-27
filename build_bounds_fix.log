@@ -1,0 +1,5 @@
+
+> ebc@0.1.0 build
+> react-scripts --openssl-legacy-provider build
+
+Creating an optimized production build...
