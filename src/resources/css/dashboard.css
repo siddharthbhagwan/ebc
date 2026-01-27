@@ -36,6 +36,15 @@ generic-dashboard {
   cursor: pointer;
 }
 
+@media (min-width: 1025px) {
+  .icon:hover {
+    background: #f5f5f5 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+  }
+}
+
 .icon.active {
   background: #e0e0e0 !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15) !important;
@@ -260,7 +269,7 @@ generic-dashboard {
   .dashboard-container {
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    border: 2px solid #cbd5e0;
   }
 }
 
@@ -268,7 +277,7 @@ generic-dashboard {
   .dashboard-container {
     border-radius: 0;
     box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #eee;
+    border: 2px solid #d1d5db;
   }
 }
 
@@ -359,7 +368,7 @@ generic-dashboard {
   padding: 4px;
   background: #f9f9f9;
   border-radius: 4px;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #a0aec0;
 }
 
 /* Unit Toggle */
@@ -372,7 +381,7 @@ generic-dashboard {
   padding: 2px;
   cursor: pointer;
   position: relative;
-  border: 1px solid #ddd;
+  border: 2px solid #9ca3af;
 }
 
 @media (min-width: 1025px) {
@@ -573,4 +582,540 @@ generic-dashboard {
 
 .pulsating-path {
   animation: routePulse 2.5s infinite ease-in-out;
+}
+/* ============================================
+   MEMOIZED COMPONENT STYLES
+   ============================================ */
+
+/* Elevation Stats */
+.elevation-stats-row {
+  color: #2c3e50;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.elevation-stats-row--desktop {
+  font-size: 12px;
+}
+
+.elevation-stats-row--mobile {
+  font-size: 13px;
+}
+
+.elevation-gain {
+  color: #27ae60;
+  font-weight: 900;
+}
+
+.elevation-gain--desktop {
+  font-size: 17px;
+}
+
+.elevation-gain--mobile {
+  font-size: 15px;
+}
+
+.elevation-descent {
+  margin-left: 6px;
+  color: #c0392b;
+  font-weight: 900;
+}
+
+.elevation-descent--desktop {
+  font-size: 14px;
+}
+
+.elevation-descent--mobile {
+  font-size: 12px;
+}
+
+.altitude-display {
+  color: #2c3e50;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.altitude-display--desktop {
+  font-size: 12px;
+}
+
+.altitude-display--mobile {
+  font-size: 13px;
+}
+
+/* Trek Name */
+.trek-name {
+  font-weight: 750;
+  color: #2c3e50;
+  text-align: center;
+  line-height: 1.1;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Stats Container */
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-container--desktop {
+  gap: 8px;
+}
+
+.stats-container--mobile {
+  gap: 4px;
+}
+
+/* Elevation Wrapper */
+.elevation-wrapper {
+  width: 100%;
+}
+
+/* Divider */
+.stats-divider {
+  height: 1px;
+  background: #cbd5e0;
+  width: 100%;
+}
+
+/* Day/Distance/Time Row */
+.metrics-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 22px;
+  gap: 0;
+}
+
+.day-indicator {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.day-label-desktop {
+  font-size: 9px;
+  font-weight: 700;
+  color: #7f8c8d;
+}
+
+.day-value-desktop {
+  font-size: 16px;
+  font-weight: 900;
+  color: #2c3e50;
+  line-height: 1;
+}
+
+.distance-time-container {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.metric-item {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.metric-value-desktop {
+  font-size: 15px;
+  color: #2c3e50;
+  font-weight: 700;
+}
+
+.time-value-desktop {
+  font-size: 15px;
+  color: #2c3e50;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.time-asterisk {
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: 1px;
+  align-self: flex-start;
+  position: relative;
+  top: -1px;
+}
+
+/* Mobile Metrics Row */
+.mobile-metrics-row {
+  height: 28px;
+  background: #fdfdfd;
+  border-top: 2px solid #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+  padding: 0 10px;
+  flex-shrink: 0;
+}
+
+.day-indicator-mobile {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 55px;
+}
+
+.day-label-mobile {
+  font-size: 8px;
+  font-weight: 700;
+  color: #95a5a6;
+}
+
+.day-value-mobile {
+  font-size: 14px;
+  font-weight: 900;
+  color: #34495e;
+}
+
+.metric-item-mobile {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.metric-value-mobile {
+  font-size: 12px;
+  font-weight: 700;
+  color: #34495e;
+}
+
+/* Metrics View Container */
+.metrics-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  justify-content: center;
+  align-items: center;
+  background: white;
+}
+
+.metrics-content--desktop {
+  padding: 8px 25px;
+}
+
+.metrics-content--mobile {
+  padding: 8px 8px;
+}
+
+.metrics-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.metrics-inner--desktop {
+  max-width: 100%;
+  gap: 8px;
+}
+
+.metrics-inner--mobile {
+  max-width: 280px;
+  gap: 6px;
+}
+
+/* Tools Panel */
+.tools-panel-row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  position: relative;
+}
+
+.tools-panel-icons {
+  flex: 1;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tool-icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.tool-icon-image {
+  padding: 4px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border: none;
+}
+
+/* Unit Toggle */
+.unit-toggle-container {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  background: #f0f0f0;
+  border-radius: 15px;
+  padding: 2px;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid #ddd;
+}
+
+.unit-toggle-container--desktop {
+  height: 25px;
+  width: 65px;
+}
+
+.unit-toggle-container--mobile {
+  height: 24px;
+  width: 62px;
+}
+
+.unit-toggle-indicator {
+  position: absolute;
+  background: #3498db;
+  border-radius: 15px;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  top: 0;
+  height: 100%;
+}
+
+.unit-toggle-indicator--desktop {
+  width: 27px;
+  font-size: 11px;
+}
+
+.unit-toggle-indicator--mobile {
+  width: 24px;
+  font-size: 10px;
+}
+
+.unit-toggle-labels {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6px;
+  font-weight: bold;
+  color: #95a5a6;
+  pointer-events: none;
+}
+
+.unit-toggle-labels--desktop {
+  font-size: 10px;
+}
+
+.unit-toggle-labels--mobile {
+  font-size: 9px;
+}
+
+/* Close Button */
+.close-button-wrapper {
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button {
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #7f8c8d;
+  font-weight: bold;
+  border: none;
+}
+
+.close-button--desktop {
+  width: 25px;
+  height: 25px;
+  font-size: 18px;
+}
+
+.close-button--mobile {
+  width: 23px;
+  height: 23px;
+  font-size: 15px;
+}
+
+/* Branding Strip */
+.branding-strip {
+  border-top: 2px solid #9ca3af;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: white;
+}
+
+.branding-strip--desktop {
+  height: 44px;
+  gap: 4px;
+}
+
+.branding-strip--mobile {
+  height: 40px;
+  gap: 3px;
+}
+
+.branding-title {
+  color: #7f8c8d;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+}
+
+.branding-title--desktop {
+  font-size: 11px;
+}
+
+.branding-title--mobile {
+  font-size: 10px;
+}
+
+.branding-attribution {
+  color: #95a5a6;
+  letter-spacing: 0.2px;
+}
+
+.branding-attribution--desktop {
+  font-size: 9.5px;
+}
+
+.branding-attribution--mobile {
+  font-size: 8.5px;
+}
+
+/* Control Icons */
+.control-icons-grid {
+  display: grid;
+  gap: 2px;
+  padding: 0 2px;
+  height: 100%;
+  align-items: center;
+}
+
+.control-icons-grid--desktop {
+  grid-template-columns: 34px;
+}
+
+.control-icons-grid--mobile {
+  grid-template-columns: 25px;
+}
+
+.control-icons-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  justify-content: center;
+  height: 100%;
+}
+
+.control-icon-button {
+  background: white;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-icon-button--top {
+  border-radius: 4px 4px 0 0;
+}
+
+.control-icon-button--bottom {
+  border-radius: 0 0 4px 4px;
+  border-top: 1px solid #cbd5e0;
+}
+
+.control-icon-button--desktop {
+  padding: 6px;
+  width: 34px;
+  height: 50%;
+}
+
+.control-icon-button--mobile {
+  padding: 4px;
+  width: 25px;
+  height: 50%;
+}
+
+.control-icon-image {
+  width: 80%;
+  height: auto;
+}
+
+.control-icon-image--desktop {
+  max-width: 24px;
+  max-height: 24px;
+}
+
+.control-icon-image--mobile {
+  max-width: 18px;
+  max-height: 18px;
+}
+
+/* Dashboard Container */
+.dashboard-container--desktop {
+  width: 600px;
+  height: 160px;
+  padding-bottom: 0;
+  position: relative;
+  z-index: auto;
+}
+
+.dashboard-container--mobile {
+  width: 100vw;
+  height: 132px;
+  padding-bottom: env(safe-area-inset-bottom);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* Right Side Container */
+.right-side-container {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+/* Toolbar Area */
+.toolbar-area {
+  padding: 0 2px;
+  border-left: 1px solid #cbd5e0;
+  display: flex;
+  align-items: center;
+  background: white;
+}
+
+/* Arrow Icon */
+.arrow-icon-rotated {
+  transform: rotate(180deg);
 }

@@ -102,7 +102,7 @@ const GeoJsonRoutes = (props) => {
       // Handle Point features (Rest Days or specialized markers)
       if (geometry.type === "Point") {
         // Show rest day circular border if zoomed in AND it's the current rest day,
-        // OR if zoomed out AND it's selected (for Day 0 or Rest Days)
+        // OR if zoomed out AND it's selected (for Rest Days)
         const isSelectedPoint = properties.day === currentDay;
         const shouldShowBorder = isZoomedIn ? isSelectedPoint : isSelectedPoint;
 
@@ -125,7 +125,7 @@ const GeoJsonRoutes = (props) => {
               iconAnchor: [16, 16],
               html: `<div class="rest-day-circle" style="border-color: ${color};">
                       ${
-                        properties.day === "0" || properties.day === "20"
+                        properties.day === "20"
                           ? `<img src="${airportIcon}" style="width: 14px; height: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />`
                           : `<img src="${tentIcon}" style="width: 14px; height: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />`
                       }
@@ -169,7 +169,6 @@ const GeoJsonRoutes = (props) => {
 
       const isHighlighted =
         properties.day === currentDay &&
-        currentDay !== "0" &&
         !isCurrentDayRestDay;
 
       const clickHandler = () => {
@@ -253,26 +252,26 @@ const GeoJsonRoutes = (props) => {
           />,
         );
 
-        // PASS 2: The "Inner Shadow" (Slightly darker version of the path color)
-        highlightedLayers.push(
-          <GeoJSON
-            key={`border-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
-            data={geometry}
-            className="pulsating-path"
-            style={{
-              color: "#2c3e50", // Charcoal contrast
-              weight: outerWeight + 1.5,
-              opacity: 0.4,
-              lineCap: "round",
-              lineJoin: "round",
-            }}
-            smoothFactor={isZoomedIn ? 0 : 4}
-            noClip={isZoomedIn}
-            interactive={false}
-          />,
-        );
+        // PASS 2: The "Inner Shadow" (Slightly darker version of the path color) - REMOVED per user request
+        // highlightedLayers.push(
+        //   <GeoJSON
+        //     key={`border-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+        //     data={geometry}
+        //     className="pulsating-path"
+        //     style={{
+        //       color: "#2c3e50", // Charcoal contrast
+        //       weight: outerWeight + 1.5,
+        //       opacity: 0.4,
+        //       lineCap: "round",
+        //       lineJoin: "round",
+        //     }}
+        //     smoothFactor={isZoomedIn ? 0 : 4}
+        //     noClip={isZoomedIn}
+        //     interactive={false}
+        //   />,
+        // );
 
-        // PASS 3: The "Glass Tube" (Semi-transparent Body)
+        // PASS 2: The "Glass Tube" (Semi-transparent Body)
         highlightedLayers.push(
           <GeoJSON
             key={`outer-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
@@ -301,7 +300,7 @@ const GeoJsonRoutes = (props) => {
           />,
         );
 
-        // PASS 4: The "Sunlight" (Thin, offset-feeling white highlight)
+        // PASS 3: The "Sunlight" (Thin, offset-feeling white highlight)
         highlightedLayers.push(
           <GeoJSON
             key={`inner-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
