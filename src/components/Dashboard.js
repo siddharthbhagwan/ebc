@@ -576,7 +576,9 @@ const Dashboard = (props) => {
                           </span>
                         </div>
                         <div className={`altitude-display altitude-display--${isDesktop ? 'desktop' : 'mobile'}`}>
-                          {startAlt ? formatAlt(startAlt) : ""}
+                          <span className="altitude-start">{startAlt ? formatAlt(startAlt) : ""}</span>
+                          {peakAlt && <span className="altitude-peak"> → {formatAlt(peakAlt)}</span>}
+                          <span className="altitude-end"> → {endAlt ? formatAlt(endAlt) : ""}</span>
                         </div>
                       </div>
                     </div>

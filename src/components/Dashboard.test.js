@@ -414,7 +414,10 @@ describe("Dashboard Elevation Stats Styling", () => {
     // Find the altitude display using CSS class
     const altitudeDisplay = container.querySelector('.altitude-display--desktop');
     expect(altitudeDisplay).toBeInTheDocument();
+    // Should show start → end altitude (2,857m → 2,610m)
     expect(altitudeDisplay.textContent).toContain("2,857m");
+    expect(altitudeDisplay.textContent).toContain("2,610m");
+    expect(altitudeDisplay.textContent).toContain("→");
   });
 
   // Note: Mobile font sizes (15px for elevation gain, 11px for altitude)
@@ -488,14 +491,17 @@ describe("Dashboard Basic Rendering", () => {
   });
 
   it("should render altitude in correct unit (km/m)", () => {
-    const { getByText } = render(
+    const { container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
     );
 
-    // startAlt 9,373 feet = 2,857m
-    expect(getByText("2,857m")).toBeInTheDocument();
+    // Should show start → end altitude format
+    // startAlt 9,373 feet = 2,857m, endAlt 8,563 feet = 2,610m
+    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    expect(altitudeDisplay.textContent).toContain("2,857m");
+    expect(altitudeDisplay.textContent).toContain("2,610m");
   });
 
   it("should render distance in correct unit (km)", () => {
@@ -702,14 +708,16 @@ describe("Dashboard Unit Conversion", () => {
       },
     });
 
-    const { getByText } = render(
+    const { container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
     );
 
-    // 9,373 feet = 2,857 meters
-    expect(getByText("2,857m")).toBeInTheDocument();
+    // 9,373 feet = 2,857 meters, 8,563 feet = 2,610 meters
+    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    expect(altitudeDisplay.textContent).toContain("2,857m");
+    expect(altitudeDisplay.textContent).toContain("2,610m");
   });
 
   it("should display altitude in feet when unit is mi", () => {
@@ -737,14 +745,16 @@ describe("Dashboard Unit Conversion", () => {
       },
     });
 
-    const { getByText } = render(
+    const { container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
     );
 
-    // Should display in feet
-    expect(getByText("9,373ft")).toBeInTheDocument();
+    // Should display start → end in feet (9,373ft → 8,563ft)
+    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    expect(altitudeDisplay.textContent).toContain("9,373ft");
+    expect(altitudeDisplay.textContent).toContain("8,563ft");
   });
 
   it("should display distance in km when unit is km", () => {

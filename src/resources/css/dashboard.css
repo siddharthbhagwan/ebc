@@ -647,6 +647,18 @@ generic-dashboard {
   font-size: 13px;
 }
 
+.altitude-start {
+  color: #27ae60;
+}
+
+.altitude-peak {
+  color: #e74c3c;
+}
+
+.altitude-end {
+  color: #3498db;
+}
+
 /* Trek Name */
 .trek-name {
   font-weight: 750;
