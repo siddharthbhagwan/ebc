@@ -497,265 +497,186 @@ const Dashboard = (props) => {
                     background: "white",
                   }}
                 >
-                  {/* Top Section (Above HR): Name on left, Stats on right */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection:
-                        isDesktop && (props.name || "").length <= 30
-                          ? "row"
-                          : "column",
-                      justifyContent:
-                        isDesktop && (props.name || "").length <= 30
-                          ? "space-between"
-                          : "center",
-                      alignItems:
-                        isDesktop && (props.name || "").length <= 30
-                          ? "center"
-                          : "flex-start",
-                      gap: isDesktop ? "20px" : "2px",
-                      width: "100%",
-                    }}
-                  >
-                    {/* Left Side: Trek Name */}
-                    <div
-                      style={{
-                        flex:
-                          isDesktop && (props.name || "").length <= 30
-                            ? 1
-                            : "none",
-                        minWidth: 0,
-                        cursor: "pointer",
-                        width:
-                          isDesktop && (props.name || "").length <= 30
-                            ? "auto"
-                            : "100%",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!isSingleDayView) {
-                          toggleViewMode();
-                        } else {
-                          // If already in single view, re-zoom (recalculated)
-                          const routes = getDayWiseDataG();
-                          const targetDay = routes[day];
-                          if (targetDay && targetDay.features[0]) {
-                            const bounds = getFeatureBounds(targetDay.features[0]);
-                            if (bounds) {
-                              map.flyToBounds(bounds, {
-                                paddingTopLeft: effectivePaddingTopLeft,
-                                paddingBottomRight: effectivePaddingBottomRight,
-                                duration: props.zoomDuration,
-                              });
-                            }
-                          }
-                        }
-                      }}
-                    >
-                      <div
-                        title={props.name}
-                        style={{
-                          fontWeight: "700",
-                          fontSize: getTitleFontSize(props.name),
-                          color: "#2c3e50",
-                          whiteSpace: "normal",
-                          overflow: "visible",
-                          textAlign:
-                            isDesktop && (props.name || "").length <= 30
-                              ? "left"
-                              : "center",
-                          lineHeight: "1.15",
-                          display: "block",
-                        }}
-                      >
-                        {props.name}
-                      </div>
-                    </div>
-
-                    {/* Right Side: Stats Block (Elevations Only) */}
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems:
-                          isDesktop && (props.name || "").length <= 30
-                            ? "flex-end"
-                            : "center",
-                        flexShrink: 0,
-                        minWidth: "fit-content",
-                        maxWidth: isDesktop ? "200px" : "100%",
-                        justifyContent: "center",
-                        alignSelf: "center",
-                        width:
-                          isDesktop && (props.name || "").length <= 30
-                            ? "auto"
-                            : "100%",
-                      }}
-                    >
-                      {/* Elevations Row */}
-                      {!isPlace ? (
+                        {/* Middle Content (Data Rows) */}
                         <div
                           style={{
                             display: "flex",
                             flexDirection: "column",
-                            alignItems:
-                              isDesktop && (props.name || "").length <= 30
-                                ? "flex-end"
-                                : "center",
-                            width: "100%",
                             justifyContent: "center",
+                            width: "100%",
+                            gap: "8px",
                           }}
                         >
+                          {/* Row 1: Trek Name */}
                           <div
                             style={{
-                              fontSize: isDesktop ? "15.5px" : "15.5px",
-                              color: "#2c3e50",
-                              fontWeight: "bold",
-                              letterSpacing: "-0.2px",
-                              textAlign:
-                                isDesktop && (props.name || "").length <= 30
-                                  ? "right"
-                                  : "center",
-                              lineHeight: "1.2",
-                              whiteSpace: "normal", // Allow wrapping if extremely narrow
+                              cursor: "pointer",
+                              width: "100%",
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              minHeight: "24px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isSingleDayView) {
+                                toggleViewMode();
+                              } else {
+                                const routes = getDayWiseDataG();
+                                const targetDay = routes[day];
+                                if (targetDay && targetDay.features[0]) {
+                                  const bounds = getFeatureBounds(
+                                    targetDay.features[0],
+                                  );
+                                  if (bounds) {
+                                    map.flyToBounds(bounds, {
+                                      paddingTopLeft: effectivePaddingTopLeft,
+                                      paddingBottomRight:
+                                        effectivePaddingBottomRight,
+                                      duration: props.zoomDuration,
+                                    });
+                                  }
+                                }
+                              }
                             }}
                           >
-                            {distance === "0 mi / 0 km" ? (
-                              formatAlt(startAlt)
-                            ) : (
-                              <>
-                                {startAlt ? formatAlt(startAlt) : ""}
-                                {peakAlt ? ` → ${formatAlt(peakAlt)}` : ""}
-                                {endAlt ? ` → ${formatAlt(endAlt)}` : ""}
-                              </>
-                            )}
+                            <div
+                              title={props.name}
+                              style={{
+                                fontWeight: "750",
+                                fontSize: "16px",
+                                color: "#2c3e50",
+                                textAlign: "center",
+                                lineHeight: "1.1",
+                              }}
+                            >
+                              {props.name}
+                            </div>
                           </div>
-                          {distance !== "0 mi / 0 km" &&
-                            (total_climb || descent) && (
+
+                          {/* Border / Divider Row */}
+                          <div
+                            style={{
+                              height: "1px",
+                              background: "#eee",
+                              width: "100%",
+                            }}
+                          />
+
+                          {/* Row 2: Elevation Stats */}
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              minHeight: "20px",
+                              width: "100%",
+                            }}
+                          >
+                            {!isPlace ? (
                               <div
                                 style={{
-                                  fontSize: isDesktop ? "15px" : "15px",
-                                  marginTop: "2px",
                                   display: "flex",
-                                  gap: isDesktop ? "8px" : "6px",
-                                  lineHeight: "1.1",
-                                  justifyContent:
-                                    isDesktop && (props.name || "").length <= 30
-                                      ? "flex-end"
-                                      : "center",
+                                  alignItems: "center",
+                                  gap: "12px",
                                   width: "100%",
+                                  justifyContent: "center",
                                 }}
                               >
-                                {total_climb && (
-                                  <span
-                                    style={{
-                                      color: "#27ae60",
-                                      fontWeight: "900",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "2px",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        fontSize: isDesktop ? "10px" : "10px",
-                                      }}
-                                    >
-                                      ▲
-                                    </span>{" "}
-                                    {formatAlt(total_climb)}
-                                  </span>
-                                )}
-                                {descent && (
-                                  <span
-                                    style={{
-                                      color: "#c0392b",
-                                      fontWeight: "900",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      gap: "2px",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        fontSize: isDesktop ? "10px" : "10px",
-                                      }}
-                                    >
-                                      ▼
-                                    </span>{" "}
-                                    {formatAlt(descent)}
-                                  </span>
-                                )}
-                              </div>
-                            )}
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#2c3e50",
+                                    fontWeight: "bold",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  {distance === "0 mi / 0 km" ? (
+                                    formatAlt(startAlt)
+                                  ) : (
+                                    <>
+                                      {startAlt ? formatAlt(startAlt) : ""}
+                                      {peakAlt
+                                        ? ` → ${formatAlt(peakAlt)}`
+                                        : ""}
+                                      {endAlt ? ` → ${formatAlt(endAlt)}` : ""}
+                                    </>
+                                  )}
+                                </div>
 
-                  {/* Stats Row (Bottom Section - Below HR) */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      marginTop: isDesktop ? "12px" : "12px",
-                      borderTop: "none",
-                      paddingTop: "0px",
-                    }}
-                  >
-                    {!isPlace && distance && time ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        {/* Day indicator on the bottom line */}
-                        <div style={{ display: "flex" }}>
-                          <span
+                                {distance !== "0 mi / 0 km" &&
+                                  (total_climb || descent) && (
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        gap: "10px",
+                                        alignItems: "center",
+                                      }}
+                                    >
+                                      {total_climb && (
+                                        <span
+                                          style={{
+                                            color: "#27ae60",
+                                            fontWeight: "900",
+                                            fontSize: "13.5px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "2px",
+                                          }}
+                                        >
+                                          ▲{formatAlt(total_climb)}
+                                        </span>
+                                      )}
+                                      {descent && (
+                                        <span
+                                          style={{
+                                            color: "#c0392b",
+                                            fontWeight: "900",
+                                            fontSize: "13.5px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "2px",
+                                          }}
+                                        >
+                                          ▼{formatAlt(descent)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                              </div>
+                            ) : null}
+                          </div>
+
+                          {/* Border / Divider Row */}
+                          <div
                             style={{
-                              fontWeight: "800",
-                              fontSize: isDesktop ? "13px" : "13.5px",
-                              color: "#34495e",
+                              height: "1px",
+                              background: "#eee",
+                              width: "100%",
+                            }}
+                          />
+
+                          {/* Row 3: Day, Distance, Time */}
+                          <div
+                            style={{
                               display: "flex",
+                              justifyContent: "space-between",
                               alignItems: "center",
-                              gap: "3px",
+                              width: "100%",
+                              minHeight: "22px",
                             }}
                           >
-                            <svg
-                              width={isDesktop ? "11" : "11"}
-                              height={isDesktop ? "11" : "11"}
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#7f8c8d"
-                              strokeWidth="2.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              style={{ flexShrink: 0 }}
-                            >
-                              <rect
-                                x="3"
-                                y="4"
-                                width="18"
-                                height="18"
-                                rx="2"
-                                ry="2"
-                              ></rect>
-                              <line x1="16" y1="2" x2="16" y2="6"></line>
-                              <line x1="8" y1="2" x2="8" y2="6"></line>
-                              <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                            <span
+                            {/* Day indicator */}
+                            <div
                               style={{
                                 display: "flex",
-                                alignItems: "baseline",
-                                gap: "1px",
+                                alignItems: "center",
+                                gap: "4px",
                               }}
                             >
                               <span
                                 style={{
-                                  fontSize: isDesktop ? "10px" : "10px",
+                                  fontSize: "10px",
                                   fontWeight: "700",
                                   color: "#7f8c8d",
                                 }}
@@ -764,7 +685,7 @@ const Dashboard = (props) => {
                               </span>
                               <span
                                 style={{
-                                  fontSize: isDesktop ? "16px" : "16px",
+                                  fontSize: "16px",
                                   fontWeight: "900",
                                   color: "#2c3e50",
                                   lineHeight: "1",
@@ -772,86 +693,100 @@ const Dashboard = (props) => {
                               >
                                 {props.day}
                               </span>
-                            </span>
-                          </span>
-                        </div>
+                            </div>
 
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: isDesktop ? "20px" : "8px",
-                          }}
-                        >
-                          {distance !== "0 mi / 0 km" && (
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: isDesktop ? "4px" : "2px",
-                                alignItems: "center",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              <svg
-                                width={isDesktop ? "14" : "14"}
-                                height={isDesktop ? "14" : "14"}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#95a5a6"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                style={{ flexShrink: 0 }}
-                              >
-                                <path d="M13 18l6-6-6-6M5 12h14" />
-                              </svg>
-                              <span
+                            {/* Distance and Time */}
+                            {!isPlace && distance && time && (
+                              <div
                                 style={{
-                                  fontSize: isDesktop ? "16px" : "16px",
-                                  color: "#2c3e50",
-                                  fontWeight: "700",
+                                  display: "flex",
+                                  gap: "12px",
+                                  alignItems: "center",
                                 }}
                               >
-                                {displayDistance()}
-                              </span>
-                            </div>
-                          )}
-                          {distance !== "0 mi / 0 km" && (
-                            <div
-                              style={{
-                                display: "flex",
-                                gap: isDesktop ? "4px" : "2px",
-                                alignItems: "center",
-                                whiteSpace: "nowrap",
-                              }}
-                            >
-                              <svg
-                                width={isDesktop ? "14" : "14"}
-                                height={isDesktop ? "14" : "14"}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#95a5a6"
-                                strokeWidth="2.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                style={{ flexShrink: 0 }}
-                              >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                              </svg>
-                              <span
-                                style={{
-                                  fontSize: isDesktop ? "16px" : "16px",
-                                  color: "#2c3e50",
-                                  fontWeight: "700",
-                                }}
-                              >
-                                {time}*
-                              </span>
-                            </div>
-                          )}
+                                {distance !== "0 mi / 0 km" && (
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "3px",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <svg
+                                      width="12"
+                                      height="12"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#95a5a6"
+                                      strokeWidth="3"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <path d="M13 18l6-6-6-6M5 12h14" />
+                                    </svg>
+                                    <span
+                                      style={{
+                                        fontSize: "15px",
+                                        color: "#2c3e50",
+                                        fontWeight: "700",
+                                      }}
+                                    >
+                                      {displayDistance()}
+                                    </span>
+                                  </div>
+                                )}
+                                {distance !== "0 mi / 0 km" && (
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "3px",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <svg
+                                      width="12"
+                                      height="12"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="#95a5a6"
+                                      strokeWidth="3"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <circle cx="12" cy="12" r="10"></circle>
+                                      <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span
+                                      style={{
+                                        fontSize: "15px",
+                                        color: "#2c3e50",
+                                        fontWeight: "700",
+                                        display: "inline-flex",
+                                        alignItems: "baseline",
+                                      }}
+                                    >
+                                      {time}
+                                      <span
+                                        style={{
+                                          fontSize: "12px",
+                                          fontWeight: "700",
+                                          marginLeft: "1px",
+                                          alignSelf: "flex-start",
+                                          position: "relative",
+                                          top: "-1px",
+                                        }}
+                                      >
+                                        *
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               )}

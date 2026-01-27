@@ -27,7 +27,7 @@ const GeoJsonRoutes = (props) => {
 
   const effectivePaddingBottomRight = isDesktop
     ? [paddingBottomRight[0] + 625, paddingBottomRight[1] + 160]
-    : [paddingBottomRight[0], paddingBottomRight[1] + 130];
+    : [paddingBottomRight[0], paddingBottomRight[1] + 160];
 
   const routes = getDayWiseDataG();
 
@@ -75,6 +75,7 @@ const GeoJsonRoutes = (props) => {
   }
 
   const polylines = [];
+  const highlightedPolylines = [];
 
   Object.entries(memoizedRoutes).forEach(([day, features]) => {
     features.forEach((featureData, featIdx) => {
@@ -88,6 +89,12 @@ const GeoJsonRoutes = (props) => {
       if (isZoomedIn && properties.day !== currentDay) {
         return;
       }
+
+      const isHighlighted =
+        !isZoomedIn &&
+        properties.day === currentDay &&
+        currentDay !== "0" &&
+        !isCurrentDayRestDay;
 
       const clickHandler = () => {
         if (properties.day === "20") return;
@@ -108,43 +115,81 @@ const GeoJsonRoutes = (props) => {
 
       // Render gradient segments (visible part)
       segments.forEach((segment, segIdx) => {
-        let weight = isZoomedIn ? 4 : 2;
+        // Standard weight for non-highlighted segments
+        let weight = isZoomedIn ? 5.0 : 2.0;
 
-        // Apply 20% increase for desktop default lines
+        // Apply increase for desktop
         if (isDesktop) {
-          weight *= 1.2;
+          weight *= 1.15;
         }
-
-        // Highlight logic: Only when zoomed out
-        const isHighlighted =
-          !isZoomedIn &&
-          properties.day === currentDay &&
-          currentDay !== "0" &&
-          !isCurrentDayRestDay;
 
         if (isHighlighted) {
-          weight = isDesktop ? 8.4 : 7; // Maintain the 20% increase for active path too
-        }
+          // "Tube" style: Thinner for more elegance
+          const outerWeight = isDesktop ? 7.5 : 6.5;
+          const innerWeight = isDesktop ? 3 : 2.5;
 
-        polylines.push(
-          <Polyline
-            key={day + "-" + featIdx + "-" + segIdx}
-            positions={segment.latlngs}
-            color={segment.color}
-            weight={weight}
-            opacity={0.9}
-            lineCap="round"
-            lineJoin="round"
-            smoothFactor={isZoomedIn ? 0 : isHighlighted ? 7 : 3}
-            interactive={properties.day !== "20"}
-            onmouseover={() => {
-              if (properties.day !== "20") {
-                dispatchLayerDetails(properties);
-              }
-            }}
-            onclick={clickHandler}
-          />,
-        );
+          // Render outer border (the color)
+          highlightedPolylines.push(
+            <Polyline
+              key={`outer-${day}-${featIdx}-${segIdx}`}
+              positions={segment.latlngs}
+              color={segment.color}
+              weight={outerWeight}
+              opacity={1}
+              lineCap="round"
+              lineJoin="round"
+              smoothFactor={4}
+              interactive={properties.day !== "20"}
+              onmouseover={() => {
+                if (properties.day !== "20") {
+                  dispatchLayerDetails(properties);
+                }
+              }}
+              onclick={clickHandler}
+            />,
+          );
+
+          // Render inner "hollow" part (white) to create the tube effect
+          highlightedPolylines.push(
+            <Polyline
+              key={`inner-${day}-${featIdx}-${segIdx}`}
+              positions={segment.latlngs}
+              color="white"
+              weight={innerWeight}
+              opacity={1}
+              lineCap="round"
+              lineJoin="round"
+              smoothFactor={4}
+              interactive={properties.day !== "20"}
+              onmouseover={() => {
+                if (properties.day !== "20") {
+                  dispatchLayerDetails(properties);
+                }
+              }}
+              onclick={clickHandler}
+            />,
+          );
+        } else {
+          polylines.push(
+            <Polyline
+              key={day + "-" + featIdx + "-" + segIdx}
+              positions={segment.latlngs}
+              color={segment.color}
+              weight={weight}
+              opacity={isZoomedIn ? 1.0 : 0.7}
+              lineCap="round"
+              lineJoin="round"
+              smoothFactor={isZoomedIn ? 0 : 3}
+              interactive={properties.day !== "20"}
+              onmouseover={() => {
+                if (properties.day !== "20") {
+                  dispatchLayerDetails(properties);
+                }
+              }}
+              onclick={clickHandler}
+            />,
+          );
+        }
       });
 
       // Render invisible wider Polyline for easier clicking/tapping
@@ -169,7 +214,7 @@ const GeoJsonRoutes = (props) => {
     });
   });
 
-  return polylines;
+  return [...polylines, ...highlightedPolylines];
 };
 
 const mapStateToProps = (state) => ({

@@ -145,11 +145,12 @@ const POI = (props) => {
       let icon;
       if (shouldCircle) {
         // Destination Circle Wrapper
+        // Decrease circle size by 1px, iconSize remains same
         const wrapSize = isHouse
-          ? 20
+          ? 19
           : isAirport
-            ? 22
-            : markerPoint.size[0] + 6;
+            ? 21
+            : markerPoint.size[0] + 5;
         const imgSize = isHouse ? 11 : isAirport ? 15 : markerPoint.size[0];
 
         let imgClass = "";
@@ -163,12 +164,16 @@ const POI = (props) => {
         }
 
         const pulseClass = isSingleDayView ? "pulsating-circle" : "";
+        const rippleClass =
+          isCurrentDayRestDay && isDayMatch && isHouse && isDest
+            ? "rest-day-ripple"
+            : "";
 
         icon = L.divIcon({
           className: "dest-circle-wrapper",
           iconSize: [wrapSize, wrapSize],
           iconAnchor: [wrapSize / 2, wrapSize / 2],
-          html: `<div class="rest-day-circle ${pulseClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: 100%; height: 100%;">
+          html: `<div class="rest-day-circle ${pulseClass} ${rippleClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: 100%; height: 100%;">
                   <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
                  </div>`,
           shadowUrl: null,
@@ -189,10 +194,13 @@ const POI = (props) => {
         // Only show if it's the start, it's zoomed in, and not already circled (which would be dest)
         const showUnderscore = isStart && isZoomedIn && !shouldCircle;
 
+        // Increase size for the underscored house (usually a tent icon)
+        const finalSize = showUnderscore ? [16, 16] : markerPoint.size;
+
         icon = L.divIcon({
           className: "standard-poi-wrapper",
-          iconSize: markerPoint.size,
-          iconAnchor: [markerPoint.size[0] / 2, markerPoint.size[1] / 2],
+          iconSize: finalSize,
+          iconAnchor: [finalSize[0] / 2, finalSize[1] / 2],
           html: `
             <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
                <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
@@ -265,11 +273,15 @@ const POI = (props) => {
     let targetDay = currentDay;
     const currentDayStr = String(currentDay);
 
-    if (!markerDays.includes(currentDayStr) || currentDayStr.includes(",") || currentDayStr.includes("&")) {
+    if (
+      !markerDays.includes(currentDayStr) ||
+      currentDayStr.includes(",") ||
+      currentDayStr.includes("&")
+    ) {
       targetDay = markerDays[0] || currentDay;
     }
 
-    // Crucial: Update the payload to use the single numeric targetDay 
+    // Crucial: Update the payload to use the single numeric targetDay
     // instead of the composite string "2, 3, 19 & 20"
     const updatedProps = { ...markerProps, day: String(targetDay) };
     dispatchLayerDetails(updatedProps);
