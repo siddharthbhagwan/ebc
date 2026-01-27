@@ -210,10 +210,10 @@ const POI = (props) => {
         const wrapSize = isHouse
           ? isCurrentDayRestDay
             ? isDesktop
-              ? 19
+              ? 17
               : 18
             : isDesktop
-              ? 18
+              ? 16
               : 17
           : isAirport
             ? isDesktop
@@ -222,7 +222,7 @@ const POI = (props) => {
             : markerPoint.size[0] + (isDesktop ? 5 : 4);
         const imgSize = isHouse
           ? isDesktop
-            ? 11
+            ? 9
             : 10
           : isAirport
             ? isDesktop
@@ -366,7 +366,7 @@ const POI = (props) => {
     // Recalculate bounds based on the full day's route collection
     const routesData = getDayWiseDataG();
     const targetRoute = routesData[targetDay];
-    
+
     const effectivePaddingTopLeft = isDesktop
       ? [120, showLegend ? 180 : 120]
       : [40, 110];
@@ -377,7 +377,7 @@ const POI = (props) => {
       // Create bounds from all features in the day
       const layer = L.geoJSON(targetRoute);
       const bounds = layer.getBounds();
-      
+
       if (bounds.isValid()) {
         map.flyToBounds(bounds, {
           paddingTopLeft: effectivePaddingTopLeft,

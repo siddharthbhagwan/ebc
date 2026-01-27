@@ -330,7 +330,7 @@ const GeoJsonRoutes = (props) => {
         segments.forEach((segment, segIdx) => {
           // Increase weight and opacity for the focused route in Single Day view
           // User requested a "thick" plain line for zoomed in view
-          let weight = isZoomedIn ? (isDesktop ? 6.5 : 5.5) : 1.8;
+          let weight = isZoomedIn ? (isDesktop ? 8 : 7) : 1.8;
           if (isDesktop && !isZoomedIn) {
             weight *= 1.15;
           }
@@ -362,7 +362,7 @@ const GeoJsonRoutes = (props) => {
               style={{
                 color: segment.color,
                 weight: weight,
-                opacity: isZoomedIn ? 1 : 0.65,
+                opacity: properties.day === currentDay ? 1 : 0.65,
                 lineCap: "round",
                 lineJoin: "round",
               }}
