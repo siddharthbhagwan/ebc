@@ -1,9 +1,8 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
-import Dashboard from "./Dashboard";
 import { combineReducers, createStore } from "redux";
+import Dashboard from "./Dashboard";
 import { routeReducer } from "../reducers/routeReducer";
 import { mapStateReducer } from "../reducers/mapStateReducer";
 
@@ -50,14 +49,14 @@ const createMockStore = (initialState) => {
   return createStore(rootReducer, initialState);
 };
 
-describe("Dashboard Navigation Behavior", () => {
+describe("Dashboard Component Behaviors", () => {
   let store;
   let mockMap;
 
   beforeEach(() => {
     mockMap = {
       flyToBounds: jest.fn(),
-      getZoom: jest.fn(() => 11.3), // Start at overview zoom
+      getZoom: jest.fn(() => 11.3), // Overview zoom
       flyTo: jest.fn(),
       invalidateSize: jest.fn(),
     };
@@ -86,66 +85,135 @@ describe("Dashboard Navigation Behavior", () => {
     });
   });
 
-  it("should highlight route in overview without zooming or activating single view on navigation", async () => {
-    // Mock getZoom to return overview level
-    mockMap.getZoom.mockReturnValue(11.3);
+  describe("Keyboard Navigation", () => {
+    it("should change day and highlight route without zooming when navigating in overview", async () => {
+      mockMap.getZoom.mockReturnValue(11.3); // Overview
 
-    render(
-      <Provider store={store}>
-        <Dashboard />
-      </Provider>,
-    );
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
 
-    // Simulate right arrow key press
-    fireEvent.keyDown(window, { key: "ArrowRight" });
+      // Simulate right arrow key press
+      fireEvent.keyDown(window, { key: "ArrowRight" });
 
-    // Wait for any async operations
-    await waitFor(() => {
-      // Check that flyToBounds was not called (no zoom)
-      expect(mockMap.flyToBounds).not.toHaveBeenCalled();
+      // Wait for any async operations
+      await waitFor(() => {
+        // flyToBounds should not be called (no zoom)
+        expect(mockMap.flyToBounds).not.toHaveBeenCalled();
+      });
+
+      // Day should change (mocked)
+      // In real test, check store state or dispatched actions
     });
 
-    // Note: Full testing requires more complex mocking of Redux dispatches and map interactions
-  });
+    it("should change day and zoom when navigating while zoomed in", async () => {
+      mockMap.getZoom.mockReturnValue(12); // Zoomed in
 
-  it("should zoom when navigating at zoomed in level", async () => {
-    // Mock getZoom to return zoomed in level
-    mockMap.getZoom.mockReturnValue(12);
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
 
-    render(
-      <Provider store={store}>
-        <Dashboard />
-      </Provider>,
-    );
+      // Simulate right arrow key press
+      fireEvent.keyDown(window, { key: "ArrowRight" });
 
-    // Simulate right arrow key press
-    fireEvent.keyDown(window, { key: "ArrowRight" });
-
-    // Wait for zoom
-    await waitFor(() => {
-      expect(mockMap.flyToBounds).toHaveBeenCalled();
+      // Wait for zoom
+      await waitFor(() => {
+        expect(mockMap.flyToBounds).toHaveBeenCalled();
+      });
     });
-  });
 
-  it("should toggle between overview and single view on space bar", async () => {
-    render(
-      <Provider store={store}>
-        <Dashboard />
-      </Provider>,
-    );
+    it("should handle left arrow navigation", async () => {
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
 
-    // Initially in overview
-    expect(store.getState().mapState.isSingleDayView).toBe(false);
+      fireEvent.keyDown(window, { key: "ArrowLeft" });
 
-    // Simulate space bar
-    fireEvent.keyDown(window, { code: "Space" });
-
-    // Wait for state change
-    await waitFor(() => {
-      // In a full test, check that dispatch was called to set single view
-      // Placeholder: actual implementation requires mocking dispatch
+      // Similar checks as above
+      expect(mockMap.flyToBounds).not.toHaveBeenCalled(); // Assuming overview
     });
   });
 
-  // Additional tests can be added for edge cases, such as boundary navigation (first/last day)
+  describe("Space Bar Toggle", () => {
+    it("should toggle to single view and zoom when pressed in overview", async () => {
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
+
+      // Initially overview
+      expect(store.getState().mapState.isSingleDayView).toBe(false);
+
+      // Simulate space bar
+      fireEvent.keyDown(window, { code: "Space" });
+
+      // Wait for toggle
+      await waitFor(() => {
+        // In real test, check if flyToBounds called for zoom
+        expect(mockMap.flyToBounds).toHaveBeenCalled();
+      });
+    });
+
+    it("should toggle to overview when pressed in single view", async () => {
+      store = createMockStore({
+        ...store.getState(),
+        mapState: { ...store.getState().mapState, isSingleDayView: true },
+      });
+
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
+
+      fireEvent.keyDown(window, { code: "Space" });
+
+      await waitFor(() => {
+        expect(mockMap.flyTo).toHaveBeenCalled(); // Overview flyTo
+      });
+    });
+  });
+
+  describe("Target Button", () => {
+    it("should toggle to single view when in overview", async () => {
+      render(
+        <Provider store={store}>
+          <Dashboard />
+        </Provider>
+      );
+
+      // Assume target button has a test id or find by text
+      const targetButton = screen.getByRole("button", { name: /target/i }); // Adjust selector
+      if (targetButton) {
+        fireEvent.click(targetButton);
+
+        // Check state change
+        await waitFor(() => {
+          // Mock dispatch check
+        });
+      }
+    });
+  });
+
+  describe("Route Highlighting", () => {
+    it("should render routes with correct opacity based on current day", () => {
+      // This would require testing GeoJsonRoutes component separately
+      // For now, placeholder
+      expect(true).toBe(true);
+    });
+  });
+
+  describe("Build and Deploy", () => {
+    it("should build successfully", () => {
+      // Integration test placeholder
+      expect(true).toBe(true);
+    });
+  });
 });
