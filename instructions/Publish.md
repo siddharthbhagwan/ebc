@@ -1,20 +1,40 @@
 # Publish Subroutine
 
 ## Description
-A comprehensive routine to prepare, commit, squash, push, update PR, and deploy changes. Ensures no build errors before committing.
+
+A comprehensive routine to prepare, commit, squash, push, update PR, and deploy changes. Ensures no build errors or test failures before committing. Optimized for speed with parallel operations and conditional testing.
 
 ## Steps
-1. **Check for Build Errors**: Run `npm run build` to ensure there are no compiling or building errors. If errors occur, stop and report them.
-2. **Commit All Unsaved Changes**: Run `git add .` and `git commit -m "<high-level summary>"` to commit all changes.
-3. **Squash Commits**: Squash all commits since the last merge into a single commit. Use `git rebase -i HEAD~<n>` where <n> is the number of commits since the last merge.
+
+1. **Check and Commit Unsaved Changes**:
+   - Check for any uncommitted changes with `git status`.
+   - If there are changes, run `git add .` and `git commit -m "<high-level summary>"` to commit all changes.
+   - If no changes, proceed to next step.
+
+2. **Build and Test (Optimized)**:
+   - **Parallel Execution**: Run `bun run build` and `bun run test --watchAll=false --maxWorkers=50%` concurrently where possible.
+   - **Layout & Logic Checks**: Ensure tests cover critical UI behavior (e.g., Dashboard vs. Toolbar mutual exclusivity).
+     - If deploying to production: Always run full test suite.
+     - If on dev branch with only non-code changes (docs, config): Skip tests, run build only.
+     - If code changes detected: Run full test suite.
+   - Stop and fix any build errors or test failures before proceeding.
+
+3. **Squash Commits**: Squash all commits since the last merge into a single commit. Use `git rebase -i HEAD~<n>` where <n> is the number of commits since the last merge. If conflicts arise, handle interactively.
+
 4. **Push Changes**: Push the squashed commit to the remote branch (e.g., `git push origin <branch> --force-with-lease`).
+
 5. **Update PR**: Ensure the PR description includes a high-level list of all changes from the squashed commit.
-6. **Deploy**: Run `npm run deploy` to deploy to production.
+
+6. **Deploy**: Run `bun run deploy` to deploy to production.
 
 ## Usage
+
 Invoke by saying: "Run the Publish subroutine" or "Execute Publish routine".
 
 ## Notes
-- Assumes the project uses npm for building and deploying.
+
+- Assumes the project uses bun for building, testing, and deploying.
 - The commit message should summarize high-level changes.
-- If squashing fails or there are conflicts, handle interactively.
+- **Optimization**: Parallel build/test execution and conditional testing reduce CI time while maintaining quality.
+- **Branch Merging Checks**: Always perform thorough checks before merging, even with optimizations.
+- **Behavioral Clashes**: If new changes cause unexpected interactions or breaking changes elsewhere, pause and consult for expected behavior to avoid circular fixes or unintended side effects.

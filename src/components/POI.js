@@ -273,8 +273,8 @@ const POI = (props) => {
 
       // Tooltip visibility: Permanent in Overview mode OR if it belongs to current day/start/dest
       // This ensures names are always visible in Overview and for relevant POIs in Zoomed view
-      const isTooltipPermanent =
-        !isSingleDayView || isDayMatch || isDest || isStart;
+      // Always show all names, even on mobile overview
+      const isTooltipPermanent = !isSingleDayView || isDayMatch || isDest || isStart;
 
       arr.push(
         <Marker
