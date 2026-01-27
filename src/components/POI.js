@@ -209,23 +209,26 @@ const POI = (props) => {
         // Decrease circle size by 1px for non-rest days, iconSize remains same
         const wrapSize = isHouse
           ? isCurrentDayRestDay
-            ? 19
-            : 18
+            ? isDesktop
+              ? 19
+              : 18
+            : isDesktop
+              ? 18
+              : 17
           : isAirport
             ? isDesktop
-              ? isActive
-                ? 11
-                : 15
-              : isActive
-                ? 10
-                : 13
-            : isDesktop
-              ? 11
-              : 10;
-
-        if (!isDesktop && isHouse) {
-          wrapSize -= 1;
-        }
+              ? 21
+              : 20
+            : markerPoint.size[0] + (isDesktop ? 5 : 4);
+        const imgSize = isHouse
+          ? isDesktop
+            ? 11
+            : 10
+          : isAirport
+            ? isDesktop
+              ? 15
+              : 14
+            : markerPoint.size[0];
 
         let imgClass = "";
         if (isEBC) imgClass = "ebc-marker-icon";

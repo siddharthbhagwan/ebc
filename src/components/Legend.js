@@ -56,7 +56,25 @@ const Legend = (props) => {
             padding: "1px 4px",
           }}
         >
-          <img src={ebcIcon} width={"12px"} alt="Base Camp" />
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={ebcIcon}
+              className="ebc-marker-icon"
+              width={isDesktop ? "12px" : "11px"}
+              alt="Base Camp"
+            />
+          </div>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -72,7 +90,25 @@ const Legend = (props) => {
             padding: "1px 4px",
           }}
         >
-          <img src={summitIcon} width={"12px"} alt="Summit" />
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={summitIcon}
+              className="summit-marker-icon"
+              width={isDesktop ? "12px" : "11px"}
+              alt="Summit"
+            />
+          </div>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -88,7 +124,25 @@ const Legend = (props) => {
             padding: "1px 4px",
           }}
         >
-          <img src={passIcon} width={"12px"} alt="Pass" />
+          <div
+            style={{
+              width: "18px",
+              height: "18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "#f5f5f5",
+              borderRadius: "4px",
+              border: "1px solid #eee",
+            }}
+          >
+            <img
+              src={passIcon}
+              className="flag-marker-icon"
+              width={isDesktop ? "12px" : "11px"}
+              alt="Pass"
+            />
+          </div>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -118,7 +172,7 @@ const Legend = (props) => {
           >
             <img
               src={tentIcon}
-              width={isDesktop ? "12px" : "7px"}
+              width={isDesktop ? "12px" : "11px"}
               alt="Lodging"
             />
           </div>
