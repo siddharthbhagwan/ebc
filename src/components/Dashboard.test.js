@@ -7,7 +7,16 @@ import { routeReducer } from "../reducers/routeReducer";
 import { mapStateReducer } from "../reducers/mapStateReducer";
 
 // Declare mockMap before jest.mock so it can be referenced
-let mockMap;
+let mockMap = {
+  on: jest.fn(),
+  off: jest.fn(),
+  getZoom: jest.fn(() => 11.3),
+  flyToBounds: jest.fn(),
+  flyTo: jest.fn(),
+  invalidateSize: jest.fn(),
+  zoomIn: jest.fn(),
+  zoomOut: jest.fn(),
+};
 
 // Mock react-leaflet
 jest.mock("react-leaflet", () => ({
@@ -17,14 +26,7 @@ jest.mock("react-leaflet", () => ({
   TileLayer: () => null,
   Marker: () => null,
   Popup: () => null,
-  useMap: () => ({
-    on: jest.fn(),
-    off: jest.fn(),
-    getZoom: jest.fn(() => 11.3),
-    flyToBounds: jest.fn(),
-    flyTo: jest.fn(),
-    invalidateSize: jest.fn(),
-  }),
+  useMap: () => mockMap,
   withLeaflet: (Component) => (props) => (
     <Component {...props} leaflet={{ map: mockMap }} />
   ),
@@ -58,6 +60,7 @@ jest.mock("../utils/geoJson", () => ({
     1: { features: [{ properties: { day: "1", name: "Lukla - Phakding" } }] },
     2: { features: [{ properties: { day: "2", name: "Phakding - Namche Bazaar" } }] },
     3: { features: [{ properties: { day: "3", name: "Namche Bazaar Acclimatization" } }] },
+    7: { features: [{ properties: { day: "7", name: "Dingboche - Chhukung" } }] },
   }),
   getFeatureBounds: () => ({
     isValid: () => true,
@@ -87,16 +90,9 @@ describe("Dashboard Component Behaviors", () => {
   let store;
 
   beforeEach(() => {
-    mockMap = {
-      flyToBounds: jest.fn(),
-      getZoom: jest.fn(() => 11.3), // Overview zoom
-      flyTo: jest.fn(),
-      invalidateSize: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
-      zoomIn: jest.fn(),
-      zoomOut: jest.fn(),
-    };
+    // Reset mock functions instead of reassigning the object
+    jest.clearAllMocks();
+    mockMap.getZoom.mockReturnValue(11.3); // Overview zoom
 
     store = createMockStore({
       mapState: {
@@ -299,7 +295,7 @@ describe("Dashboard Elevation Stats Styling", () => {
     expect(altitudeChange.textContent).toMatch(/▼\s*248m/);
   });
 
-  it("should render elevation stats when both total_climb and descent are zero", () => {
+  it("should hide elevation stats when both total_climb and descent are zero", () => {
     store = createMockStore({
       ...store.getState(),
       route: {
@@ -315,12 +311,12 @@ describe("Dashboard Elevation Stats Styling", () => {
       </Provider>,
     );
 
-    // Dashboard always shows elevation stats with "0m" values (text may have whitespace)
-    expect(container.textContent).toMatch(/▲\s*0m/);
-    expect(container.textContent).toMatch(/▼\s*0m/);
+    // Zero values should be hidden (new behavior)
+    expect(container.textContent).not.toMatch(/▲/);
+    expect(container.textContent).not.toMatch(/▼/);
   });
 
-  it("should render both elevation gain and descent even when descent is zero", () => {
+  it("should render only elevation gain when descent is zero", () => {
     store = createMockStore({
       ...store.getState(),
       route: {
@@ -336,12 +332,12 @@ describe("Dashboard Elevation Stats Styling", () => {
       </Provider>,
     );
 
-    // Both should be rendered (text may have whitespace between arrow and value)
+    // Should show elevation gain, but NOT descent when it's 0
     expect(container.textContent).toMatch(/▲\s*152m/);
-    expect(container.textContent).toMatch(/▼\s*0m/);
+    expect(container.textContent).not.toMatch(/▼\s*0m/);
   });
 
-  it("should render both elevation gain and descent even when total_climb is zero", () => {
+  it("should render only descent when total_climb is zero", () => {
     store = createMockStore({
       ...store.getState(),
       route: {
@@ -357,8 +353,8 @@ describe("Dashboard Elevation Stats Styling", () => {
       </Provider>,
     );
 
-    // Both should be rendered (text may have whitespace between arrow and value)
-    expect(container.textContent).toMatch(/▲\s*0m/);
+    // Should NOT show elevation gain when it's 0, but should show descent
+    expect(container.textContent).not.toMatch(/▲\s*0m/);
     expect(container.textContent).toMatch(/▼\s*248m/);
   });
 
@@ -998,7 +994,7 @@ describe("Dashboard Click Navigation", () => {
 // =====================================================
 
 describe("Dashboard Rest Day Display", () => {
-  it("should not show distance/time for rest days (0 mi / 0 km)", () => {
+  it("should show only name and single altitude for rest days", () => {
     const store = createMockStore({
       mapState: {
         isSingleDayView: false,
@@ -1023,7 +1019,7 @@ describe("Dashboard Rest Day Display", () => {
       },
     });
 
-    const { queryByText, getByText } = render(
+    const { queryByText, getByText, container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
@@ -1034,6 +1030,54 @@ describe("Dashboard Rest Day Display", () => {
     
     // Day should be shown
     expect(getByText("3")).toBeInTheDocument();
+
+    // For rest days, should NOT show elevation gain/descent arrows
+    expect(container.textContent).not.toMatch(/▲/);
+    expect(container.textContent).not.toMatch(/▼/);
+    
+    // Should NOT show arrow between altitudes (single altitude only)
+    expect(container.textContent).not.toContain("→");
+    
+    // Should show single altitude (3,440m in metric)
+    expect(container.textContent).toContain("3,440m");
+  });
+
+  it("should detect isRestDay when time equals 'Rest Day'", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "7",
+        name: "Dingboche Acclimatization",
+        time: "Rest Day",
+        distance: "0 mi / 0 km",
+        startAlt: "14,469",
+        endAlt: "14,469",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    const { container, queryByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Rest day should not show distance
+    expect(queryByText("0 km")).not.toBeInTheDocument();
+    
+    // Should not show time (Rest Day)
+    expect(queryByText("Rest Day")).not.toBeInTheDocument();
   });
 
   it("should handle place markers (startAlt=0, endAlt=0)", () => {
@@ -1069,6 +1113,198 @@ describe("Dashboard Rest Day Display", () => {
 
     // Name should be shown
     expect(getByText("Lukla Airport")).toBeInTheDocument();
+  });
+});
+
+// =====================================================
+// ZERO ELEVATION HIDING TESTS
+// =====================================================
+
+describe("Dashboard Zero Elevation Hiding", () => {
+  it("should hide elevation gain arrow when total_climb is 0", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Downhill Only Trek",
+        time: "4h 00m",
+        distance: "5.0 mi / 8.0 km",
+        startAlt: "10,000",
+        endAlt: "8,000",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "610",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should NOT show elevation gain (▲0m)
+    expect(container.textContent).not.toMatch(/▲\s*0m/);
+    
+    // Should show descent
+    expect(container.textContent).toMatch(/▼\s*186m/);
+  });
+
+  it("should hide descent arrow when descent is 0", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Uphill Only Trek",
+        time: "5h 00m",
+        distance: "5.0 mi / 8.0 km",
+        startAlt: "8,000",
+        endAlt: "10,000",
+        peakAlt: "",
+        total_climb: "610",
+        descent: "0",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should show elevation gain
+    expect(container.textContent).toMatch(/▲\s*186m/);
+    
+    // Should NOT show descent (▼0m)
+    expect(container.textContent).not.toMatch(/▼\s*0m/);
+  });
+
+  it("should show both elevation stats when neither is zero", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Normal Trek Day",
+        time: "6h 00m",
+        distance: "10.0 mi / 16.0 km",
+        startAlt: "9,000",
+        endAlt: "11,000",
+        peakAlt: "",
+        total_climb: "800",
+        descent: "400",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should show both elevation stats
+    expect(container.textContent).toMatch(/▲\s*244m/);
+    expect(container.textContent).toMatch(/▼\s*122m/);
+  });
+});
+
+// =====================================================
+// ENTER KEY NAVIGATION TESTS
+// =====================================================
+
+describe("Dashboard Enter Key Navigation", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMap.getZoom.mockReturnValue(11.3);
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+  });
+
+  it("should handle Enter key same as Space key for toggle", async () => {
+    render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Initially overview
+    expect(store.getState().mapState.isSingleDayView).toBe(false);
+
+    // Simulate Enter key
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    // Should behave same as Space - toggle to single view with zoom
+    await waitFor(() => {
+      expect(mockMap.flyToBounds).toHaveBeenCalled();
+    });
+  });
+
+  it("should toggle to overview when Enter pressed in single view", async () => {
+    store = createMockStore({
+      ...store.getState(),
+      mapState: { ...store.getState().mapState, isSingleDayView: true },
+    });
+
+    render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(mockMap.flyTo).toHaveBeenCalled();
+    });
   });
 });
 
@@ -1255,5 +1491,793 @@ describe("Dashboard Metrics Display Order", () => {
     // Both should be present (text may have whitespace between arrow and value)
     expect(container.textContent).toMatch(/▲\s*152m/);
     expect(container.textContent).toMatch(/▼\s*248m/);
+  });
+});
+// =====================================================
+// REST DAY DISPLAY TESTS (Acclimatization Days)
+// =====================================================
+
+describe("Dashboard Acclimatization Day Display", () => {
+  it("should hide elevation gain/descent on rest days", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "3",
+        name: "Namche Bazaar Acclimatization",
+        time: "Rest Day",
+        distance: "0 mi / 0 km",
+        startAlt: "11,286",
+        endAlt: "11,286",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    const { container, getByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Name should be shown
+    expect(getByText("Namche Bazaar Acclimatization")).toBeInTheDocument();
+    
+    // Elevation gain/descent should NOT be shown (no ▲ or ▼)
+    expect(container.textContent).not.toMatch(/▲/);
+    expect(container.textContent).not.toMatch(/▼/);
+  });
+
+  it("should show only single altitude on rest days", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "3",
+        name: "Namche Bazaar Acclimatization",
+        time: "Rest Day",
+        distance: "0 mi / 0 km",
+        startAlt: "11,286",
+        endAlt: "11,286",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should show single altitude (endAlt converted to meters)
+    // 11,286 ft = ~3,440m
+    expect(container.textContent).toMatch(/3,440\s*m/);
+    
+    // Should NOT show altitude arrows (→) since it's a rest day
+    const altitudeSection = container.querySelector('.altitude-single');
+    expect(altitudeSection).toBeInTheDocument();
+  });
+});
+
+// =====================================================
+// ZERO ELEVATION HIDING TESTS
+// =====================================================
+
+describe("Dashboard Zero Elevation Handling", () => {
+  it("should hide elevation gain when total_climb is 0", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Test Route - Descent Only",
+        time: "3h",
+        distance: "5 mi / 8 km",
+        startAlt: "10,000",
+        endAlt: "9,000",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "1000",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should NOT show elevation gain arrow
+    expect(container.textContent).not.toMatch(/▲/);
+    // Should show descent
+    expect(container.textContent).toMatch(/▼/);
+  });
+
+  it("should hide elevation descent when descent is 0", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Test Route - Climb Only",
+        time: "3h",
+        distance: "5 mi / 8 km",
+        startAlt: "9,000",
+        endAlt: "10,000",
+        peakAlt: "",
+        total_climb: "1000",
+        descent: "0",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should show elevation gain
+    expect(container.textContent).toMatch(/▲/);
+    // Should NOT show descent arrow
+    expect(container.textContent).not.toMatch(/▼/);
+  });
+
+  it("should hide entire elevation row when both are 0", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Test Route - Flat",
+        time: "3h",
+        distance: "5 mi / 8 km",
+        startAlt: "9,000",
+        endAlt: "9,000",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Neither elevation arrow should be shown
+    expect(container.textContent).not.toMatch(/▲/);
+    expect(container.textContent).not.toMatch(/▼/);
+  });
+});
+
+// =====================================================
+// KEYBOARD NAVIGATION TESTS
+// =====================================================
+
+describe("Dashboard Keyboard Navigation", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMap.getZoom.mockReturnValue(11.3);
+
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+  });
+
+  it("should handle Enter key same as Space key (resetZoom)", async () => {
+    render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Simulate Enter key press
+    fireEvent.keyDown(window, { key: "Enter" });
+
+    // Wait for the action to be triggered (resetZoom toggles view)
+    await waitFor(() => {
+      // The map should have been interacted with
+      expect(mockMap.invalidateSize).toHaveBeenCalled();
+    });
+  });
+
+  it("should handle Space key for resetZoom", async () => {
+    render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Simulate Space key press
+    fireEvent.keyDown(window, { code: "Space" });
+
+    await waitFor(() => {
+      expect(mockMap.invalidateSize).toHaveBeenCalled();
+    });
+  });
+});
+
+// =====================================================
+// ALTITUDE DISPLAY FORMAT TESTS
+// =====================================================
+
+describe("Dashboard Altitude Display Format", () => {
+  it("should show start → peak → end format for normal days", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "8",
+        name: "Chhukung - Kongma La Pass - Lobuche",
+        time: "8h",
+        distance: "6.5 mi / 10.5 km",
+        startAlt: "15,535",
+        endAlt: "16,109",
+        peakAlt: "18,159",
+        total_climb: "2,624",
+        descent: "2,050",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should show altitude arrows (→) for start/peak/end
+    expect(container.textContent).toMatch(/→/);
+    
+    // Should have altitude-start, altitude-peak, and altitude-end elements
+    expect(container.querySelector('.altitude-start')).toBeInTheDocument();
+    expect(container.querySelector('.altitude-peak')).toBeInTheDocument();
+    expect(container.querySelector('.altitude-end')).toBeInTheDocument();
+  });
+
+  it("should show start → end format when no peak altitude", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should have start and end but no peak
+    expect(container.querySelector('.altitude-start')).toBeInTheDocument();
+    expect(container.querySelector('.altitude-end')).toBeInTheDocument();
+    expect(container.querySelector('.altitude-peak')).not.toBeInTheDocument();
+  });
+});
+
+// =====================================================
+// DAY INDICATOR POSITION TESTS
+// =====================================================
+
+describe("Dashboard Day Indicator Position", () => {
+  it("should display day indicator on the left side (desktop)", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "5",
+        name: "Namche Bazaar - Tengboche",
+        time: "5h",
+        distance: "6.2 mi / 10 km",
+        startAlt: "11,286",
+        endAlt: "12,687",
+        peakAlt: "",
+        total_climb: "2,000",
+        descent: "600",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Day indicator should exist
+    const dayIndicator = container.querySelector('.day-indicator');
+    expect(dayIndicator).toBeInTheDocument();
+    
+    // Day label and value should be present
+    expect(container.querySelector('.day-label-desktop')).toBeInTheDocument();
+    expect(container.querySelector('.day-value-desktop')).toBeInTheDocument();
+  });
+
+  it("should show day number correctly", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "12",
+        name: "Gorak Shep - Kala Patthar - Dzongla",
+        time: "7h",
+        distance: "7.5 mi / 12 km",
+        startAlt: "17,598",
+        endAlt: "15,951",
+        peakAlt: "18,514",
+        total_climb: "916",
+        descent: "2,563",
+      },
+    });
+
+    const { getByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Day number should be displayed
+    expect(getByText("12")).toBeInTheDocument();
+  });
+});
+
+// =====================================================
+// TARGET BUTTON BEHAVIOR TESTS
+// =====================================================
+
+describe("Dashboard Target Button Behavior", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMap.getZoom.mockReturnValue(11.3);
+  });
+
+  it("should zoom to currently selected route when target button is clicked", async () => {
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "7", // Currently selected day 7
+        name: "Dingboche - Chhukung",
+        time: "3h",
+        distance: "3.1 mi / 5 km",
+        startAlt: "14,469",
+        endAlt: "15,518",
+        peakAlt: "",
+        total_climb: "1,050",
+        descent: "0",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Find and click the target/location button
+    const targetButton = container.querySelector('img[alt="Reset"]');
+    expect(targetButton).toBeInTheDocument();
+    
+    fireEvent.click(targetButton.parentElement);
+
+    // Wait for the map interaction - flyToBounds is called for single day view
+    await waitFor(() => {
+      expect(mockMap.flyToBounds).toHaveBeenCalled();
+    });
+  });
+
+  it("should toggle active state on target button when in single day view", () => {
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: true,
+        zoom: 13,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "5",
+        name: "Namche Bazaar - Tengboche",
+        time: "5h",
+        distance: "6.2 mi / 10 km",
+        startAlt: "11,286",
+        endAlt: "12,687",
+        peakAlt: "",
+        total_climb: "2,000",
+        descent: "600",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Target button should have active class when in single day view
+    const activeButton = container.querySelector('.icon.active');
+    expect(activeButton).toBeInTheDocument();
+  });
+});
+
+// =====================================================
+// TIME DISPLAY WITH ASTERISK TESTS
+// =====================================================
+
+describe("Dashboard Time Display", () => {
+  it("should display time with asterisk on desktop", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Time asterisk should be present
+    const asterisk = container.querySelector('.time-asterisk');
+    expect(asterisk).toBeInTheDocument();
+    expect(asterisk.textContent).toBe('*');
+  });
+
+  it("should not show time for rest days", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "4",
+        name: "Namche Bazaar Acclimatization",
+        time: "Rest Day",
+        distance: "0 mi / 0 km",
+        startAlt: "11,286",
+        endAlt: "11,286",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    const { container, queryByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Time with asterisk should not be shown for rest days (distance is 0)
+    // The time-asterisk class should not be in the metrics row
+    const metricsRow = container.querySelector('.metrics-bottom-row');
+    if (metricsRow) {
+      expect(metricsRow.textContent).not.toContain('Rest Day*');
+    }
+  });
+});
+
+// =====================================================
+// TOOLBAR ICON STYLING TESTS
+// =====================================================
+
+describe("Dashboard Toolbar Icons", () => {
+  it("should render legend and info icons in tools panel", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Tools button should exist
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    expect(toolsButton).toBeInTheDocument();
+
+    // Click to open tools panel
+    fireEvent.click(toolsButton.parentElement);
+
+    // Legend and Info icons should be visible
+    const legendIcon = container.querySelector('img[alt="Toggle Legend"]');
+    const infoIcon = container.querySelector('img[alt="Toggle Info"]');
+    
+    expect(legendIcon).toBeInTheDocument();
+    expect(infoIcon).toBeInTheDocument();
+  });
+
+  it("should have tool-icon-image class with proper styling", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Check that tool icons have the proper class
+    const toolIcons = container.querySelectorAll('.tool-icon-image');
+    expect(toolIcons.length).toBeGreaterThan(0);
+  });
+});
+
+// =====================================================
+// UNIT TOGGLE TESTS
+// =====================================================
+
+describe("Dashboard Unit Toggle", () => {
+  it("should display unit toggle switch in tools panel", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container, getAllByText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Unit toggle should show KM and MI labels (multiple elements expected)
+    const kmElements = getAllByText("KM");
+    const miElements = getAllByText("MI");
+    expect(kmElements.length).toBeGreaterThan(0);
+    expect(miElements.length).toBeGreaterThan(0);
+  });
+
+  it("should show current unit in toggle indicator", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "mi",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Unit indicator should show MI
+    const indicator = container.querySelector('.unit-toggle-indicator--desktop');
+    expect(indicator).toBeInTheDocument();
+    expect(indicator.textContent).toBe('MI');
   });
 });

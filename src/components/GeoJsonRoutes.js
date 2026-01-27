@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo } from "react";
 import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
 import L from "leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { connect } from "react-redux";
-import { isDesktop } from "react-device-detect";
+import { isDesktop, useMobileOrientation } from "react-device-detect";
 import { mapDispatchToProps } from "../utils/utils";
 import {
   createGradientSegments,
@@ -25,24 +25,25 @@ const GeoJsonRoutes = (props) => {
     showLegend,
   } = props;
 
-  // Local state to track zoom for reactivity, since Redux zoom is static
-  const [currentZoom, setCurrentZoom] = useState(map.getZoom());
+  // Get landscape orientation for mobile
+  const { isLandscape = false } = useMobileOrientation();
 
-  useEffect(() => {
-    const onZoom = () => {
-      setCurrentZoom(map.getZoom());
-    };
-    map.on("zoomend", onZoom);
-    return () => map.off("zoomend", onZoom);
-  }, [map]);
+  // Memoized padding values - optimized for various screen sizes
+  const effectivePaddingTopLeft = useMemo(() => {
+    if (isDesktop) {
+      return [120, showLegend ? 180 : 120];
+    }
+    // Mobile: adjust for landscape orientation
+    return isLandscape ? [60, showLegend ? 100 : 60] : [40, showLegend ? 90 : 60];
+  }, [showLegend, isLandscape]);
 
-  // Adjust padding for mobile and desktop to account for UI elements
-  // TopLeft: [left, top], BottomRight: [right, bottom]
-  const effectivePaddingTopLeft = isDesktop
-    ? [120, showLegend ? 180 : 120]
-    : [40, 110];
-
-  const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
+  const effectivePaddingBottomRight = useMemo(() => {
+    if (isDesktop) {
+      return [650, 180];
+    }
+    // Mobile: landscape needs less bottom padding due to shorter dashboard
+    return isLandscape ? [60, 120] : [40, 150];
+  }, [isLandscape]);
 
   const routes = getDayWiseDataG();
 
@@ -83,9 +84,6 @@ const GeoJsonRoutes = (props) => {
   }
 
   const isZoomedIn = isSingleDayView;
-
-  // Additional check: If manually zoomed in deep even in Overview, hide the tube
-  const isDeepZoom = currentZoom > 12.2;
 
   // On acclimatization days (Rest Days), hide all routes when zoomed in
   if (isZoomedIn && isCurrentDayRestDay) {
@@ -140,6 +138,7 @@ const GeoJsonRoutes = (props) => {
             onclick={() => {
               if (properties.day !== "20") {
                 dispatchLayerDetails(properties);
+                setSingleDayView(true);
                 // Zoom to the point
                 const offset = 0.005;
                 const bounds = L.latLngBounds(
@@ -202,8 +201,7 @@ const GeoJsonRoutes = (props) => {
 
       // Only show the pronounced "Tube" highlight in the Overview view when a route is selected/hovered.
       // In Single Day view, we show the clean, raw gradient segments as requested.
-      // Added isDeepZoom check to ensure manual zooming also hides the tube.
-      const isShowTube = !isZoomedIn && isHighlighted && !isDeepZoom;
+      const isShowTube = !isZoomedIn && isHighlighted;
 
       // In Zoomed In view, we only want to show the current day's route clearly.
       // Filter out other routes unless we are in overview.
@@ -236,7 +234,7 @@ const GeoJsonRoutes = (props) => {
         // PASS 1: The "Depth" (Deep, wide shadow)
         highlightedLayers.push(
           <GeoJSON
-            key={`depth-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            key={`depth-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -274,7 +272,7 @@ const GeoJsonRoutes = (props) => {
         // PASS 2: The "Glass Tube" (Semi-transparent Body)
         highlightedLayers.push(
           <GeoJSON
-            key={`outer-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            key={`outer-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -295,6 +293,7 @@ const GeoJsonRoutes = (props) => {
                   }
                 },
                 click: clickHandler,
+                dblclick: clickHandler,
               });
             }}
           />,
@@ -303,7 +302,7 @@ const GeoJsonRoutes = (props) => {
         // PASS 3: The "Sunlight" (Thin, offset-feeling white highlight)
         highlightedLayers.push(
           <GeoJSON
-            key={`inner-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
+            key={`inner-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -345,8 +344,6 @@ const GeoJsonRoutes = (props) => {
                 "-" +
                 isZoomedIn +
                 "-" +
-                isDeepZoom +
-                "-" +
                 reduxZoom +
                 "-" +
                 showLegend
@@ -370,6 +367,7 @@ const GeoJsonRoutes = (props) => {
                     }
                   },
                   click: clickHandler,
+                  dblclick: clickHandler,
                 });
               }}
             />,
@@ -387,8 +385,6 @@ const GeoJsonRoutes = (props) => {
             featIdx +
             "-" +
             isZoomedIn +
-            "-" +
-            isDeepZoom +
             "-" +
             reduxZoom +
             "-" +
@@ -411,6 +407,7 @@ const GeoJsonRoutes = (props) => {
                 }
               },
               click: clickHandler,
+              dblclick: clickHandler,
             });
           }}
         />,

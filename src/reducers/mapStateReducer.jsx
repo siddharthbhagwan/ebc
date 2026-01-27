@@ -1,3 +1,12 @@
+import {
+  loadPreferences,
+  saveUnitPreference,
+  saveLegendPreference,
+} from "../utils/cookies";
+
+// Load saved preferences from cookies
+const savedPreferences = loadPreferences();
+
 const initialState = {
   url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
   attribution:
@@ -11,9 +20,9 @@ const initialState = {
   zoomDuration: 1.25,
   paddingTopLeft: [50, 110],
   paddingBottomRight: [50, 50],
-  showLegend: true, // Visible by default
+  showLegend: savedPreferences.showLegend, // Loaded from cookies, defaults to true
   showInfo: false,
-  unit: "km",
+  unit: savedPreferences.unit, // Loaded from cookies, defaults to "km"
   isSingleDayView: false,
 };
 
@@ -29,16 +38,22 @@ export const mapStateReducer = (state = initialState, action) => {
         ...state,
         zoom: action.payload.mapState.zoom,
       };
-    case "TOGGLE_UNIT":
+    case "TOGGLE_UNIT": {
+      const newUnit = state.unit === "km" ? "mi" : "km";
+      saveUnitPreference(newUnit);
       return {
         ...state,
-        unit: state.unit === "km" ? "mi" : "km",
+        unit: newUnit,
       };
-    case "TOGGLE_LEGEND":
+    }
+    case "TOGGLE_LEGEND": {
+      const newShowLegend = !state.showLegend;
+      saveLegendPreference(newShowLegend);
       return {
         ...state,
-        showLegend: !state.showLegend,
+        showLegend: newShowLegend,
       };
+    }
     case "TOGGLE_INFO":
       return {
         ...state,
