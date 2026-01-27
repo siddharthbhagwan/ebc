@@ -17,8 +17,8 @@ import { createGradientSegments } from "../utils/heightGradient";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 
-const ZOOM_MOBILE = 10.9;
-const ZOOM_LANDSCAPE = 10.8;
+const ZOOM_MOBILE = 10.4;
+const ZOOM_LANDSCAPE = 10.3;
 
 const Dashboard = (props) => {
   const {
@@ -393,7 +393,16 @@ const Dashboard = (props) => {
         }}
       >
         {/* Top Section: Main content row */}
-        <div className="dashboard-top-section">
+        <div 
+          className="dashboard-top-section"
+          style={{ 
+            display: "flex", 
+            alignItems: "stretch", 
+            width: "100%", 
+            height: "100%",
+            position: "relative"
+          }}
+        >
           {/* Left Arrow Slab */}
           <div
             onClick={(e) => {
@@ -401,6 +410,7 @@ const Dashboard = (props) => {
               handleNavigation("prev");
             }}
             className="navigation-slab"
+            style={{ flexShrink: 0 }}
           >
             <img
               src={arrowIcon}
@@ -410,14 +420,26 @@ const Dashboard = (props) => {
             />
           </div>
 
-          {/* Invisible spacer to balance the toolbar on the right for perfect centering on mobile */}
-          {!isDesktop && !isToolsOpen && (
-            <div style={{ width: `${iconBaseWidth + 8}px`, flexShrink: 0 }} />
-          )}
-
-          <div className="dashboard-main-content">
+          <div 
+            className="dashboard-main-content" 
+            style={{ 
+              flex: 1, 
+              display: "flex", 
+              flexDirection: "column",
+              position: "relative",
+              minWidth: 0
+            }}
+          >
             {/* Top Content (Metrics or Tools) */}
-            <div className="dashboard-view-wrapper">
+            <div 
+              className="dashboard-view-wrapper"
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                width: "100%"
+              }}
+            >
               {isToolsOpen ? (
                 /* Tools View */
                 <div className="tools-view">
@@ -621,6 +643,7 @@ const Dashboard = (props) => {
                     padding: isDesktop ? "8px 25px" : "8px 8px",
                     minWidth: 0,
                     justifyContent: "center",
+                    alignItems: "center", // Center horizontally within the flex:1 space
                     background: "white",
                   }}
                 >
@@ -631,6 +654,7 @@ const Dashboard = (props) => {
                       flexDirection: "column",
                       justifyContent: "center",
                       width: "100%",
+                      maxWidth: isDesktop ? "100%" : "280px", // Limit width on mobile to ensure centering doesn't get squashed
                       gap: isDesktop ? "8px" : "6px",
                       height: "100%",
                     }}
@@ -803,147 +827,186 @@ const Dashboard = (props) => {
                         />
                       )}
 
-                      {/* Day, Distance, Time - Row 3 in Desktop, same row in Mobile if it fits */}
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: isDesktop
-                            ? "space-between"
-                            : "center",
-                          alignItems: "center",
-                          width: isDesktop ? "100%" : "auto",
-                          minHeight: isDesktop ? "22px" : "auto",
-                          gap: isDesktop ? "0" : "12px",
-                          marginTop: isDesktop ? "0" : "2px",
-                        }}
-                      >
-                        {/* Day indicator */}
+                      {/* Day, Distance, Time - Row 3 Moved for Mobile Visibility */}
+                      {isDesktop && (
                         <div
                           style={{
                             display: "flex",
+                            justifyContent: "space-between",
                             alignItems: "center",
-                            gap: "3px",
+                            width: "100%",
+                            minHeight: "22px",
+                            gap: "0",
                           }}
                         >
-                          <span
-                            style={{
-                              fontSize: "9px",
-                              fontWeight: "700",
-                              color: "#7f8c8d",
-                            }}
-                          >
-                            DAY
-                          </span>
-                          <span
-                            style={{
-                              fontSize: isDesktop ? "16px" : "14px",
-                              fontWeight: "900",
-                              color: "#2c3e50",
-                              lineHeight: "1",
-                            }}
-                          >
-                            {props.day}
-                          </span>
-                        </div>
-
-                        {/* Distance and Time */}
-                        {!isPlace && distance && time && (
+                          {/* Day indicator */}
                           <div
                             style={{
                               display: "flex",
-                              gap: isDesktop ? "12px" : "8px",
                               alignItems: "center",
+                              gap: "3px",
                             }}
                           >
-                            {distance !== "0 mi / 0 km" && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: "2px",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <svg
-                                  width="11"
-                                  height="11"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#95a5a6"
-                                  strokeWidth="3"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path d="M13 18l6-6-6-6M5 12h14" />
-                                </svg>
-                                <span
+                            <span
+                              style={{
+                                fontSize: "9px",
+                                fontWeight: "700",
+                                color: "#7f8c8d",
+                              }}
+                            >
+                              DAY
+                            </span>
+                            <span
+                              style={{
+                                fontSize: "16px",
+                                fontWeight: "900",
+                                color: "#2c3e50",
+                                lineHeight: "1",
+                              }}
+                            >
+                              {props.day}
+                            </span>
+                          </div>
+
+                          {/* Distance and Time */}
+                          {!isPlace && distance && time && (
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "12px",
+                                alignItems: "center",
+                              }}
+                            >
+                              {distance !== "0 mi / 0 km" && (
+                                <div
                                   style={{
-                                    fontSize: isDesktop ? "15px" : "13px",
-                                    color: "#2c3e50",
-                                    fontWeight: "700",
+                                    display: "flex",
+                                    gap: "2px",
+                                    alignItems: "center",
                                   }}
                                 >
-                                  {displayDistance()}
-                                </span>
-                              </div>
-                            )}
-                            {distance !== "0 mi / 0 km" && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  gap: "2px",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <svg
-                                  width="11"
-                                  height="11"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="#95a5a6"
-                                  strokeWidth="3"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <circle cx="12" cy="12" r="10"></circle>
-                                  <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                                <span
-                                  style={{
-                                    fontSize: isDesktop ? "15px" : "13px",
-                                    color: "#2c3e50",
-                                    fontWeight: "700",
-                                    display: "inline-flex",
-                                    alignItems: "baseline",
-                                  }}
-                                >
-                                  {time}
+                                  <svg
+                                    width="11"
+                                    height="11"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#95a5a6"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path d="M13 18l6-6-6-6M5 12h14" />
+                                  </svg>
                                   <span
                                     style={{
-                                      fontSize: "10px",
+                                      fontSize: "15px",
+                                      color: "#2c3e50",
                                       fontWeight: "700",
-                                      marginLeft: "1px",
-                                      alignSelf: "flex-start",
-                                      position: "relative",
-                                      top: "-1px",
                                     }}
                                   >
-                                    *
+                                    {displayDistance()}
                                   </span>
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
+                                </div>
+                              )}
+                              {distance !== "0 mi / 0 km" && (
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "2px",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <svg
+                                    width="11"
+                                    height="11"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="#95a5a6"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                  </svg>
+                                  <span
+                                    style={{
+                                      fontSize: "15px",
+                                      color: "#2c3e50",
+                                      fontWeight: "700",
+                                      display: "inline-flex",
+                                      alignItems: "baseline",
+                                    }}
+                                  >
+                                    {time}
+                                    <span
+                                      style={{
+                                        fontSize: "10px",
+                                        fontWeight: "700",
+                                        marginLeft: "1px",
+                                        alignSelf: "flex-start",
+                                        position: "relative",
+                                        top: "-1px",
+                                      }}
+                                    >
+                                      *
+                                    </span>
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               )}
             </div>
+            
+            {/* NEW Fixed Metrics Row for Mobile */}
+            {!isDesktop && (
+              <div 
+                style={{
+                  height: "28px",
+                  background: "#fdfdfd",
+                  borderTop: "1px solid #f0f0f0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "15px",
+                  padding: "0 10px",
+                  flexShrink: 0
+                }}
+              >
+                  {/* Day indicator */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                    <span style={{ fontSize: "8px", fontWeight: "700", color: "#95a5a6" }}>DAY</span>
+                    <span style={{ fontSize: "14px", fontWeight: "900", color: "#34495e" }}>{props.day}</span>
+                  </div>
+
+                  {!isPlace && distance && time && distance !== "0 mi / 0 km" && (
+                    <>
+                      <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#95a5a6" strokeWidth="3">
+                          <path d="M13 18l6-6-6-6M5 12h14" />
+                        </svg>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#34495e" }}>{displayDistance()}</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#95a5a6" strokeWidth="3">
+                          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span style={{ fontSize: "12px", fontWeight: "700", color: "#34495e" }}>{time}</span>
+                      </div>
+                    </>
+                  )}
+              </div>
+            )}
           </div>
 
           {/* Right Side: Toolbar and Next Arrow (Slab) */}
-          <div style={{ display: "flex", alignItems: "stretch" }}>
+          <div style={{ display: "flex", alignItems: "stretch", flexShrink: 0 }}>
             {/* Toolbar Area */}
             {!isToolsOpen && (
               <div
@@ -954,7 +1017,7 @@ const Dashboard = (props) => {
                   alignItems: "center",
                   background: "white",
                 }}
-                onClick={(e) => e.stopPropagation()} // Prevent triggering parent or slab clicks
+                onClick={(e) => e.stopPropagation()}
               >
                 {ControlIcons}
               </div>

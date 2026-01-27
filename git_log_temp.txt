@@ -1,5 +1,0 @@
-3805270 UI Polishing: Responsive metrics, artistic bounds framing, and optimized mobile layouts
-072a42d Merge pull request #106 from siddharthbhagwan/polishing
-9ff29ea UI Polishing: Icon sizing, rest day visibility, and route selection enhancements
-1961b7d Merge pull request #100 from siddharthbhagwan/polishing
-f6d3c3a feat: comprehensive UI polishing, security updates, and landscape mode prevention

@@ -7,7 +7,7 @@ import Control from "react-leaflet-control";
 import { useMobileOrientation, isDesktop } from "react-device-detect";
 import "leaflet-easybutton";
 
-const ZOOM_MOBILE = 10.7;
+const ZOOM_MOBILE = 10.4;
 const ZOOM_LANDSCAPE = 10;
 
 const Reset = (props) => {

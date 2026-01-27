@@ -18,7 +18,7 @@ const MapContainer = (props) => {
   const initialCenter = [center[0] - currentOffset, center[1]];
 
   // Calculate the derived zoom for mobile/landscape
-  const ZOOM_MOBILE = 10.9;
+  const ZOOM_MOBILE = 10.4;
   const derivedZoom = isDesktop ? zoom : ZOOM_MOBILE;
   const initialZoom = derivedZoom; // Start zoomed out as requested
 
