@@ -1871,6 +1871,7 @@ const dingboche_to_chukung_6 = {
       properties: {
         day: "6",
         name: "Chhukung",
+        startAlt: "15,535",
       },
     },
   ],
@@ -2300,6 +2301,7 @@ const chhukung_to_chhukung_ri_to_chhukung_7 = {
       properties: {
         day: "7",
         name: "Chhukung",
+        startAlt: "15,535",
       },
     },
   ],
@@ -4248,30 +4250,6 @@ const marlung_to_namche_bazaar_19 = {
 };
 
 const dayWiseDataG = {
-  0: {
-    type: "FeatureCollection",
-    bbox: [86.72644, 27.68225, 86.73644, 27.69225],
-    features: [
-      {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [86.73144, 27.68725, 2860],
-        },
-        properties: {
-          weight: 2,
-          day: "0",
-          name: "Fly from Kathmandu to Lukla",
-          distance: "0 mi / 0 km",
-          time: "0h 30m",
-          startAlt: "4,593",
-          endAlt: "9,373",
-          total_climb: "4,780",
-          descent: "0",
-        },
-      },
-    ],
-  },
   1: lukla_to_phakding_1,
   2: phakding_to_namche_bazaar_2,
   3: {
