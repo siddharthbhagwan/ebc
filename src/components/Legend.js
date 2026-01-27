@@ -106,8 +106,8 @@ const Legend = (props) => {
         >
           <div
             style={{
-              width: isDesktop ? "18px" : "13px",
-              height: isDesktop ? "18px" : "13px",
+              width: isDesktop ? "18px" : "12px",
+              height: isDesktop ? "18px" : "12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -118,7 +118,7 @@ const Legend = (props) => {
           >
             <img
               src={tentIcon}
-              width={isDesktop ? "12px" : "8px"}
+              width={isDesktop ? "12px" : "7px"}
               alt="Lodging"
             />
           </div>

@@ -150,12 +150,6 @@ const POI = (props) => {
         Math.abs(markerPoint.point[0] - startCoord[1]) < 0.005 &&
         Math.abs(markerPoint.point[1] - startCoord[0]) < 0.005;
 
-      // Check if this marker is at the start coordinate
-      const isStart =
-        startCoord &&
-        Math.abs(markerPoint.point[0] - startCoord[1]) < 0.0015 &&
-        Math.abs(markerPoint.point[1] - startCoord[0]) < 0.0015;
-
       // Check if this marker matches the current day
       const currentDayStr = String(currentDay);
       const isDayMatch = markerPoint.properties.day
@@ -205,7 +199,7 @@ const POI = (props) => {
         // When zoomed into a single route, make active houses even larger
         const isZoomedInSingleRoute = isSingleDayView && isZoomedIn;
 
-        const wrapSize = isPulsatingOnly
+        let wrapSize = isPulsatingOnly
           ? isDesktop
             ? 17
             : 15
@@ -231,12 +225,12 @@ const POI = (props) => {
                   : 16
                 : 11
             : isPulsatingOnly
-              ? 9
+              ? 8
               : isActive
                 ? isZoomedInSingleRoute
-                  ? 16
-                  : 13
-                : 9
+                  ? 15
+                  : 12
+                : 8
           : isAirport
             ? isDesktop
               ? isActive
@@ -248,6 +242,10 @@ const POI = (props) => {
             : isDesktop
               ? 11
               : 10;
+
+        if (!isDesktop && isHouse) {
+          wrapSize -= 1;
+        }
 
         let imgClass = "";
         if (isEBC) imgClass = "ebc-marker-icon";
@@ -286,7 +284,10 @@ const POI = (props) => {
         // Only show if it's the start, it's zoomed in, and not already circled (which would be dest)
         const showUnderscore = isStart && isZoomedIn && !shouldCircle;
 
-        const adjustedSize = markerPoint.size;
+        let adjustedSize = markerPoint.size;
+        if (!isDesktop && isHouse) {
+          adjustedSize = [adjustedSize[0] - 1, adjustedSize[1] - 1];
+        }
 
         icon = L.divIcon({
           className: "standard-poi-wrapper",
