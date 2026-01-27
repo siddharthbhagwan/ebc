@@ -282,6 +282,7 @@ const POI = (props) => {
           style={markerPoint.properties}
           key={snappedPoint.toString() + markerPoint.properties.day}
           onclick={clickHandler}
+          ondblclick={clickHandler}
           onmouseover={mouseoverHandler}
           icon={icon}
           properties={markerPoint.properties}

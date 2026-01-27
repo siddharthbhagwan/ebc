@@ -6,21 +6,25 @@ import GeoJsonRoutes from "./GeoJsonRoutes";
 import Legend from "./Legend";
 import Info from "./Info";
 import POI from "./POI";
-import { isDesktop } from "react-device-detect";
+import { isDesktop, useMobileOrientation } from "react-device-detect";
 
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
+  const { isLandscape = false } = useMobileOrientation();
 
-  // Use a southern offset to clear space for the dashboard at the bottom
-  const mobileOffset = 0.024;
+  // Calculate offset based on device type and orientation
+  // Mobile portrait needs more offset to clear the dashboard
+  // Mobile landscape and desktop need less offset
+  const mobileOffset = isLandscape ? 0.016 : 0.024;
   const desktopOffset = 0.008;
   const currentOffset = isDesktop ? desktopOffset : mobileOffset;
   const initialCenter = [center[0] - currentOffset, center[1]];
 
-  // Calculate the derived zoom for mobile/landscape
-  const ZOOM_MOBILE = 10.4;
-  const derivedZoom = isDesktop ? zoom : ZOOM_MOBILE;
-  const initialZoom = derivedZoom; // Start zoomed out as requested
+  // Calculate zoom based on device type and orientation
+  const ZOOM_MOBILE = 10.6;
+  const ZOOM_LANDSCAPE = 10.5;
+  const derivedZoom = isDesktop ? zoom : isLandscape ? ZOOM_LANDSCAPE : ZOOM_MOBILE;
+  const initialZoom = derivedZoom;
 
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>

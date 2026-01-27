@@ -647,6 +647,12 @@ generic-dashboard {
   font-size: 13px;
 }
 
+/* Single altitude for rest/acclimatization days */
+.altitude-single {
+  font-weight: 900;
+  color: #2c3e50;
+}
+
 /* Trek Name */
 .trek-name {
   font-weight: 750;
@@ -859,7 +865,7 @@ generic-dashboard {
   padding: 4px;
   background: #f9f9f9;
   border-radius: 4px;
-  border: none;
+  border: 1.5px solid #bdc3c7;
 }
 
 /* Unit Toggle */
@@ -1097,6 +1103,115 @@ generic-dashboard {
   left: 0;
   right: 0;
   z-index: 1000;
+}
+
+/* Landscape mobile - shorter dashboard */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .dashboard-container--mobile {
+    height: 100px;
+  }
+
+  .mobile-metrics-row {
+    height: 24px;
+    gap: 12px;
+    padding: 0 8px;
+  }
+
+  .metrics-content--mobile {
+    padding: 4px 6px;
+  }
+
+  .metrics-inner--mobile {
+    gap: 3px;
+  }
+
+  .stats-container--mobile {
+    gap: 2px;
+  }
+
+  .navigation-slab {
+    width: 45px;
+  }
+
+  .branding-strip--mobile {
+    height: 32px;
+    gap: 2px;
+  }
+
+  .branding-title--mobile {
+    font-size: 9px;
+  }
+
+  .branding-attribution--mobile {
+    font-size: 7.5px;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 375px) {
+  .dashboard-container--mobile {
+    height: 125px;
+  }
+
+  .metrics-inner--mobile {
+    max-width: 220px;
+  }
+
+  .mobile-metrics-row {
+    gap: 10px;
+    padding: 0 6px;
+  }
+
+  .trek-name {
+    font-size: 13px !important;
+  }
+
+  .elevation-gain--mobile {
+    font-size: 13px;
+  }
+
+  .elevation-descent--mobile {
+    font-size: 11px;
+  }
+
+  .altitude-display--mobile {
+    font-size: 11px;
+  }
+}
+
+/* Large tablets in portrait */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .dashboard-container--mobile {
+    height: 145px;
+  }
+
+  .metrics-inner--mobile {
+    max-width: 400px;
+  }
+
+  .trek-name {
+    font-size: 17px !important;
+  }
+
+  .elevation-gain--mobile {
+    font-size: 17px;
+  }
+
+  .elevation-descent--mobile {
+    font-size: 14px;
+  }
+
+  .altitude-display--mobile {
+    font-size: 14px;
+  }
+
+  .day-value-mobile {
+    font-size: 16px;
+  }
+
+  .metric-value-mobile {
+    font-size: 14px;
+  }
 }
 
 /* Right Side Container */

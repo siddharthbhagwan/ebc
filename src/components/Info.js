@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import ReactGA from "react-ga4";
 import "../resources/css/dashboard.css";
 import "../resources/css/info.css";
 import { mapDispatchToProps } from "../utils/utils";
@@ -29,6 +30,7 @@ const Info = (props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="info-link"
+                onClick={() => ReactGA.event({ category: 'Social', action: 'Click Twitter', label: 'Johann' })}
               >
                 Johann
               </a>{" "}
@@ -43,6 +45,7 @@ const Info = (props) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="info-social-button"
+                  onClick={() => ReactGA.event({ category: 'Social', action: 'Click Twitter', label: 'Sid' })}
                 >
                   Say Hi on
                   <svg

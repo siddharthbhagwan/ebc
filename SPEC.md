@@ -130,10 +130,21 @@ src/
 | Element | Description |
 |---------|-------------|
 | Route Name | Current day's route segment name |
-| Elevation Stats | Total climb (▲) and descent (▼) |
-| Altitude Stats | Start, end, and peak altitudes |
-| Day Indicator | Current day number and icon |
+| Elevation Stats | Total climb (▲) and descent (▼) - hidden if zero |
+| Altitude Stats | Start → peak → end altitudes (or single altitude for rest days) |
+| Day Indicator | Current day number (always on the left) |
 | Navigation Arrows | Previous/Next day controls |
+
+#### Rest Day / Acclimatization Day Display
+- **Name:** Shown normally
+- **Elevation:** Hidden (no ▲ or ▼)
+- **Altitude:** Single altitude only (no start → end progression)
+- **Distance/Time:** Hidden
+
+#### Zero Value Handling
+- Elevation gain (▲) hidden when `total_climb` is "0"
+- Elevation descent (▼) hidden when `descent` is "0"
+- Entire elevation row hidden when both are "0"
 
 ### 3. Navigation
 
@@ -142,14 +153,24 @@ src/
 |-------|--------|
 | Arrow Keys (←/→) | Navigate between days |
 | Click Arrows | Navigate between days |
-| Space Bar | Toggle overview/single day view |
-| Click Route | Select and zoom to route |
-| Click POI | Select and zoom to location |
+| Space / Enter | Toggle overview/single day view |
+| Tap/Click Route | Select and enter Single Route View |
+| Double-tap Route | Select and enter Single Route View |
+| Tap/Click POI | Select and enter Single Route View |
+
+#### View Mode Decoupling
+- **Visuals**: Manual zoom levels (scroll/pinch) do not affect view mode state or visuals (e.g., Tube highlight remains visible in overview even when zoomed in manually).
+- **Engagement**: Single Route View is only engaged via explicit tap/click on a feature or the Target button.
+
+#### Target Button Behavior
+- **From Overview:** Zooms to currently highlighted/selected route (not Day 1)
+- **From Single Day:** Returns to overview mode
+- **Priority:** Current day → Last zoomed day → Day 1
 
 #### View Modes
 | Mode | Zoom | Description |
 |------|------|-------------|
-| Overview | 11.3 | Full trek visible |
+| Overview | 10.6 (mobile) / 11.3 (desktop) | Full trek visible |
 | Single Day | ~13+ | Zoomed to current day's route |
 
 ### 4. Points of Interest (POI)
@@ -184,11 +205,14 @@ src/
 
 | Icon | Function |
 |------|----------|
-| Location | Toggle between overview and single day view |
+| Location/Target | Toggle between overview and single day view (zooms to selected route) |
 | Settings | Open tools menu |
 | Legend | Toggle legend visibility |
 | Info | Show about modal |
-| Zoom +/- | Map zoom controls |
+
+#### Tool Icon Styling
+- Icons have visible borders for better contrast
+- Background: `#f9f9f9` with `1.5px solid #bdc3c7` border
 
 ### 7. Unit Conversion
 
@@ -196,6 +220,14 @@ src/
 |------|----------|----------|
 | Metric (km) | Kilometers | Meters |
 | Imperial (mi) | Miles | Feet |
+
+### 8. User Preferences (Cookies)
+
+User preferences are persisted via cookies with 1-year expiry:
+| Preference | Cookie Key | Default |
+|------------|------------|---------|
+| Unit (km/mi) | `ebc_unit` | `km` |
+| Legend visibility | `ebc_show_legend` | `true` |
 
 ---
 
