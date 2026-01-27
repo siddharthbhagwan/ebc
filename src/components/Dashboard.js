@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import L from "leaflet";
@@ -12,7 +12,6 @@ import infoIcon from "../resources/images/info.svg";
 
 import { mapDispatchToProps } from "../utils/utils";
 import useDays from "../hooks/useDays";
-import { createGradientSegments } from "../utils/heightGradient";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 
@@ -38,8 +37,6 @@ const Dashboard = (props) => {
     day,
     center,
     zoom,
-    paddingTopLeft,
-    paddingBottomRight,
     isSingleDayView,
     setSingleDayView,
     showLegend,
@@ -48,15 +45,6 @@ const Dashboard = (props) => {
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
-  const [lastZoomedState, setLastZoomedState] = useState(null);
-  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
-
-  useEffect(() => {
-    if (!map) return;
-    const handleZoom = () => setCurrentZoom(map.getZoom());
-    map.on("zoomend", handleZoom);
-    return () => map.off("zoomend", handleZoom);
-  }, [map]);
 
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
@@ -131,11 +119,15 @@ const Dashboard = (props) => {
 
   // Adjust padding for mobile and desktop to account for UI elements
   // TopLeft: [left, top], BottomRight: [right, bottom]
-  const effectivePaddingTopLeft = isDesktop
-    ? [120, showLegend ? 180 : 120]
-    : [40, 110];
+  const effectivePaddingTopLeft = useMemo(
+    () => (isDesktop ? [120, showLegend ? 180 : 120] : [40, 110]),
+    [showLegend],
+  );
 
-  const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
+  const effectivePaddingBottomRight = useMemo(
+    () => (isDesktop ? [650, 180] : [40, 190]),
+    [],
+  );
 
   const resetZoom = () => {
     if (!map) return;
@@ -230,45 +222,19 @@ const Dashboard = (props) => {
   };
 
   // Track map state for icon highlights (zoom and center)
-  const [isAtInitialState, setIsAtInitialState] = useState(true);
+  // const [isAtInitialState, setIsAtInitialState] = useState(true);
 
   useEffect(() => {
     if (!map) return;
 
     const checkState = () => {
-      const currentMapZoom = map.getZoom();
-      const currentMapCenter = map.getCenter();
-
-      if (isSingleDayView && day && day !== "0") {
-        // In day view, check if zoom matches roughly (could be more complex but zoom is a good proxy)
-        setIsAtInitialState(
-          Math.abs(
-            currentMapZoom -
-              map.getBoundsZoom(getFeatureBounds(getDayWiseDataG()[day], day)),
-          ) < 0.2,
-        );
-      } else {
-        const baseOffset = 0.024;
-        const legendOffset = showLegend ? 0.004 : 0;
-        const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
-
-        const lat = Array.isArray(center) ? center[0] : center.lat;
-        const lng = Array.isArray(center) ? center[1] : center.lng;
-        const targetLat = lat - currentOffset;
-
-        const isZoomed = Math.abs(currentMapZoom - derivedZoom) > 0.1;
-        const isPanned =
-          Math.abs(currentMapCenter.lat - targetLat) > 0.002 ||
-          Math.abs(currentMapCenter.lng - lng) > 0.002;
-
-        setIsAtInitialState(!isZoomed && !isPanned);
-      }
+      // State checking removed as isAtInitialState was unused
     };
 
     map.on("zoomend moveend", checkState);
     checkState(); // initial check
     return () => map.off("zoomend moveend", checkState);
-  }, [map, isSingleDayView, day, center, derivedZoom, isDesktop, showLegend]);
+  }, [map, isSingleDayView, day, center, derivedZoom, showLegend]);
 
   // Re-apply bounds when padding-affecting states change or view mode changes
   useEffect(() => {
@@ -295,10 +261,11 @@ const Dashboard = (props) => {
     showLegend,
     isSingleDayView,
     day,
-    isDesktop,
     isLandscape,
     map,
     isToolsOpen,
+    effectivePaddingTopLeft,
+    effectivePaddingBottomRight,
   ]);
 
   // Adjust overview center when legend visibility changes on mobile
@@ -320,7 +287,7 @@ const Dashboard = (props) => {
       }, 150);
       return () => clearTimeout(timer);
     }
-  }, [showLegend, isSingleDayView, isDesktop, center, derivedZoom, map]);
+  }, [showLegend, isSingleDayView, center, derivedZoom, map]);
 
   const handleNavigation = (direction) => {
     const targetFeature = direction === "next" ? nextDay() : prevDay();
@@ -347,12 +314,6 @@ const Dashboard = (props) => {
             paddingTopLeft: effectivePaddingTopLeft,
             paddingBottomRight: effectivePaddingBottomRight,
             duration: props.zoomDuration,
-          });
-
-          // Save the zoomed state
-          setLastZoomedState({
-            day: targetFeature.properties.day,
-            bounds: bounds,
           });
         }
       }

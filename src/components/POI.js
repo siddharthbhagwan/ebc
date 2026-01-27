@@ -20,8 +20,6 @@ const POI = (props) => {
   const { map } = props.leaflet;
   const {
     markerZoom,
-    paddingTopLeft,
-    paddingBottomRight,
     dispatchLayerDetails,
     zoom,
     unit,
@@ -57,19 +55,6 @@ const POI = (props) => {
   }, [map, currentZoom, derivedZoom]);
 
   const isZoomedIn = currentZoom > derivedZoom + 0.5;
-
-  // Check if a marker's day matches the current day
-  const isDayRelevant = (markerDay) => {
-    if (!isZoomedIn || currentDay === "0") return true; // Show all when zoomed out or on Day 0
-
-    // Handle multi-day markers like "2 & 3", "10, 11 & 12"
-    const days = markerDay.split(/[,&]/).map((d) => parseInt(d.trim(), 10));
-    const curr = parseInt(currentDay, 10);
-
-    // A marker is relevant if it's the arrival point of the current day (curr)
-    // OR the starting point (arrival point of the previous day, curr - 1)
-    return days.includes(curr) || days.includes(curr - 1);
-  };
 
   // Format altitude based on unit
   const formatAltitude = (altFt) => {
@@ -197,11 +182,8 @@ const POI = (props) => {
       const altM = altFt * 0.3048;
       const borderColor = getColorForElevation(altM);
 
-      const pulseClass = isDest ? "pulsating-circle" : "";
       const rippleClass =
         isCurrentDayRestDay && isDayMatch && isHouse ? "rest-day-ripple" : "";
-      const isActive = pulseClass !== "" || rippleClass !== "";
-      const isPulsatingOnly = pulseClass !== "" && rippleClass === "";
 
       let icon;
       if (shouldCircle) {

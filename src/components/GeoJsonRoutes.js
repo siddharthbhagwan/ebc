@@ -4,7 +4,7 @@ import L from "leaflet";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { connect } from "react-redux";
-import { isDesktop, useMobileOrientation } from "react-device-detect";
+import { isDesktop } from "react-device-detect";
 import { mapDispatchToProps } from "../utils/utils";
 import {
   createGradientSegments,
@@ -13,15 +13,10 @@ import {
 import tentIcon from "../resources/images/tent.svg";
 import airportIcon from "../resources/images/airport.svg";
 
-const ZOOM_MOBILE = 10.5;
-const ZOOM_LANDSCAPE = 10;
-
 const GeoJsonRoutes = (props) => {
   const { map } = props.leaflet;
   const {
     zoomDuration,
-    paddingTopLeft,
-    paddingBottomRight,
     dispatchLayerDetails,
     currentDay,
     zoom: reduxZoom,
@@ -213,7 +208,6 @@ const GeoJsonRoutes = (props) => {
 
       // In Zoomed In view, we only want to show the current day's route clearly.
       // Filter out other routes unless we are in overview.
-      const isActiveDayInZoom = isZoomedIn && properties.day === currentDay;
       const isOtherDayInZoom = isZoomedIn && properties.day !== currentDay;
 
       // Skip rendering other days in zoom view to keep it clean, or keep them with minimal opacity
