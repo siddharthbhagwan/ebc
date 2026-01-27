@@ -1,0 +1,37 @@
+1961b7d Merge pull request #100 from siddharthbhagwan/polishing
+f6d3c3a feat: comprehensive UI polishing, security updates, and landscape mode prevention
+79617c7 feat: resolve security vulnerabilities and update dependencies
+41bb4fa chore: solve vulnerability issues by updating package.json and resolving conflicts
+698b99a Merge pull request #99 from siddharthbhagwan/Tools-UI
+4f79b72 feat: Tools UI update with latest improvements and rebased on master
+a899510 UI: Implement dashboard mobile full-width, touch-friendly icons, and static branding strip
+9f1c360 Fix: stable build and module exports
+46b8c8a mobile redesign
+0e2f1c1 Mobile Friendly dashboard
+52c2dca Merge pull request #70 from siddharthbhagwan/dependabot/npm_and_yarn/decode-uri-component-0.2.2
+8f013fc Merge pull request #71 from siddharthbhagwan/dependabot/npm_and_yarn/qs-6.5.3
+598fe07 Merge pull request #78 from siddharthbhagwan/dependabot/npm_and_yarn/glob-parent-5.1.2
+d32ed40 Bump glob-parent from 5.1.1 to 5.1.2
+9d5795d Merge pull request #36 from siddharthbhagwan/dependabot/npm_and_yarn/acorn-5.7.4
+0f9eeef Merge pull request #75 from siddharthbhagwan/dependabot/npm_and_yarn/ua-parser-js-0.7.33
+0da6aed Merge pull request #76 from siddharthbhagwan/dependabot/npm_and_yarn/minimist-and-minimist-and-mkdirp-1.2.8
+18d0fba Merge pull request #77 from siddharthbhagwan/gh-pages
+2507e53 GA Added
+f7d0222 Bump minimist and mkdirp
+607ba23 Bump ua-parser-js from 0.7.31 to 0.7.33
+776ee25 Bump qs from 6.5.2 to 6.5.3
+ffac3a9 Bump decode-uri-component from 0.2.0 to 0.2.2
+1dcfc75 Merge pull request #67 from siddharthbhagwan/dependabot/npm_and_yarn/eventsource-1.1.1
+5d683db Bump eventsource from 1.0.7 to 1.1.1
+a0db5fc Merge pull request #65 from siddharthbhagwan/hide-mobile
+757493b analytics
+bd2adc8 ga added
+2f6c9aa Toggle legend enabled
+83adf71 smaller house icons
+fcc5751 Hide dashboard and legend on mobile
+c379e7d Merge pull request #64 from siddharthbhagwan/analytics
+bd1a99f analytics updated
+b2866ce analytics updated
+71788cd Merge pull request #63 from siddharthbhagwan/analytics
+8763750 Added google analytics
+22272cf Bump acorn from 5.7.3 to 5.7.4

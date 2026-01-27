@@ -178,52 +178,54 @@ generic-dashboard {
 }
 
 .rest-day-circle {
-  width: 100%;
-  height: 100%;
+  width: 65%;
+  height: 65%;
   border: 1px solid;
   border-radius: 50%;
   box-sizing: border-box;
   background: white; /* Add white background to make the icon stand out */
   position: relative;
   z-index: 1000;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dest-circle-wrapper:hover .rest-day-circle {
+  transform: scale(1.25);
+  z-index: 2000 !important;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Pulsating Ripple (Wave) for Rest Days */
+.rest-day-ripple::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid;
+  border-color: inherit;
+  border-radius: 50%;
+  animation: ripple-wave 2.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes ripple-wave {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
 }
 
 .pulsating-circle {
   animation: strong-throb 2s ease-in-out infinite;
   /* Override global shadow removal for the throb glow */
-  box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
-}
-
-.rest-day-ripple {
-  position: relative;
-}
-
-.rest-day-ripple::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border: 4px solid #004b7b;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: ripple-wave 2s infinite;
-  pointer-events: none;
-  box-sizing: border-box;
-}
-
-@keyframes ripple-wave {
-  0% {
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-  }
-  100% {
-    width: 350%;
-    height: 350%;
-    opacity: 0;
-  }
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
 }
 
 @keyframes strong-throb {
@@ -232,8 +234,8 @@ generic-dashboard {
     box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
   }
   50% {
-    transform: scale(1.3);
-    box-shadow: 0 0 20px 8px rgba(0, 75, 123, 0.3) !important; /* Lighter Blue glow */
+    transform: scale(1.05); /* Very subtle pulse */
+    box-shadow: 0 0 8px 3px rgba(0, 75, 123, 0.15) !important;
   }
   100% {
     transform: scale(1);
@@ -257,7 +259,7 @@ generic-dashboard {
 @media (min-width: 1025px) {
   .dashboard-container {
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border: 1px solid #e2e8f0;
   }
 }
@@ -265,7 +267,7 @@ generic-dashboard {
 @media (max-width: 1024px) {
   .dashboard-container {
     border-radius: 0;
-    box-shadow: 0 -1px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
     border: 1px solid #eee;
   }
 }
@@ -554,4 +556,17 @@ generic-dashboard {
   display: flex;
   align-items: center;
   background: white;
+}
+
+/* Route Highlighting Classes */
+.route-highlight-casing {
+  pointer-events: none;
+}
+
+.route-highlight-main {
+  /* Sharp look, no animation */
+}
+
+.non-highlighted-route {
+  transition: opacity 0.3s ease;
 }

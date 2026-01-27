@@ -1,0 +1,8 @@
+commit 1961b7da38e58b3d19301baa824e5d60ee8474ca
+Merge: 79617c7 f6d3c3a
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Sun Jan 25 16:59:33 2026 +0100
+
+    Merge pull request #100 from siddharthbhagwan/polishing
+    
+    UI Refinement, Mobile Optimization, and Stability Overhaul

@@ -1,19 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import * as L from "leaflet";
 import { connect } from "react-redux";
 import { isDesktop } from "react-device-detect";
 import "../resources/css/dashboard.css";
 import { getMarkers } from "../utils/markers";
-import { getDayWiseDataG } from "../utils/geoJson";
 import { mapDispatchToProps } from "../utils/utils";
 import { Marker, withLeaflet, Tooltip } from "react-leaflet";
-
+import { getDayWiseDataG } from "../utils/geoJson";
+import { getColorForElevation } from "../utils/heightGradient";
 import tentIcon from "../resources/images/tent.svg";
-import summitIcon from "../resources/images/summit.svg";
-import passIcon from "../resources/images/pass.svg";
 import ebcIcon from "../resources/images/ebc.svg";
 import airportIcon from "../resources/images/airport.svg";
-import { getColorForElevation } from "../utils/heightGradient";
+import passIcon from "../resources/images/pass.svg";
+import summitIcon from "../resources/images/summit.svg";
+
+const ZOOM_MOBILE = 10.7;
 
 const POI = (props) => {
   const { map } = props.leaflet;
@@ -22,13 +23,52 @@ const POI = (props) => {
     paddingTopLeft,
     paddingBottomRight,
     dispatchLayerDetails,
+    zoom,
     unit,
     currentDay,
     isSingleDayView,
     setSingleDayView,
   } = props;
 
-  const isZoomedIn = isSingleDayView;
+  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
+
+  const derivedZoom = isDesktop ? zoom : ZOOM_MOBILE;
+
+  // Listen for zoom changes
+  useEffect(() => {
+    if (!map) return;
+
+    const handleZoom = () => {
+      const newZoom = map.getZoom();
+      const wasZoomedIn = currentZoom > derivedZoom + 0.5;
+      const isNowZoomedIn = newZoom > derivedZoom + 0.5;
+
+      if (wasZoomedIn !== isNowZoomedIn) {
+        setCurrentZoom(newZoom);
+      }
+    };
+
+    map.on("zoom", handleZoom);
+
+    return () => {
+      map.off("zoom", handleZoom);
+    };
+  }, [map, currentZoom, derivedZoom]);
+
+  const isZoomedIn = currentZoom > derivedZoom + 0.5;
+
+  // Check if a marker's day matches the current day
+  const isDayRelevant = (markerDay) => {
+    if (!isZoomedIn || currentDay === "0") return true; // Show all when zoomed out or on Day 0
+
+    // Handle multi-day markers like "2 & 3", "10, 11 & 12"
+    const days = markerDay.split(/[,&]/).map((d) => parseInt(d.trim(), 10));
+    const curr = parseInt(currentDay, 10);
+
+    // A marker is relevant if it's the arrival point of the current day (curr)
+    // OR the starting point (arrival point of the previous day, curr - 1)
+    return days.includes(curr) || days.includes(curr - 1);
+  };
 
   // Format altitude based on unit
   const formatAltitude = (altFt) => {
@@ -98,7 +138,7 @@ const POI = (props) => {
       const isSummit = markerPoint.icon === summitIcon;
 
       // Check if this marker is at the destination coordinate
-      // Increased threshold to 0.005 to account for slight GPS/marker mismatches (e.g. Gorak Shep, Namche)
+      // Precision threshold: 0.0015 (~150m) to avoid multiple highlights in villages like Namche
       const isDest =
         destCoord &&
         Math.abs(markerPoint.point[0] - destCoord[1]) < 0.005 &&
@@ -111,28 +151,32 @@ const POI = (props) => {
         Math.abs(markerPoint.point[1] - startCoord[0]) < 0.005;
 
       // Check if this marker matches the current day
+      const currentDayStr = String(currentDay);
       const isDayMatch = markerPoint.properties.day
         .split(/[,&]/)
         .map((d) => d.trim())
-        .includes(currentDay);
+        .includes(currentDayStr);
 
       // Filter out markers that aren't relevant to the current day when zoomed in
-      // We keep: dest, matches day, or matches start of route
-      if (isZoomedIn && !isDayMatch && !isDest && !isStart) {
+      // We keep: dest, matches day, start of route, or Airports.
+      // Houses are only kept if they belong to the current day (start or dest).
+      if (isZoomedIn && !isDayMatch && !isDest && !isStart && !isAirport) {
         return;
       }
 
-      // On acclimatization days (Rest Days), only show the circled house
+      // On acclimatization days (Rest Days), only show the destination house
       if (isZoomedIn && isCurrentDayRestDay) {
-        if (!isDayMatch || !isHouse) {
+        if (!isDest || !isHouse) {
           return;
         }
       }
 
       // Determine circle logic:
-      // 1. In Overview (!isSingleDayView), circle all Houses and Airports.
-      // 2. In Single Day View, circle ONLY the Destination POI (including rest day houses).
-      const shouldCircle = !isSingleDayView ? isHouse || isAirport : isDest;
+      // In Overview, circle all Houses & Airports.
+      // In Single Day View, Circle only the destination and airports.
+      const shouldCircle = !isSingleDayView
+        ? isHouse || isAirport
+        : isDest || isAirport;
 
       // Altitude-based border color
       const altFt = parseInt(
@@ -142,16 +186,66 @@ const POI = (props) => {
       const altM = altFt * 0.3048;
       const borderColor = getColorForElevation(altM);
 
+      const pulseClass = isDest ? "pulsating-circle" : "";
+      const rippleClass =
+        isCurrentDayRestDay && isDayMatch && isHouse ? "rest-day-ripple" : "";
+      const isActive = pulseClass !== "" || rippleClass !== "";
+      const isPulsatingOnly = pulseClass !== "" && rippleClass === "";
+
       let icon;
       if (shouldCircle) {
-        // Destination Circle Wrapper
-        // Decrease circle size by 1px, iconSize remains same
-        const wrapSize = isHouse
-          ? 19
+        // Active (pulsating/rippling) markers should be small to avoid clutter.
+        // Static circled markers (in overview) should be bigger as requested.
+        // When zoomed into a single route, make active houses even larger
+        const isZoomedInSingleRoute = isSingleDayView && isZoomedIn;
+
+        let wrapSize = isPulsatingOnly
+          ? isDesktop
+            ? 17
+            : 15
+          : isActive
+            ? isDesktop
+              ? isZoomedInSingleRoute
+                ? 24
+                : 20
+              : isZoomedInSingleRoute
+                ? 22
+                : 18
+            : isDesktop
+              ? 17
+              : 15;
+
+        const imgSize = isHouse
+          ? isDesktop
+            ? isPulsatingOnly
+              ? 11
+              : isActive
+                ? isZoomedInSingleRoute
+                  ? 19
+                  : 16
+                : 11
+            : isPulsatingOnly
+              ? 8
+              : isActive
+                ? isZoomedInSingleRoute
+                  ? 15
+                  : 12
+                : 8
           : isAirport
-            ? 21
-            : markerPoint.size[0] + 5;
-        const imgSize = isHouse ? 11 : isAirport ? 15 : markerPoint.size[0];
+            ? isDesktop
+              ? isActive
+                ? 11
+                : 15
+              : isActive
+                ? 10
+                : 13
+            : isDesktop
+              ? 11
+              : 10;
+
+        if (!isDesktop && isHouse) {
+          wrapSize -= 1;
+        }
 
         let imgClass = "";
         if (isEBC) imgClass = "ebc-marker-icon";
@@ -164,10 +258,6 @@ const POI = (props) => {
         }
 
         const pulseClass = isSingleDayView ? "pulsating-circle" : "";
-        const rippleClass =
-          isCurrentDayRestDay && isDayMatch && isHouse && isDest
-            ? "rest-day-ripple"
-            : "";
 
         icon = L.divIcon({
           className: "dest-circle-wrapper",
@@ -194,13 +284,15 @@ const POI = (props) => {
         // Only show if it's the start, it's zoomed in, and not already circled (which would be dest)
         const showUnderscore = isStart && isZoomedIn && !shouldCircle;
 
-        // Increase size for the underscored house (usually a tent icon)
-        const finalSize = showUnderscore ? [16, 16] : markerPoint.size;
+        let adjustedSize = markerPoint.size;
+        if (!isDesktop && isHouse) {
+          adjustedSize = [adjustedSize[0] - 1, adjustedSize[1] - 1];
+        }
 
         icon = L.divIcon({
           className: "standard-poi-wrapper",
-          iconSize: finalSize,
-          iconAnchor: [finalSize[0] / 2, finalSize[1] / 2],
+          iconSize: adjustedSize,
+          iconAnchor: [adjustedSize[0] / 2, adjustedSize[1] / 2],
           html: `
             <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
                <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
@@ -235,6 +327,7 @@ const POI = (props) => {
               permanent={true}
               className={"tooltipLabel"}
               direction={markerPoint.properties.direction}
+              // offset={markerPoint.properties.offset || [0, 0]}
             >
               <div style={{ fontSize: isZoomedIn ? "14px" : "11px" }}>
                 <div style={{ fontWeight: isZoomedIn ? "600" : "normal" }}>

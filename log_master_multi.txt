@@ -1,0 +1,47 @@
+commit f3d969bf96f191534f58a19f562178a1ee14f734
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Mon Jan 26 22:15:25 2026 +0100
+
+    UI Polishing: Icon sizing, rest day visibility, and route selection enhancements
+
+commit ed33570b4215b5c6230953743e370fcb12f99b51
+Merge: 314e949 49ade82
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Fri Mar 4 12:46:21 2022 -0800
+
+    Merge pull request #62 from siddharthbhagwan/dependabot/npm_and_yarn/url-parse-1.5.10
+    
+    Bump url-parse from 1.4.7 to 1.5.10
+
+commit 49ade8290cc93f5860eb0efd8b9d6590c154e6d7
+Author: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+Date:   Sat Feb 26 12:20:40 2022 +0000
+
+    Bump url-parse from 1.4.7 to 1.5.10
+    
+    Bumps [url-parse](https://github.com/unshiftio/url-parse) from 1.4.7 to 1.5.10.
+    - [Release notes](https://github.com/unshiftio/url-parse/releases)
+    - [Commits](https://github.com/unshiftio/url-parse/compare/1.4.7...1.5.10)
+    
+    ---
+    updated-dependencies:
+    - dependency-name: url-parse
+      dependency-type: indirect
+    ...
+    
+    Signed-off-by: dependabot[bot] <support@github.com>
+
+commit 314e9495edcbdebcaf03e1995019ddfd7c54e860
+Merge: 943f26e 5dde591
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Thu Jan 27 23:49:28 2022 -0800
+
+    Merge pull request #55 from siddharthbhagwan/altitude
+    
+    Altitude
+
+commit 5dde5912d75a263269d93862447ab5dcef3b0900
+Author: Siddhartha Bhagwan <sbhagwan@tesla.com>
+Date:   Thu Jan 27 23:00:47 2022 -0800
+
+    Labels added

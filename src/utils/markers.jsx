@@ -7,7 +7,7 @@ import ebcIcon from "../resources/images/ebc.svg";
 const markers = [
   {
     // Phakding
-    point: [27.74004, 86.712555],
+    point: [27.74018, 86.71263],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -21,7 +21,7 @@ const markers = [
   },
   {
     // Namche Bazaar
-    point: [27.8069, 86.714],
+    point: [27.80695, 86.71371],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -34,7 +34,7 @@ const markers = [
   },
   {
     // Tengboche
-    point: [27.8362, 86.7646],
+    point: [27.83606, 86.76477],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -47,7 +47,7 @@ const markers = [
   },
   {
     // Dingboche
-    point: [27.8923, 86.8314],
+    point: [27.89264, 86.8304],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -73,7 +73,7 @@ const markers = [
   },
   {
     // Lobuche
-    point: [27.9485, 86.8104],
+    point: [27.948426, 86.810534],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -86,7 +86,7 @@ const markers = [
   },
   {
     // Gorak Shep
-    point: [27.9809, 86.8285],
+    point: [27.98094, 86.82939],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -99,7 +99,7 @@ const markers = [
   },
   {
     // Dzongla
-    point: [27.9397, 86.7733],
+    point: [27.93929, 86.77398],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -112,7 +112,7 @@ const markers = [
   },
   {
     // Thangnak
-    point: [27.94058, 86.721246],
+    point: [27.94088, 86.72055],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -125,7 +125,7 @@ const markers = [
   },
   {
     // Gokyo
-    point: [27.9535, 86.6945],
+    point: [27.95417, 86.69377],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -138,7 +138,7 @@ const markers = [
   },
   {
     // Marlung
-    point: [27.8877, 86.6365],
+    point: [27.88825, 86.63783],
     icon: tentIcon,
     size: [10, 10],
     properties: {
@@ -178,7 +178,7 @@ const markers = [
   },
   {
     // Kala Patthar
-    point: [27.995700274264355, 86.82849997210725],
+    point: [27.9957, 86.8285],
     icon: summitIcon,
     size: [24, 24],
     properties: {
@@ -217,7 +217,7 @@ const markers = [
   },
   {
     // Cho La
-    point: [27.962122, 86.751923],
+    point: [27.96211, 86.75169],
     icon: passIcon,
     size: [24, 24],
     properties: {

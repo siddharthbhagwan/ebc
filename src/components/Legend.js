@@ -52,29 +52,11 @@ const Legend = (props) => {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "5px",
-            padding: "2px 6px",
+            gap: "3px",
+            padding: "1px 4px",
           }}
         >
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f5f5f5",
-              borderRadius: "4px",
-              border: "1px solid #eee",
-            }}
-          >
-            <img
-              src={ebcIcon}
-              className="ebc-marker-icon"
-              width={"12px"}
-              alt="Base Camp"
-            />
-          </div>
+          <img src={ebcIcon} width={"12px"} alt="Base Camp" />
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -86,29 +68,11 @@ const Legend = (props) => {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "5px",
-            padding: "2px 6px",
+            gap: "3px",
+            padding: "1px 4px",
           }}
         >
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f5f5f5",
-              borderRadius: "4px",
-              border: "1px solid #eee",
-            }}
-          >
-            <img
-              src={summitIcon}
-              className="summit-marker-icon"
-              width={"12px"}
-              alt="Summit"
-            />
-          </div>
+          <img src={summitIcon} width={"12px"} alt="Summit" />
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -120,29 +84,11 @@ const Legend = (props) => {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "5px",
-            padding: "2px 6px",
+            gap: "3px",
+            padding: "1px 4px",
           }}
         >
-          <div
-            style={{
-              width: "18px",
-              height: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f5f5f5",
-              borderRadius: "4px",
-              border: "1px solid #eee",
-            }}
-          >
-            <img
-              src={passIcon}
-              className="flag-marker-icon"
-              width={"12px"}
-              alt="Pass"
-            />
-          </div>
+          <img src={passIcon} width={"12px"} alt="Pass" />
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -154,14 +100,14 @@ const Legend = (props) => {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "5px",
-            padding: "2px 6px",
+            gap: "3px",
+            padding: "1px 4px",
           }}
         >
           <div
             style={{
-              width: "18px",
-              height: "18px",
+              width: isDesktop ? "18px" : "12px",
+              height: isDesktop ? "18px" : "12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -170,7 +116,11 @@ const Legend = (props) => {
               border: "1px solid #eee",
             }}
           >
-            <img src={tentIcon} width={"12px"} alt="Lodging" />
+            <img
+              src={tentIcon}
+              width={isDesktop ? "12px" : "7px"}
+              alt="Lodging"
+            />
           </div>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
@@ -197,7 +147,7 @@ const Legend = (props) => {
               marginLeft: "4px",
             }}
           >
-            * YMMV
+            <span style={{ fontSize: "8px", verticalAlign: "top" }}>*</span> YMMV
           </span>
         </div>
       </div>

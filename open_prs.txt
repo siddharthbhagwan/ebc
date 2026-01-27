@@ -1,0 +1,5 @@
+105	fix: resolve core dependabot vulnerabilities	fix/all-dependabot-security	OPEN	2026-01-25T16:43:32Z
+104	Bump tmp and react-scripts	dependabot/npm_and_yarn/multi-3e178e39cd	OPEN	2026-01-25T15:29:49Z
+103	Bump shell-quote and react-scripts	dependabot/npm_and_yarn/multi-703623c7d7	OPEN	2026-01-25T15:29:45Z
+102	Bump @babel/runtime and react-scripts	dependabot/npm_and_yarn/multi-38e4ea57f0	OPEN	2026-01-25T15:29:31Z
+101	Bump node-forge and react-scripts	dependabot/npm_and_yarn/multi-1b6f83b174	OPEN	2026-01-25T15:29:29Z

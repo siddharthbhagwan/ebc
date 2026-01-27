@@ -2,7 +2,7 @@
   "name": "ebc",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://coderbear.com/ebc",
+  "homepage": "https://coderbear.com/ebc/",
   "dependencies": {
     "decode-google-map-polyline": "^1.0.1",
     "gh-pages": "^6.3.0",

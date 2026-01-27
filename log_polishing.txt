@@ -1,0 +1,5 @@
+commit 6f20c0d140e6412d59747bff2c162348641d3e91
+Author: Siddhartha Bhagwan <siddharthabhagwan@gmail.com>
+Date:   Tue Jan 27 11:29:56 2026 +0100
+
+    UI: Refine mobile centering and fixed metric placement
