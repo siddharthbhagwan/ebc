@@ -201,7 +201,8 @@ const Legend = (props) => {
               marginLeft: "4px",
             }}
           >
-            <span style={{ fontSize: "8px", verticalAlign: "top" }}>*</span> YMMV
+            <span style={{ fontSize: "8px", verticalAlign: "top" }}>*</span>{" "}
+            YMMV
           </span>
         </div>
       </div>

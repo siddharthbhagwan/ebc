@@ -145,9 +145,20 @@ const Dashboard = (props) => {
       map.invalidateSize();
 
       if (isSingleDayView && day && day !== "0") {
+        // Switch to overview
+        setSingleDayView(false);
+        const baseOffset = 0.024;
+        const legendOffset = showLegend ? 0.004 : 0;
+        const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
+        const lat = Array.isArray(center) ? center[0] : center.lat;
+        const lng = Array.isArray(center) ? center[1] : center.lng;
+        const initialCenter = [lat - currentOffset, lng];
+        map.flyTo(initialCenter, derivedZoom, { duration: 1 });
+      } else if (!isSingleDayView && day && day !== "0") {
+        // Switch to single day view and zoom to the current day
+        setSingleDayView(true);
         const routes = getDayWiseDataG();
         const targetDay = routes[day];
-
         if (targetDay) {
           const bounds = getFeatureBounds(targetDay, day);
           if (bounds) {
@@ -159,10 +170,10 @@ const Dashboard = (props) => {
           }
         }
       } else {
-        // Overview mode: Reset to initial world center
-        const mobileOffset = 0.024;
-        const desktopOffset = 0.008;
-        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+        // Overview mode with no specific day, reset to initial world center
+        const baseOffset = 0.024;
+        const legendOffset = showLegend ? 0.004 : 0;
+        const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
 
         // Safety check for center
         const lat = Array.isArray(center) ? center[0] : center.lat;
@@ -186,21 +197,26 @@ const Dashboard = (props) => {
         if (routes && routes["0"]) {
           dispatchLayerDetails(routes["0"].features[0].properties);
         }
-        const mobileOffset = 0.024;
-        const desktopOffset = 0.008;
-        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+        const baseOffset = 0.024;
+        const legendOffset = showLegend ? 0.004 : 0;
+        const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
         const lat = Array.isArray(center) ? center[0] : center.lat;
         const lng = Array.isArray(center) ? center[1] : center.lng;
         const initialCenter = [lat - currentOffset, lng];
         map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
       } else {
-        // Switch to Day 1
+        // Switch to highlighted route or Day 1
+        // Test: If lastZoomedDay exists, use it; otherwise default to "1"
+        const targetDayKey = lastZoomedDay || "1";
+        console.log(
+          `Target button: Switching to day ${targetDayKey} (lastZoomedDay: ${lastZoomedDay})`,
+        );
         setSingleDayView(true);
         const routes = getDayWiseDataG();
-        const targetDay = routes["1"];
+        const targetDay = routes[targetDayKey];
         if (targetDay) {
           dispatchLayerDetails(targetDay.features[0].properties);
-          const bounds = getFeatureBounds(targetDay, "1");
+          const bounds = getFeatureBounds(targetDay, targetDayKey);
           if (bounds) {
             map.flyToBounds(bounds, {
               paddingTopLeft: effectivePaddingTopLeft,
@@ -232,9 +248,9 @@ const Dashboard = (props) => {
           ) < 0.2,
         );
       } else {
-        const mobileOffset = 0.024;
-        const desktopOffset = 0.008;
-        const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+        const baseOffset = 0.024;
+        const legendOffset = showLegend ? 0.004 : 0;
+        const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
 
         const lat = Array.isArray(center) ? center[0] : center.lat;
         const lng = Array.isArray(center) ? center[1] : center.lng;
@@ -252,7 +268,7 @@ const Dashboard = (props) => {
     map.on("zoomend moveend", checkState);
     checkState(); // initial check
     return () => map.off("zoomend moveend", checkState);
-  }, [map, isSingleDayView, day, center, derivedZoom, isDesktop]);
+  }, [map, isSingleDayView, day, center, derivedZoom, isDesktop, showLegend]);
 
   // Re-apply bounds when padding-affecting states change or view mode changes
   useEffect(() => {
@@ -285,36 +301,60 @@ const Dashboard = (props) => {
     isToolsOpen,
   ]);
 
+  // Adjust overview center when legend visibility changes on mobile
+  useEffect(() => {
+    if (!isSingleDayView && !isDesktop) {
+      // On mobile, in overview mode, adjust latitude offset based on legend visibility
+      const baseOffset = 0.024;
+      const legendOffset = showLegend ? 0.004 : 0; // Additional offset when legend is shown
+      const currentOffset = baseOffset + legendOffset;
+
+      const lat = Array.isArray(center) ? center[0] : center.lat;
+      const lng = Array.isArray(center) ? center[1] : center.lng;
+      const newCenter = [lat - currentOffset, lng];
+
+      // Use a small timeout to ensure state/DOM stability
+      const timer = setTimeout(() => {
+        map.invalidateSize();
+        map.flyTo(newCenter, derivedZoom, { duration: 0.8 });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [showLegend, isSingleDayView, isDesktop, center, derivedZoom, map]);
+
   const handleNavigation = (direction) => {
     const targetFeature = direction === "next" ? nextDay() : prevDay();
 
     // Auto-reset tools when navigating
     setIsToolsOpen(false);
 
-    if (isSingleDayView && targetFeature) {
-      // Find the whole day collection to get full bounds
-      const routes = getDayWiseDataG();
-      const targetDayCollection = targetFeature.properties?.day
-        ? routes[targetFeature.properties.day]
-        : targetFeature;
+    if (targetFeature) {
+      // Only zoom if the map is currently zoomed in (not at overview zoom)
+      if (map.getZoom() > 11.3) {
+        // Find the whole day collection to get full bounds
+        const routes = getDayWiseDataG();
+        const targetDayCollection = targetFeature.properties?.day
+          ? routes[targetFeature.properties.day]
+          : targetFeature;
 
-      const bounds = getFeatureBounds(
-        targetDayCollection,
-        targetFeature.properties?.day,
-      );
+        const bounds = getFeatureBounds(
+          targetDayCollection,
+          targetFeature.properties?.day,
+        );
 
-      if (bounds) {
-        map.flyToBounds(bounds, {
-          paddingTopLeft: effectivePaddingTopLeft,
-          paddingBottomRight: effectivePaddingBottomRight,
-          duration: props.zoomDuration,
-        });
+        if (bounds) {
+          map.flyToBounds(bounds, {
+            paddingTopLeft: effectivePaddingTopLeft,
+            paddingBottomRight: effectivePaddingBottomRight,
+            duration: props.zoomDuration,
+          });
 
-        // Save the zoomed state
-        setLastZoomedState({
-          day: targetFeature.properties.day,
-          bounds: bounds,
-        });
+          // Save the zoomed state
+          setLastZoomedState({
+            day: targetFeature.properties.day,
+            bounds: bounds,
+          });
+        }
       }
     }
   };
@@ -359,9 +399,9 @@ const Dashboard = (props) => {
       setSingleDayView(false);
 
       // Zoom out to the exact initial center
-      const mobileOffset = 0.024;
-      const desktopOffset = 0.008;
-      const currentOffset = isDesktop ? desktopOffset : mobileOffset;
+      const baseOffset = 0.024;
+      const legendOffset = showLegend ? 0.004 : 0;
+      const currentOffset = isDesktop ? 0.008 : baseOffset + legendOffset;
       const initialCenter = [center[0] - currentOffset, center[1]];
 
       // Reset to Day 0 (Default page)
@@ -420,9 +460,9 @@ const Dashboard = (props) => {
 
   const getTitleFontSize = (name) => {
     if (isDesktop) {
-      if (name.length > 30) return "13px";
-      if (name.length > 22) return "14.5px";
-      return "17.5px";
+      if (name.length > 30) return "15px";
+      if (name.length > 22) return "16px";
+      return "19px";
     } else {
       if (name.length > 30) return "11px";
       if (name.length > 25) return "12px";
@@ -523,6 +563,11 @@ const Dashboard = (props) => {
           width: isDesktop ? "600px" : "100vw",
           height: isDesktop ? "160px" : "132px",
           paddingBottom: isDesktop ? "0" : "env(safe-area-inset-bottom)",
+          position: isDesktop ? "relative" : "fixed",
+          bottom: isDesktop ? "auto" : 0,
+          left: isDesktop ? "auto" : 0,
+          right: isDesktop ? "auto" : 0,
+          zIndex: isDesktop ? "auto" : 1000,
         }}
       >
         {/* Top Section: Main content row */}
