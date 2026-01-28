@@ -69,6 +69,8 @@ generic-dashboard {
   background-color: transparent;
   z-index: 100;
   border: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .tooltipLabel:before {

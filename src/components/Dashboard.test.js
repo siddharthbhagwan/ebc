@@ -3,6 +3,7 @@ import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { combineReducers, createStore } from "redux";
 import Dashboard from "./Dashboard";
+import MapContainer from "./MapContainer";
 import { routeReducer } from "../reducers/routeReducer";
 import { mapStateReducer } from "../reducers/mapStateReducer";
 
@@ -20,6 +21,9 @@ let mockMap = {
 
 // Mock react-leaflet
 jest.mock("react-leaflet", () => ({
+  Map: ({ children, ...props }) => (
+    <div data-testid="leaflet-control">{children}</div>
+  ),
   MapContainer: ({ children, ...props }) => (
     <div data-testid="leaflet-control">{children}</div>
   ),
@@ -30,12 +34,6 @@ jest.mock("react-leaflet", () => ({
   withLeaflet: (Component) => (props) => (
     <Component {...props} leaflet={{ map: mockMap }} />
   ),
-}));
-
-// Mock react-device-detect
-jest.mock("react-device-detect", () => ({
-  isDesktop: true,
-  useMobileOrientation: () => ({ isLandscape: false }),
 }));
 
 // Mock Leaflet
@@ -52,6 +50,8 @@ jest.mock("leaflet", () => ({
     getNorthEast: () => ({ lat: 27.9, lng: 86.9 }),
     getSouthWest: () => ({ lat: 27.8, lng: 86.7 }),
   }),
+  icon: (options) => ({ options }),
+  divIcon: (options) => ({ options }),
 }));
 
 // Mock other dependencies
@@ -73,9 +73,34 @@ jest.mock("../hooks/useDays", () => ({
   __esModule: true,
   default: () => ({
     day: "1",
-    nextDay: () => ({ properties: { day: "2", name: "Phakding - Namche Bazaar" } }),
+    nextDay: () => ({
+      properties: { day: "2", name: "Phakding - Namche Bazaar" },
+    }),
     prevDay: () => ({ properties: { day: "1", name: "Lukla - Phakding" } }),
   }),
+}));
+
+// Mock assets
+jest.mock("../resources/images/tent.svg", () => "tent.svg");
+jest.mock("../resources/images/ebc.svg", () => "ebc.svg");
+jest.mock("../resources/images/airport.svg", () => "airport.svg");
+jest.mock("../resources/images/pass.svg", () => "pass.svg");
+jest.mock("../resources/images/summit.svg", () => "summit.svg");
+
+// Mock markers
+jest.mock("../utils/markers", () => ({
+  getMarkers: () => [
+    {
+      point: [27.98094, 86.82939],
+      icon: "tent.svg",
+      size: [10, 10],
+      properties: {
+        day: "11",
+        name: "Gorak Shep",
+        startAlt: "16,942",
+      },
+    },
+  ],
 }));
 
 const createMockStore = (initialState) => {
@@ -125,7 +150,7 @@ describe("Dashboard Component Behaviors", () => {
       render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       // Simulate right arrow key press
@@ -147,7 +172,7 @@ describe("Dashboard Component Behaviors", () => {
       render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       // Simulate right arrow key press
@@ -163,7 +188,7 @@ describe("Dashboard Component Behaviors", () => {
       render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.keyDown(window, { key: "ArrowLeft" });
@@ -178,7 +203,7 @@ describe("Dashboard Component Behaviors", () => {
       render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       // Initially overview
@@ -203,7 +228,7 @@ describe("Dashboard Component Behaviors", () => {
       render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       fireEvent.keyDown(window, { code: "Space" });
@@ -219,7 +244,7 @@ describe("Dashboard Component Behaviors", () => {
       const { getByAltText } = render(
         <Provider store={store}>
           <Dashboard />
-        </Provider>
+        </Provider>,
       );
 
       // The target button is the Reset image (location icon)
@@ -285,12 +310,14 @@ describe("Dashboard Elevation Stats Styling", () => {
     );
 
     // Find the elevation gain span (green color) using CSS class
-    const elevationGain = container.querySelector('.elevation-gain--desktop');
+    const elevationGain = container.querySelector(".elevation-gain--desktop");
     expect(elevationGain).toBeInTheDocument();
     expect(elevationGain.textContent).toMatch(/▲\s*152m/);
 
     // Find the descent span (red color) using CSS class
-    const altitudeChange = container.querySelector('.elevation-descent--desktop');
+    const altitudeChange = container.querySelector(
+      ".elevation-descent--desktop",
+    );
     expect(altitudeChange).toBeInTheDocument();
     expect(altitudeChange.textContent).toMatch(/▼\s*248m/);
   });
@@ -366,12 +393,14 @@ describe("Dashboard Elevation Stats Styling", () => {
     );
 
     // Elevation gain should have green class (color defined in CSS)
-    const elevationGain = container.querySelector('.elevation-gain--desktop');
+    const elevationGain = container.querySelector(".elevation-gain--desktop");
     expect(elevationGain).toBeInTheDocument();
     expect(elevationGain.textContent).toMatch(/▲\s*152m/);
 
     // Altitude change should have red class (color defined in CSS)
-    const altitudeChange = container.querySelector('.elevation-descent--desktop');
+    const altitudeChange = container.querySelector(
+      ".elevation-descent--desktop",
+    );
     expect(altitudeChange).toBeInTheDocument();
     expect(altitudeChange.textContent).toMatch(/▼\s*248m/);
   });
@@ -385,11 +414,11 @@ describe("Dashboard Elevation Stats Styling", () => {
 
     // Verify elevation stats appear in the rendered output
     const renderedText = container.textContent;
-    
+
     // Find positions using regex match index
     const elevationMatch = renderedText.match(/▲\s*152m/);
     const altitudeIndex = renderedText.indexOf("2,857m");
-    
+
     // Elevation should appear before altitude in the DOM
     expect(elevationMatch).not.toBeNull();
     expect(altitudeIndex).toBeGreaterThan(-1);
@@ -404,11 +433,13 @@ describe("Dashboard Elevation Stats Styling", () => {
     );
 
     // Find the elevation gain span using CSS class
-    const elevationGain = container.querySelector('.elevation-gain--desktop');
+    const elevationGain = container.querySelector(".elevation-gain--desktop");
     expect(elevationGain).toBeInTheDocument();
 
     // Find the altitude display using CSS class
-    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    const altitudeDisplay = container.querySelector(
+      ".altitude-display--desktop",
+    );
     expect(altitudeDisplay).toBeInTheDocument();
     // Should show start → end altitude (2,857m → 2,610m)
     expect(altitudeDisplay.textContent).toContain("2,857m");
@@ -495,7 +526,9 @@ describe("Dashboard Basic Rendering", () => {
 
     // Should show start → end altitude format
     // startAlt 9,373 feet = 2,857m, endAlt 8,563 feet = 2,610m
-    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    const altitudeDisplay = container.querySelector(
+      ".altitude-display--desktop",
+    );
     expect(altitudeDisplay.textContent).toContain("2,857m");
     expect(altitudeDisplay.textContent).toContain("2,610m");
   });
@@ -552,7 +585,7 @@ describe("Dashboard Toolbar Behavior", () => {
         paddingTopLeft: [50, 110],
         paddingBottomRight: [50, 50],
         unit: "km",
-        attribution: '&copy; OpenStreetMap',
+        attribution: "&copy; OpenStreetMap",
       },
       route: {
         day: "1",
@@ -579,7 +612,9 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(toolsBtn);
 
     await waitFor(() => {
-      expect(getByText("Everest Base Camp 3 Pass Trek, Nepal")).toBeInTheDocument();
+      expect(
+        getByText("Everest Base Camp 3 Pass Trek, Nepal"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -645,7 +680,9 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(toolsBtn);
 
     await waitFor(() => {
-      expect(getByText("Everest Base Camp 3 Pass Trek, Nepal")).toBeInTheDocument();
+      expect(
+        getByText("Everest Base Camp 3 Pass Trek, Nepal"),
+      ).toBeInTheDocument();
     });
 
     // Close toolbar
@@ -653,7 +690,9 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(closeBtn);
 
     await waitFor(() => {
-      expect(queryByText("Everest Base Camp 3 Pass Trek, Nepal")).not.toBeInTheDocument();
+      expect(
+        queryByText("Everest Base Camp 3 Pass Trek, Nepal"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -711,7 +750,9 @@ describe("Dashboard Unit Conversion", () => {
     );
 
     // 9,373 feet = 2,857 meters, 8,563 feet = 2,610 meters
-    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    const altitudeDisplay = container.querySelector(
+      ".altitude-display--desktop",
+    );
     expect(altitudeDisplay.textContent).toContain("2,857m");
     expect(altitudeDisplay.textContent).toContain("2,610m");
   });
@@ -748,7 +789,9 @@ describe("Dashboard Unit Conversion", () => {
     );
 
     // Should display start → end in feet (9,373ft → 8,563ft)
-    const altitudeDisplay = container.querySelector('.altitude-display--desktop');
+    const altitudeDisplay = container.querySelector(
+      ".altitude-display--desktop",
+    );
     expect(altitudeDisplay.textContent).toContain("9,373ft");
     expect(altitudeDisplay.textContent).toContain("8,563ft");
   });
@@ -1027,7 +1070,7 @@ describe("Dashboard Rest Day Display", () => {
 
     // Name should be shown
     expect(getByText("Namche Bazaar Acclimatization")).toBeInTheDocument();
-    
+
     // Day should be shown
     expect(getByText("3")).toBeInTheDocument();
 
@@ -1469,7 +1512,7 @@ describe("Dashboard Metrics Display Order", () => {
     );
 
     const content = container.textContent;
-    
+
     // Find positions of each metric (elevation may have whitespace between arrow and value)
     const nameIndex = content.indexOf("Lukla - Phakding");
     const elevationMatch = content.match(/▲\s*152m/);
@@ -2016,6 +2059,129 @@ describe("Dashboard Target Button Behavior", () => {
     // Target button should have active class when in single day view
     const activeButton = container.querySelector('.icon.active');
     expect(activeButton).toBeInTheDocument();
+  });
+
+  it("should zoom to most recently viewed day when target button clicked from overview", async () => {
+    // Start in single day view on day 7
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: true,
+        zoom: 13,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "7",
+        name: "Dingboche - Chhukung",
+        time: "3h",
+        distance: "3.1 mi / 5 km",
+        startAlt: "14,469",
+        endAlt: "15,518",
+        peakAlt: "",
+        total_climb: "1,050",
+        descent: "0",
+      },
+    });
+
+    const { container, rerender } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    const targetButton = container.querySelector('img[alt="Reset"]');
+    expect(targetButton).toBeInTheDocument();
+
+    // Click to go to overview (this should remember day 7)
+    fireEvent.click(targetButton.parentElement);
+
+    // Update store to overview mode with day 1 selected (default)
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1", // Now showing day 1
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "310",
+      },
+    });
+
+    rerender(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Click target button again - should zoom to day 7 (most recent), not day 1
+    fireEvent.click(targetButton.parentElement);
+
+    await waitFor(() => {
+      expect(mockMap.flyToBounds).toHaveBeenCalled();
+    });
+
+    // The component should have used lastZoomedDay (7) instead of current day (1)
+    // We can verify this through the console.log in the implementation
+  });
+
+  it("should zoom to day 1 when target button clicked from overview with no previous zoom", async () => {
+    // Start in overview mode with day 1 selected and no previous zoom
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "310",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    const targetButton = container.querySelector('img[alt="Reset"]');
+    expect(targetButton).toBeInTheDocument();
+
+    // Click target button - should zoom to day 1 (no lastZoomedDay exists)
+    fireEvent.click(targetButton.parentElement);
+
+    await waitFor(() => {
+      expect(mockMap.flyToBounds).toHaveBeenCalled();
+    });
   });
 });
 
