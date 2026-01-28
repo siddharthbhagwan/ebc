@@ -98,6 +98,9 @@ const GeoJsonRoutes = (props) => {
       const { geometry, properties, segments } = featureData;
 
       // Handle Point features (Rest Days or specialized markers)
+      // Note: We hide these here because they are already rendered by POI.js
+      // as part of the markers.jsx data set. This prevents "double" icons
+      // and double ripples on rest days like Gorak Shep.
       if (geometry.type === "Point") {
         // Show rest day circular border if zoomed in AND it's the current rest day,
         // OR if zoomed out AND it's selected (for Rest Days)
@@ -167,12 +170,18 @@ const GeoJsonRoutes = (props) => {
       }
 
       const isHighlighted =
-        properties.day === currentDay &&
-        !isCurrentDayRestDay;
+        properties.day === currentDay && !isCurrentDayRestDay;
 
       const clickHandler = () => {
         if (properties.day === "20") return;
         dispatchLayerDetails(properties);
+
+        // Toggle behavior: if already in single day view on mobile and clicking current day, toggle back to overview
+        if (!isDesktop && isSingleDayView && properties.day === currentDay) {
+          setSingleDayView(false); // Toggle back to overview
+          return; // Skip zoom logic
+        }
+
         setSingleDayView(true); // Switch to Single Day View on selection
 
         // Use pre-calculated bounds or calculate on the fly
@@ -244,8 +253,8 @@ const GeoJsonRoutes = (props) => {
               lineCap: "round",
               lineJoin: "round",
             }}
-            smoothFactor={isZoomedIn ? 0 : 4}
-            noClip={isZoomedIn}
+            smoothFactor={0}
+            noClip={true}
             interactive={false}
           />,
         );
@@ -282,8 +291,8 @@ const GeoJsonRoutes = (props) => {
               lineCap: "round",
               lineJoin: "round",
             }}
-            smoothFactor={isZoomedIn ? 0 : 4}
-            noClip={isZoomedIn}
+            smoothFactor={0}
+            noClip={true}
             interactive={properties.day !== "20"}
             onEachFeature={(feature, layer) => {
               layer.on({
@@ -312,8 +321,8 @@ const GeoJsonRoutes = (props) => {
               lineCap: "round",
               lineJoin: "round",
             }}
-            smoothFactor={isZoomedIn ? 0 : 4}
-            noClip={isZoomedIn}
+            smoothFactor={0}
+            noClip={true}
             interactive={false}
           />,
         );
@@ -356,8 +365,8 @@ const GeoJsonRoutes = (props) => {
                 lineCap: "round",
                 lineJoin: "round",
               }}
-              smoothFactor={isZoomedIn ? 0 : 4}
-              noClip={isZoomedIn}
+              smoothFactor={0}
+              noClip={true}
               interactive={properties.day !== "20"}
               onEachFeature={(feature, layer) => {
                 layer.on({
@@ -396,8 +405,8 @@ const GeoJsonRoutes = (props) => {
             weight: 25,
             opacity: 0,
           }}
-          smoothFactor={isZoomedIn ? 0 : 4}
-          noClip={isZoomedIn}
+          smoothFactor={0}
+          noClip={true}
           interactive={properties.day !== "20"}
           onEachFeature={(feature, layer) => {
             layer.on({

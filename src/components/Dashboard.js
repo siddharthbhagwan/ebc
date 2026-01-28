@@ -256,8 +256,9 @@ const Dashboard = (props) => {
         const initialCenter = calculateCenterOffset(center, currentOffset);
         map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
       } else {
-        // Switch to highlighted route (current day) or fallback to lastZoomedDay or Day 1
-        const targetDayKey = day || lastZoomedDay || "1";
+        // Switch to highlighted route or most recently zoomed day
+        // Priority: lastZoomedDay (if exists) > current highlighted day > Day 1
+        const targetDayKey = lastZoomedDay || day || "1";
         console.log(
           `Target button: Switching to day ${targetDayKey} (current day: ${day}, lastZoomedDay: ${lastZoomedDay})`,
         );
@@ -308,18 +309,19 @@ const Dashboard = (props) => {
 
   // Re-apply bounds when padding-affecting states change or view mode changes
   useEffect(() => {
-    if (isSingleDayView && day && routes[day]) {
+    if (isSingleDayView && day && routes[day] && map) {
       const bounds = getFeatureBounds(routes[day], day, isDesktop);
       if (bounds) {
-        const timer = setTimeout(() => {
+        // Use requestAnimationFrame for smoother animation
+        const frameId = requestAnimationFrame(() => {
           map.invalidateSize();
           map.flyToBounds(bounds, {
             paddingTopLeft: effectivePaddingTopLeft,
             paddingBottomRight: effectivePaddingBottomRight,
-            duration: 0.8,
+            duration: 0.6,
           });
-        }, 150);
-        return () => clearTimeout(timer);
+        });
+        return () => cancelAnimationFrame(frameId);
       }
     }
   }, [
@@ -335,15 +337,16 @@ const Dashboard = (props) => {
 
   // Adjust overview center when legend visibility changes on mobile
   useEffect(() => {
-    if (!isSingleDayView && !isDesktop) {
+    if (!isSingleDayView && !isDesktop && map) {
       const newCenter = calculateCenterOffset(center, currentOffset);
-      const timer = setTimeout(() => {
+      // Use requestAnimationFrame for smoother animation without jitter
+      const frameId = requestAnimationFrame(() => {
         map.invalidateSize();
-        map.flyTo(newCenter, derivedZoom, { duration: 0.8 });
-      }, 150);
-      return () => clearTimeout(timer);
+        map.flyTo(newCenter, derivedZoom, { duration: 0.6 });
+      });
+      return () => cancelAnimationFrame(frameId);
     }
-  }, [showLegend, isSingleDayView, center, derivedZoom, map]);
+  }, [showLegend, isSingleDayView, center, currentOffset, derivedZoom, map, isDesktop]);
 
   const handleNavigation = useCallback(
     (direction) => {

@@ -143,13 +143,6 @@ const POI = (props) => {
         .map((d) => d.trim())
         .includes(currentDayStr);
 
-      // Filter out markers that aren't relevant to the current day when zoomed in
-      // We keep: dest, matches day, start of route, or Airports.
-      // Houses are only kept if they belong to the current day (start or dest).
-      if (isZoomedIn && !isDayMatch && !isDest && !isStart && !isAirport) {
-        return;
-      }
-
       // Snap to route coordinates if it's the start or end of the current day
       let snappedPoint = markerPoint.point;
       if (isZoomedIn) {
@@ -157,13 +150,6 @@ const POI = (props) => {
           snappedPoint = [destCoord[1], destCoord[0]];
         } else if (isStart && startCoord) {
           snappedPoint = [startCoord[1], startCoord[0]];
-        }
-      }
-
-      // On acclimatization days (Rest Days), only show the circled house
-      if (isZoomedIn && isCurrentDayRestDay) {
-        if (!isDest || !isHouse) {
-          return;
         }
       }
 
@@ -183,7 +169,7 @@ const POI = (props) => {
       const borderColor = getColorForElevation(altM);
 
       const rippleClass =
-        isCurrentDayRestDay && isDayMatch && isHouse ? "rest-day-ripple" : "";
+        isCurrentDayRestDay && isDest && isHouse ? "rest-day-ripple" : "";
 
       let icon;
       if (shouldCircle) {
@@ -199,8 +185,8 @@ const POI = (props) => {
               : 17
           : isAirport
             ? isDesktop
-              ? 21
-              : 20
+              ? 20
+              : 19
             : markerPoint.size[0] + (isDesktop ? 5 : 4);
         const imgSize = isHouse
           ? isDesktop
@@ -224,12 +210,17 @@ const POI = (props) => {
 
         const pulseClass = isSingleDayView ? "pulsating-circle" : "";
 
+        // Create larger tap target on mobile for better accessibility
+        const tapTargetSize = !isDesktop ? Math.max(wrapSize + 20, 44) : wrapSize;
+
         icon = L.divIcon({
           className: "dest-circle-wrapper",
-          iconSize: [wrapSize, wrapSize],
-          iconAnchor: [wrapSize / 2, wrapSize / 2],
-          html: `<div class="rest-day-circle ${pulseClass} ${rippleClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: 100%; height: 100%;">
-                  <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
+          iconSize: [tapTargetSize, tapTargetSize],
+          iconAnchor: [tapTargetSize / 2, tapTargetSize / 2],
+          html: `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <div class="rest-day-circle ${pulseClass} ${rippleClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: ${wrapSize}px; height: ${wrapSize}px; position: relative;">
+                    <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
+                  </div>
                  </div>`,
           shadowUrl: null,
         });
@@ -254,18 +245,25 @@ const POI = (props) => {
           adjustedSize = [adjustedSize[0] - 1, adjustedSize[1] - 1];
         }
 
+        // Create larger tap target on mobile for better accessibility
+        const tapTargetSize = !isDesktop
+          ? [Math.max(adjustedSize[0] + 20, 44), Math.max(adjustedSize[1] + 20, 44)]
+          : adjustedSize;
+
         icon = L.divIcon({
           className: "standard-poi-wrapper",
-          iconSize: adjustedSize,
-          iconAnchor: [adjustedSize[0] / 2, adjustedSize[1] / 2],
+          iconSize: tapTargetSize,
+          iconAnchor: [tapTargetSize[0] / 2, tapTargetSize[1] / 2],
           html: `
-            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; position: relative;">
-               <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
-               ${
-                 showUnderscore
-                   ? `<div style="position: absolute; bottom: -7px; width: 140%; height: 3.5px; background: #000; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>`
-                   : ""
-               }
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+               <div style="width: ${adjustedSize[0]}px; height: ${adjustedSize[1]}px; position: relative;">
+                 <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
+                 ${
+                   showUnderscore
+                     ? `<div style="position: absolute; bottom: -7px; width: 140%; height: 3.5px; background: #000; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);"></div>`
+                     : ""
+                 }
+               </div>
             </div>`,
           shadowUrl: null,
         });
@@ -274,7 +272,8 @@ const POI = (props) => {
       // Tooltip visibility: Permanent in Overview mode OR if it belongs to current day/start/dest
       // This ensures names are always visible in Overview and for relevant POIs in Zoomed view
       // Always show all names, even on mobile overview
-      const isTooltipPermanent = !isSingleDayView || isDayMatch || isDest || isStart;
+      const isTooltipPermanent =
+        !isSingleDayView || isDayMatch || isDest || isStart;
 
       arr.push(
         <Marker
@@ -293,9 +292,27 @@ const POI = (props) => {
               permanent={true}
               className={"tooltipLabel"}
               direction={markerPoint.properties.direction}
+              onclick={clickHandler}
               // offset={markerPoint.properties.offset || [0, 0]}
             >
-              <div style={{ fontSize: isZoomedIn ? "14px" : "11px" }}>
+              <div
+                style={{
+                  fontSize: isZoomedIn ? "14px" : "11px",
+                  cursor: "pointer",
+                }}
+                onClick={(e) => {
+                  // Create a synthetic event that matches the marker click handler signature
+                  const syntheticEvent = {
+                    target: {
+                      options: {
+                        properties: markerPoint.properties,
+                      },
+                    },
+                    latlng: snappedPoint,
+                  };
+                  clickHandler(syntheticEvent);
+                }}
+              >
                 <div style={{ fontWeight: isZoomedIn ? "600" : "normal" }}>
                   {markerPoint.properties.name}
                 </div>
@@ -344,6 +361,13 @@ const POI = (props) => {
     // instead of the composite string "2, 3, 19 & 20"
     const updatedProps = { ...markerProps, day: String(targetDay) };
     dispatchLayerDetails(updatedProps);
+
+    // Toggle behavior: if already in single day view on mobile, toggle back to overview
+    if (!isDesktop && isSingleDayView && markerDays.includes(currentDayStr)) {
+      setSingleDayView(false); // Toggle back to overview
+      return; // Skip zoom logic
+    }
+
     setSingleDayView(true); // Switch to Single Day View on selection
 
     // Recalculate bounds based on the full day's route collection
