@@ -5,6 +5,13 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-01-30
+
+### Changed
+- **Code Maintenance**: Refactored React hooks to resolve ESLint warnings and optimize performance.
+- **Dependency Optimization**: Cleaned up unnecessary hook dependencies.
+- **Repository Health**: Squashed development commits for a cleaner branch history.
+
 ## [1.5.0] - 2026-01-30
 
 ### Added

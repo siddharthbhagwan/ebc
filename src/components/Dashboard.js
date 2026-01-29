@@ -155,7 +155,7 @@ const Dashboard = (props) => {
   const derivedZoom = useMemo(() => {
     if (isDesktop) return zoom;
     return isLandscape ? ZOOM_LANDSCAPE : ZOOM_MOBILE;
-  }, [isDesktop, isLandscape, zoom]);
+  }, [isLandscape, zoom]);
 
   const { nextDay, prevDay } = useDays(day, dispatchLayerDetails);
 
@@ -168,7 +168,7 @@ const Dashboard = (props) => {
     return isLandscape
       ? [60, showLegend ? 100 : 60]
       : [40, showLegend ? 90 : 60];
-  }, [isDesktop, showLegend, isLandscape]);
+  }, [showLegend, isLandscape]);
 
   const effectivePaddingBottomRight = useMemo(() => {
     if (isDesktop) {
@@ -176,13 +176,13 @@ const Dashboard = (props) => {
     }
     // Mobile: landscape needs less bottom padding due to shorter dashboard
     return isLandscape ? [60, 120] : [40, 150];
-  }, [isDesktop, isLandscape]);
+  }, [isLandscape]);
 
   // Memoized legend offset calculation
   const currentOffset = useMemo(() => {
     const legendOffset = showLegend ? 0.004 : 0;
     return isDesktop ? DESKTOP_OFFSET : BASE_OFFSET + legendOffset;
-  }, [isDesktop, showLegend]);
+  }, [showLegend]);
 
   // Memoized icon sizes
   const iconSizes = useMemo(
@@ -193,7 +193,7 @@ const Dashboard = (props) => {
       toolIcon: isDesktop ? "29px" : "27px",
       maxIcon: isDesktop ? "24px" : "18px",
     }),
-    [isDesktop],
+    [],
   );
 
   // Memoized formatAlt function
@@ -220,7 +220,7 @@ const Dashboard = (props) => {
   // Memoized title font size
   const titleFontSize = useMemo(
     () => getTitleFontSize(props.name || "", isDesktop),
-    [props.name, isDesktop],
+    [props.name],
   );
 
   // Memoized routes data (cached)
@@ -316,7 +316,6 @@ const Dashboard = (props) => {
     derivedZoom,
     day,
     lastZoomedDay,
-    isDesktop,
     effectivePaddingTopLeft,
     effectivePaddingBottomRight,
   ]);
@@ -372,6 +371,7 @@ const Dashboard = (props) => {
     isToolsOpen,
     effectivePaddingTopLeft,
     effectivePaddingBottomRight,
+    routes,
   ]);
 
   // Adjust overview center when legend visibility changes on mobile
@@ -395,7 +395,7 @@ const Dashboard = (props) => {
       // Mark as mounted even if conditions aren't met
       isInitialMount.current = false;
     }
-  }, [showLegend, isSingleDayView, center, currentOffset, derivedZoom, map, isDesktop]);
+  }, [showLegend, isSingleDayView, center, currentOffset, derivedZoom, map]);
 
   const handleToggleTools = useCallback(() => {
     setIsToolsOpen((prev) => {
@@ -579,7 +579,7 @@ const Dashboard = (props) => {
         </div>
       </div>
     ),
-    [isDesktop, isSingleDayView, toggleTargetView],
+    [isSingleDayView, toggleTargetView, handleToggleTools],
   );
 
   return (
