@@ -760,7 +760,7 @@ generic-dashboard {
 
 /* Mobile Metrics Row */
 .mobile-metrics-row {
-  height: 28px;
+  height: 20px;
   background: #fdfdfd;
   border-top: 2px solid #9ca3af;
   display: flex;
@@ -984,8 +984,8 @@ generic-dashboard {
 }
 
 .branding-strip--mobile {
-  height: 40px;
-  gap: 3px;
+  height: 56px;
+  gap: 2px;
 }
 
 .branding-title {

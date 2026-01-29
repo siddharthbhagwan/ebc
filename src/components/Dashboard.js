@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import ReactGA from "react-ga4";
@@ -15,6 +15,7 @@ import { mapDispatchToProps } from "../utils/utils";
 import useDays from "../hooks/useDays";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
+import packageJson from "../../package.json";
 
 import "../resources/css/dashboard.css";
 
@@ -116,6 +117,7 @@ const Dashboard = (props) => {
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
+  const isInitialMount = useRef(true);
 
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
@@ -286,6 +288,7 @@ const Dashboard = (props) => {
     center,
     currentOffset,
     derivedZoom,
+    day,
     lastZoomedDay,
     isDesktop,
     effectivePaddingTopLeft,
@@ -312,16 +315,26 @@ const Dashboard = (props) => {
     if (isSingleDayView && day && routes[day] && map) {
       const bounds = getFeatureBounds(routes[day], day, isDesktop);
       if (bounds) {
-        // Use requestAnimationFrame for smoother animation
-        const frameId = requestAnimationFrame(() => {
+        // Skip animation on initial mount to prevent jitter
+        if (isInitialMount.current) {
           map.invalidateSize();
           map.flyToBounds(bounds, {
             paddingTopLeft: effectivePaddingTopLeft,
             paddingBottomRight: effectivePaddingBottomRight,
-            duration: 0.6,
+            animate: false,
           });
-        });
-        return () => cancelAnimationFrame(frameId);
+        } else {
+          // Use requestAnimationFrame for smoother animation
+          const frameId = requestAnimationFrame(() => {
+            map.invalidateSize();
+            map.flyToBounds(bounds, {
+              paddingTopLeft: effectivePaddingTopLeft,
+              paddingBottomRight: effectivePaddingBottomRight,
+              duration: 0.6,
+            });
+          });
+          return () => cancelAnimationFrame(frameId);
+        }
       }
     }
   }, [
@@ -339,12 +352,22 @@ const Dashboard = (props) => {
   useEffect(() => {
     if (!isSingleDayView && !isDesktop && map) {
       const newCenter = calculateCenterOffset(center, currentOffset);
-      // Use requestAnimationFrame for smoother animation without jitter
-      const frameId = requestAnimationFrame(() => {
+      // Skip animation on initial mount to prevent jitter
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
         map.invalidateSize();
-        map.flyTo(newCenter, derivedZoom, { duration: 0.6 });
-      });
-      return () => cancelAnimationFrame(frameId);
+        map.setView(newCenter, derivedZoom, { animate: false });
+      } else {
+        // Use requestAnimationFrame for smoother animation without jitter
+        const frameId = requestAnimationFrame(() => {
+          map.invalidateSize();
+          map.flyTo(newCenter, derivedZoom, { duration: 0.6 });
+        });
+        return () => cancelAnimationFrame(frameId);
+      }
+    } else if (isInitialMount.current) {
+      // Mark as mounted even if conditions aren't met
+      isInitialMount.current = false;
     }
   }, [showLegend, isSingleDayView, center, currentOffset, derivedZoom, map, isDesktop]);
 
@@ -643,7 +666,17 @@ const Dashboard = (props) => {
                       className={`branding-title branding-title--${isDesktop ? "desktop" : "mobile"}`}
                     >
                       Everest Base Camp 3 Pass Trek, Nepal
+                      {isDesktop && (
+                        <span style={{ fontSize: "0.75em", opacity: 0.8, marginLeft: "8px" }}>
+                          <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
+                        </span>
+                      )}
                     </div>
+                    {!isDesktop && (
+                      <div style={{ fontSize: "9px", color: "#7f8c8d", fontWeight: 700, letterSpacing: "0.8px" }}>
+                        <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
+                      </div>
+                    )}
                     {props.attribution && (
                       <div
                         className={`branding-attribution branding-attribution--${isDesktop ? "desktop" : "mobile"}`}

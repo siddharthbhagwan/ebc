@@ -12,7 +12,7 @@ const initialState = {
   attribution:
     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> | <a href="https://leafletjs.com/">Leaflet</a>',
   center: [27.840457443855108, 86.76420972837559],
-  zoom: 11.3,
+  zoom: 11.2,
   zoomSnap: 0.1,
   hoverColor: "#1EBBD7",
   markerZoom: 14.5,

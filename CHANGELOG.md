@@ -5,6 +5,42 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-01-29
+
+### Added
+- **Smart Altitude Display**: Altitudes now appear dynamically based on view mode and zoom level
+  - Overview mode (not zoomed): Names only - prevents label crowding
+  - Overview mode (zoomed in): Names + altitudes - complete view of all locations
+  - Single day view: Names + altitudes always visible
+  - Provides a clear view with all information visible when needed without overwhelming the map
+- **Version Display**: Application version number now visible in toolbar title (smaller font, subtle styling)
+
+### Fixed
+- **Target Button Navigation**: Fixed stale closure bug where target button would zoom to Day 1 instead of the currently navigated day
+  - Added 'day' to toggleTargetView dependency array
+  - Target button now correctly respects arrow key navigation in overview mode
+- **Page Load Jitter**: Eliminated jittery map adjustments on initial page load
+  - Map bounds and center adjustments now skip animations on first render
+  - Subsequent changes (like legend toggle) still animate smoothly
+  - Uses `isInitialMount` ref to track initial vs. subsequent renders
+- **Hover Tooltip Arrow Display**: Fixed incorrect arrow display when hovering over POI markers that shouldn't show elevation changes
+  - Route properties now properly merged with marker data during hover events
+  - Prevents arrows from appearing on markers where descent is "0" or unavailable
+
+### Changed
+- **POI Label Cleanup**: Simplified location names for better readability
+  - Removed "Pass" suffix from passes: "Kongma La Pass" → "Kongma La"
+  - Removed "Pass" suffix from passes: "Cho La Pass" → "Cho La"  
+  - Removed "Pass" suffix from passes: "Renjo La Pass" → "Renjo La"
+  - Removed "Summit" suffix from summits: "Chhukung Ri Summit" → "Chhukung Ri"
+  - Removed "Summit" suffix from summits: "Kala Patthar Summit" → "Kala Patthar"
+  - Removed "Summit" suffix from summits: "Gokyo Ri Summit" → "Gokyo Ri"
+  - Renamed "Lukla Airport" to simply "Lukla"
+- **Mobile Icon Sizing**: Reduced house icon circle by 1px on mobile for improved visual balance
+  - Rest days: 18px → 17px
+  - Non-rest days: 17px → 16px
+- **Desktop Zoom Level**: Reduced initial desktop zoom from 11.3 to 11.2 for better overview perspective
+
 ## [1.2.0] - 2026-01-29
 
 ### Added

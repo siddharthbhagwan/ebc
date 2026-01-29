@@ -179,10 +179,10 @@ const POI = (props) => {
           ? isCurrentDayRestDay
             ? isDesktop
               ? 17
-              : 18
+              : 17
             : isDesktop
               ? 16
-              : 17
+              : 16
           : isAirport
             ? isDesktop
               ? 20
@@ -316,7 +316,7 @@ const POI = (props) => {
                 <div style={{ fontWeight: isZoomedIn ? "600" : "normal" }}>
                   {markerPoint.properties.name}
                 </div>
-                {isZoomedIn && markerPoint.properties.startAlt && (
+                {(isSingleDayView || isZoomedIn) && markerPoint.properties.startAlt && (
                   <div
                     style={{
                       fontSize: "0.9em",
@@ -422,7 +422,17 @@ const POI = (props) => {
       targetDay = markerDays[0] || currentDay;
     }
 
-    const updatedProps = { ...markerProps, day: String(targetDay) };
+    // Fetch route data for the target day to get full properties including descent, total_climb, etc.
+    const routesData = getDayWiseDataG();
+    const routeForDay = routesData[targetDay];
+    const routeProps = routeForDay?.features?.[0]?.properties || {};
+
+    // Merge route properties with marker properties, prioritizing marker props for name and altitude
+    const updatedProps = { 
+      ...routeProps,
+      ...markerProps, 
+      day: String(targetDay) 
+    };
     dispatchLayerDetails(updatedProps);
   };
 
