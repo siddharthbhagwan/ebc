@@ -158,7 +158,7 @@ const markers = [
       day: "7",
       color: "red",
       icon: summitIcon,
-      name: "Chhukung Ri Summit",
+      name: "Chhukung Ri",
       startAlt: "18,058",
       direction: "right",
     },
@@ -184,7 +184,7 @@ const markers = [
     properties: {
       day: "12",
       icon: summitIcon,
-      name: "Kala Patthar Summit",
+      name: "Kala Patthar",
       startAlt: "18,519",
       direction: "auto",
     },
@@ -197,7 +197,7 @@ const markers = [
     properties: {
       day: "16",
       icon: summitIcon,
-      name: "Gokyo Ri Summit",
+      name: "Gokyo Ri",
       startAlt: "17,989",
       direction: "top",
     },
@@ -210,7 +210,7 @@ const markers = [
     properties: {
       day: "8",
       icon: passIcon,
-      name: "Kongma La Pass",
+      name: "Kongma La",
       startAlt: "18,058",
       direction: "bottom",
     },
@@ -223,7 +223,7 @@ const markers = [
     properties: {
       day: "14",
       icon: passIcon,
-      name: "Cho La Pass",
+      name: "Cho La",
       startAlt: "17,625",
       direction: "top",
     },
@@ -236,7 +236,7 @@ const markers = [
     properties: {
       day: "18",
       icon: passIcon,
-      name: "Renjo La Pass",
+      name: "Renjo La",
       startAlt: "17,680",
       direction: "left",
     },
@@ -249,7 +249,7 @@ const markers = [
     properties: {
       day: "0 & 20",
       icon: airportIcon,
-      name: "Lukla Airport",
+      name: "Lukla",
       startAlt: "9,383",
       direction: "auto",
     },
