@@ -18,7 +18,14 @@ const MapContainer = (props) => {
   const mobileOffset = isLandscape ? 0.016 : 0.024;
   const desktopOffset = 0.008;
   const currentOffset = isDesktop ? desktopOffset : mobileOffset;
-  const initialCenter = [center[0] - currentOffset, center[1]];
+  
+  // Robustly handle center whether it's [lat, lng] or {lat, lng}
+  const lat = center && (Array.isArray(center) ? center[0] : center.lat);
+  const lng = center && (Array.isArray(center) ? center[1] : center.lng);
+  
+  const initialCenter = (lat !== undefined && lng !== undefined) 
+    ? [lat - currentOffset, lng] 
+    : [27.840457443855108, 86.76420972837559]; // Fallback to a default center
 
   // Calculate zoom based on device type and orientation
   const ZOOM_MOBILE = 10.6;

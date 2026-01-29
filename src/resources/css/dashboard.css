@@ -280,6 +280,7 @@ generic-dashboard {
     border-radius: 0;
     box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
     border: 2px solid #d1d5db;
+    border-top: 2px solid #cbd5e0;
   }
 }
 
@@ -760,7 +761,7 @@ generic-dashboard {
 
 /* Mobile Metrics Row */
 .mobile-metrics-row {
-  height: 20px;
+  height: 24px;
   background: #fdfdfd;
   border-top: 2px solid #9ca3af;
   display: flex;
@@ -984,8 +985,8 @@ generic-dashboard {
 }
 
 .branding-strip--mobile {
-  height: 56px;
-  gap: 2px;
+  height: 48px;
+  gap: 1px;
 }
 
 .branding-title {
@@ -1001,7 +1002,7 @@ generic-dashboard {
 }
 
 .branding-title--mobile {
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .branding-attribution {
@@ -1014,7 +1015,7 @@ generic-dashboard {
 }
 
 .branding-attribution--mobile {
-  font-size: 8.5px;
+  font-size: 8px;
 }
 
 /* Control Icons */
@@ -1235,4 +1236,162 @@ generic-dashboard {
 /* Arrow Icon */
 .arrow-icon-rotated {
   transform: rotate(180deg);
+}
+
+/* Trek Statistics Card */
+.statistics-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 132px - env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 999;
+}
+
+@media (min-width: 1025px) {
+  .statistics-backdrop {
+    height: calc(100% - 160px);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  .statistics-backdrop {
+    height: calc(100% - 100px - env(safe-area-inset-bottom));
+  }
+}
+
+.statistics-card {
+  position: fixed;
+  bottom: calc(112px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px 12px 0 0;
+  border: 2px solid #cbd5e0;
+  border-bottom: none;
+  padding: 12px 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  width: 100%;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1025px) {
+  .statistics-card {
+    bottom: 172px; /* 152px height + 20px bottom offset */
+    width: 320px;
+    left: auto;
+    right: 20px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .statistics-card {
+    bottom: calc(112px + env(safe-area-inset-bottom));
+    padding: 16px 20px 24px 20px;
+  }
+
+  .statistics-card h3 {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #2c3e50;
+    margin-bottom: 2px;
+  }
+
+  .statistics-card .stat-row {
+    font-size: 11px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f8f9fa;
+  }
+
+  .statistics-card .high-passes-section h4 {
+    font-size: 12px;
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  .statistics-card {
+    bottom: 84px;
+  }
+}
+
+/* Top border on dashboard when statistics is open */
+.dashboard-container--mobile.statistics-open {
+  border-top: 2px solid #cbd5e0;
+}
+
+.statistics-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+}
+
+.statistics-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  margin: 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  font-size: 10.5px;
+}
+
+@media (min-width: 1025px) {
+  .stat-row {
+    font-size: 12.5px;
+    padding: 2px 0;
+  }
+  
+  .statistics-card h3 {
+    font-size: 19px;
+    margin-bottom: 12px;
+  }
+
+  .high-passes-section h4 {
+    font-size: 16px;
+  }
+}
+
+.stat-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.high-passes-section {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.high-passes-section h4 {
+  margin: 0 0 3px 0;
+  color: #2d3748;
+  font-size: 13.5px;
+  letter-spacing: 0.3px;
+}
+
+.high-passes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  margin-bottom: 20px;
 }

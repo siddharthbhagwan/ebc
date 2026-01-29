@@ -111,6 +111,11 @@ const GeoJsonRoutes = (props) => {
           return;
         }
 
+        // Validate coordinates
+        if (!geometry.coordinates || geometry.coordinates.length < 2 || isNaN(geometry.coordinates[0]) || isNaN(geometry.coordinates[1])) {
+          return;
+        }
+
         const pointLatlng = [geometry.coordinates[1], geometry.coordinates[0]];
         const elevation = geometry.coordinates[2];
         const color = getColorForElevation(elevation);
@@ -189,10 +194,13 @@ const GeoJsonRoutes = (props) => {
         const stored = preCalculatedBounds[properties.day];
         if (stored) {
           const boundData = isDesktop ? stored.desktop : stored.mobile;
-          bounds = L.latLngBounds(boundData[0], boundData[1]);
+          if (boundData && boundData[0] && boundData[1]) {
+            bounds = L.latLngBounds(boundData[0], boundData[1]);
+          }
         } else {
           const allLatlngs = geometry.coordinates.flatMap((line) =>
-            line.map((coord) => [coord[1], coord[0]]),
+            line.filter(coord => Array.isArray(coord) && coord.length >= 2 && !isNaN(coord[0]) && !isNaN(coord[1]))
+                .map((coord) => [coord[1], coord[0]]),
           );
           if (allLatlngs.length > 0) {
             bounds = L.latLngBounds(allLatlngs);

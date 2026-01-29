@@ -5,6 +5,47 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-30
+
+### Added
+- **Refined Statistics UI**: Improved typography and layout for better readability.
+- **Robust Geodata Validation**: Implemented coordinate sanitization to prevent "Invalid LatLng" runtime errors during rapid navigation.
+
+### Changed
+- **Trek Statistics**:
+  - Normalized all altitude and climb/descent data to feet for consistent display.
+  - Corrected high point elevations for Chhukung Ri (18,209 ft), Kongma La (18,159 ft), and Gokyo Ri (17,575 ft).
+  - Switched labels to uppercase for impact (TOTAL ASCENT, MAX ALTITUDE, etc.).
+  - Added triangle icon to Trek Statistics header.
+  - Removed space between ascent/descent triangles and digits.
+- **Info Component**:
+  - Redesigned with a dedicated "Click here to close" section and separator line.
+  - Adjusted mobile metrics bar height and branding strip (Rangola) for better visibility on small screens.
+  - Integrated toolbar closure: closing the toolbar now automatically closes the statistics tab.
+- **Layout**:
+  - Full-content width map on desktop with non-blurring background when stats are open.
+  - Thinner dashboard borders (2px) and optimized spacing.
+
+## [1.4.0] - 2026-01-29
+
+### Added
+- **Trek Statistics**: New statistics overlay displaying comprehensive trek metrics
+  - Total Distance: 130.7 km
+  - Total Climb and Descent
+  - Maximum Altitude: 18,192 ft
+  - Active Days: 19
+  - Rest Days: 0
+  - Sortable HIGH PASSES section (click to cycle between altitude descent/ascent/day order)
+- **Day Badges**: Visual indicators for special days
+  - Pass badges (Days 8, 14, 18) showing pass names
+  - Summit badges (Days 7, 12, 16) showing summit names
+  - Displayed on both desktop and mobile day indicators
+- **Statistics Button**: Sigma (Σ) button in toolbar with visual feedback when active
+
+### Changed
+- **About Section**: Updated with "Click anywhere to close" instruction
+- **Info Modal**: Improved styling for better consistency
+
 ## [1.3.0] - 2026-01-29
 
 ### Added

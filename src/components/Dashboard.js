@@ -15,6 +15,7 @@ import { mapDispatchToProps } from "../utils/utils";
 import useDays from "../hooks/useDays";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
+import { calculateTrekStats, getPassInfo, getSummitInfo, getSortedPasses } from "../utils/trekStats";
 import packageJson from "../../package.json";
 
 import "../resources/css/dashboard.css";
@@ -27,9 +28,15 @@ const DESKTOP_OFFSET = 0.008;
 
 // Memoized helper to calculate center offset
 const calculateCenterOffset = (center, offset) => {
+  if (!center) return [27.840457443855108, 86.76420972837559];
   const lat = Array.isArray(center) ? center[0] : center.lat;
   const lng = Array.isArray(center) ? center[1] : center.lng;
-  return [lat - offset, lng];
+  
+  if (lat === undefined || lng === undefined || isNaN(lat) || isNaN(lng)) {
+    return [27.840457443855108, 86.76420972837559];
+  }
+  
+  return [lat - (offset || 0), lng];
 };
 
 // Memoized title font size calculator
@@ -59,7 +66,9 @@ const getFeatureBounds = (input, dayOverride = null, isDesktopView = true) => {
   if (targetDayId && preCalculatedBounds[targetDayId]) {
     const mode = isDesktopView ? "desktop" : "mobile";
     const pBounds = preCalculatedBounds[targetDayId][mode];
-    if (pBounds) return L.latLngBounds(pBounds);
+    if (pBounds && pBounds.length >= 2 && pBounds[0] && pBounds[1]) {
+      return L.latLngBounds(pBounds);
+    }
   }
 
   // Fallback: calculate bounds from GeoJSON (rarely needed)
@@ -79,13 +88,25 @@ const getFeatureBounds = (input, dayOverride = null, isDesktopView = true) => {
     const coords = feature.geometry.coordinates;
 
     if (feature.geometry.type === "Point") {
-      allLatlngs.push([coords[1], coords[0]]);
+      if (Array.isArray(coords) && coords.length >= 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+        allLatlngs.push([coords[1], coords[0]]);
+      }
     } else if (feature.geometry.type === "LineString") {
-      coords.forEach((c) => allLatlngs.push([c[1], c[0]]));
+      coords.forEach((c) => {
+        if (Array.isArray(c) && c.length >= 2 && !isNaN(c[0]) && !isNaN(c[1])) {
+          allLatlngs.push([c[1], c[0]]);
+        }
+      });
     } else if (feature.geometry.type === "MultiLineString") {
-      coords.forEach((line) =>
-        line.forEach((c) => allLatlngs.push([c[1], c[0]])),
-      );
+      coords.forEach((line) => {
+        if (Array.isArray(line)) {
+          line.forEach((c) => {
+            if (Array.isArray(c) && c.length >= 2 && !isNaN(c[0]) && !isNaN(c[1])) {
+              allLatlngs.push([c[1], c[0]]);
+            }
+          });
+        }
+      });
     }
   });
 
@@ -117,7 +138,12 @@ const Dashboard = (props) => {
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
+  const [showTrekStats, setShowTrekStats] = useState(false);
+  const [passSortOrder, setPassSortOrder] = useState('day');
   const isInitialMount = useRef(true);
+
+  // Calculate trek statistics once
+  const trekStats = useMemo(() => calculateTrekStats(), []);
 
   //  no altitude data
   const isPlace = startAlt === "0" && endAlt === "0";
@@ -177,8 +203,8 @@ const Dashboard = (props) => {
       const val = parseInt(alt.toString().replace(/,/g, ""));
       if (isNaN(val)) return alt;
       return unit === "km"
-        ? `${Math.round(val * 0.3048).toLocaleString()}m`
-        : `${val.toLocaleString()}ft`;
+        ? `${Math.round(val * 0.3048).toLocaleString()} m`
+        : `${val.toLocaleString()} ft`;
     },
     [unit],
   );
@@ -371,10 +397,21 @@ const Dashboard = (props) => {
     }
   }, [showLegend, isSingleDayView, center, currentOffset, derivedZoom, map, isDesktop]);
 
+  const handleToggleTools = useCallback(() => {
+    setIsToolsOpen((prev) => {
+      const newState = !prev;
+      if (!newState) {
+        setShowTrekStats(false);
+      }
+      return newState;
+    });
+  }, []);
+
   const handleNavigation = useCallback(
     (direction) => {
       const targetFeature = direction === "next" ? nextDay() : prevDay();
       setIsToolsOpen(false);
+      setShowTrekStats(false);
 
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
@@ -529,7 +566,7 @@ const Dashboard = (props) => {
           <div
             onClick={(e) => {
               e.stopPropagation();
-              setIsToolsOpen((prev) => !prev);
+              handleToggleTools();
             }}
             className={`icon control-icon-button control-icon-button--bottom control-icon-button--${isDesktop ? "desktop" : "mobile"}`}
           >
@@ -548,7 +585,7 @@ const Dashboard = (props) => {
   return (
     <Control position="bottomright">
       <div
-        className={`dashboard-container dashboard-container--${isDesktop ? "desktop" : "mobile"}`}
+        className={`dashboard-container dashboard-container--${isDesktop ? "desktop" : "mobile"}${showTrekStats ? " statistics-open" : ""}`}
       >
         {/* Top Section: Main content row */}
         <div className="dashboard-top-section">
@@ -581,18 +618,57 @@ const Dashboard = (props) => {
                           e.stopPropagation();
                           ReactGA.event({
                             category: "UI",
+                            action: "Toggle Stats",
+                            label: `${showTrekStats ? "Hide" : "Show"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                          });
+                          setShowTrekStats(!showTrekStats);
+                        }}
+                        className="tool-icon-button"
+                        title="Trek Statistics"
+                      >
+                        <div 
+                          className="tool-icon-image"
+                          style={{ 
+                            fontSize: isDesktop ? '18px' : '16px',
+                            fontWeight: '700',
+                            color: '#4a5568',
+                            userSelect: 'none',
+                            lineHeight: '1',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: iconSizes.toolIcon,
+                            height: iconSizes.toolIcon,
+                            background: showTrekStats ? '#e3f2fd' : '#f9f9f9',
+                            border: showTrekStats ? '1.5px solid #2563eb' : '1.5px solid #bdc3c7',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          Σ
+                        </div>
+                      </div>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          ReactGA.event({
+                            category: "UI",
                             action: "Toggle Legend",
-                            label: showLegend ? "Hide" : "Show",
+                            label: `${showLegend ? "Hide" : "Show"} - ${isDesktop ? "Desktop" : "Mobile"}`,
                           });
                           toggleLegend();
                         }}
                         className="tool-icon-button"
+                        title="Toggle Legend"
                       >
                         <img
                           src={legendIcon}
                           width={iconSizes.toolIcon}
                           alt="Toggle Legend"
                           className="tool-icon-image"
+                          style={{
+                            background: showLegend ? '#e3f2fd' : '#f9f9f9',
+                            border: showLegend ? '1.5px solid #2563eb' : '1.5px solid #bdc3c7'
+                          }}
                         />
                       </div>
                       <div
@@ -647,6 +723,7 @@ const Dashboard = (props) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsToolsOpen(false);
+                        setShowTrekStats(false);
                       }}
                       className="close-button-wrapper"
                     >
@@ -791,6 +868,36 @@ const Dashboard = (props) => {
                         <div className="day-indicator">
                           <span className="day-label-desktop">DAY</span>
                           <span className="day-value-desktop">{props.day}</span>
+                          {getPassInfo(props.day) && (
+                            <span
+                              style={{
+                                marginLeft: '8px',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: '#fff',
+                                backgroundColor: getPassInfo(props.day).color,
+                              }}
+                            >
+                              Pass
+                            </span>
+                          )}
+                          {getSummitInfo(props.day) && (
+                            <span
+                              style={{
+                                marginLeft: '8px',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                fontSize: '11px',
+                                fontWeight: '600',
+                                color: '#fff',
+                                backgroundColor: getSummitInfo(props.day).color,
+                              }}
+                            >
+                              Summit
+                            </span>
+                          )}
                         </div>
 
                         {/* Distance and Time */}
@@ -852,6 +959,42 @@ const Dashboard = (props) => {
                 <div className="day-indicator-mobile">
                   <span className="day-label-mobile">DAY</span>
                   <span className="day-value-mobile">{props.day}</span>
+                  {getPassInfo(props.day) && (
+                    <span
+                      style={{
+                        marginLeft: '6px',
+                        padding: '1px 5px',
+                        borderRadius: '3px',
+                        fontSize: '9px',
+                        lineHeight: '1.1',
+                        fontWeight: '700',
+                        color: '#fff',
+                        backgroundColor: getPassInfo(props.day).color,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      PASS
+                    </span>
+                  )}
+                  {getSummitInfo(props.day) && (
+                    <span
+                      style={{
+                        marginLeft: '6px',
+                        padding: '1px 5px',
+                        borderRadius: '3px',
+                        fontSize: '9px',
+                        lineHeight: '1.1',
+                        fontWeight: '700',
+                        color: '#fff',
+                        backgroundColor: getSummitInfo(props.day).color,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      SUMMIT
+                    </span>
+                  )}
                 </div>
 
                 {/* Distance and Time, if present */}
@@ -898,7 +1041,7 @@ const Dashboard = (props) => {
           {/* Right Side: Toolbar and Next Arrow */}
           <div className="right-side-container">
             {/* Toolbar Area */}
-            {!isToolsOpen && <div className="toolbar-area">{ControlIcons}</div>}
+            {(isDesktop || !isToolsOpen || props.showInfo) && <div className="toolbar-area">{ControlIcons}</div>}
 
             {/* Right Arrow Slab */}
             <div
@@ -918,6 +1061,71 @@ const Dashboard = (props) => {
           </div>
         </div>
       </div>
+
+      {/* Trek Statistics Overlay */}
+      {showTrekStats && (
+        <>
+          <div
+            className="statistics-backdrop"
+            onClick={() => setShowTrekStats(false)}
+          />
+          <div className="statistics-card">
+            <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="icon-triangle" style={{ transform: 'rotate(-90deg)', borderRightColor: '#2c3e50' }}></div>
+              TREK STATISTICS
+            </h3>
+            <div className="statistics-content">
+              <div className="stat-row">
+                <span className="stat-label">TOTAL DISTANCE</span>
+                <span className="stat-value">
+                  {unit === "km" ? `${trekStats.totalDistance} km` : `${(trekStats.totalDistance * 0.621371).toFixed(1)} mi`}
+                </span>
+              </div>
+              <div className="stat-row">
+                <span className="stat-label">TOTAL ASCENT</span>
+                <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
+                  ▲{formatAlt(trekStats.totalClimb)}
+                </span>
+              </div>
+              <div className="stat-row">
+                <span className="stat-label">TOTAL DESCENT</span>
+                <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
+                  ▼{formatAlt(trekStats.totalDescent)}
+                </span>
+              </div>
+              <div className="stat-row">
+                <span className="stat-label">MAX ALTITUDE</span>
+                <span className="stat-value" style={{ fontWeight: '800' }}>{formatAlt(trekStats.maxAltitude)}</span>
+              </div>
+              <div className="stat-row">
+                <span className="stat-label">DAYS (ACTIVE/REST)</span>
+                <span className="stat-value">{trekStats.activeDays}/{trekStats.restDays}</span>
+              </div>
+            </div>
+
+            <div className="high-passes-section">
+              <h4 
+                onClick={() => {
+                  const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
+                  setPassSortOrder(nextOrder);
+                }}
+                style={{ cursor: 'pointer', userSelect: 'none', margin: '15px 0 5px 0' }}
+              >
+                <span style={{ opacity: 0.6, marginRight: '4px' }}>⇅</span>
+                HIGH POINTS {passSortOrder === 'desc' ? '↓' : passSortOrder === 'asc' ? '↑' : ''}
+              </h4>
+              <div className="high-passes-list">
+                {getSortedPasses(passSortOrder).map((pass, index) => (
+                  <div key={index} className="stat-row">
+                    <span className="stat-label">{pass.name}</span>
+                    <span className="stat-value">{formatAlt(pass.altitude)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </Control>
   );
 };
