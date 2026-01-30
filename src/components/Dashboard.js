@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import ReactGA from "react-ga4";
 import L from "leaflet";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
-import Control from "react-leaflet-control";
 import arrowIcon from "../resources/images/leftArrow.svg";
 import locationIcon from "../resources/images/location.svg";
 import toolsIcon from "../resources/images/settings.svg";
@@ -134,13 +132,26 @@ const Dashboard = (props) => {
     setSingleDayView,
     showLegend,
   } = props;
-  const { map } = props.leaflet;
+  const map = props.map;
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
   const [showTrekStats, setShowTrekStats] = useState(false);
   const [passSortOrder, setPassSortOrder] = useState('day');
   const isInitialMount = useRef(true);
+
+  // Ensure About and Stats panels are mutually exclusive
+  useEffect(() => {
+    if (props.showInfo && showTrekStats) {
+      setShowTrekStats(false);
+    }
+  }, [props.showInfo, showTrekStats]);
+
+  useEffect(() => {
+    if (showTrekStats && props.showInfo) {
+      toggleInfo();
+    }
+  }, [showTrekStats, props.showInfo, toggleInfo]);
 
   // Calculate trek statistics once
   const trekStats = useMemo(() => calculateTrekStats(), []);
@@ -203,8 +214,8 @@ const Dashboard = (props) => {
       const val = parseInt(alt.toString().replace(/,/g, ""));
       if (isNaN(val)) return alt;
       return unit === "km"
-        ? `${Math.round(val * 0.3048).toLocaleString()} m`
-        : `${val.toLocaleString()} ft`;
+        ? `${Math.round(val * 0.3048).toLocaleString()}m`
+        : `${val.toLocaleString()}ft`;
     },
     [unit],
   );
@@ -402,16 +413,32 @@ const Dashboard = (props) => {
       const newState = !prev;
       if (!newState) {
         setShowTrekStats(false);
+        // Close About/Info panel when toolbar closes on mobile
+        if (!isDesktop && props.showInfo) {
+          toggleInfo();
+        }
       }
       return newState;
     });
-  }, []);
+  }, [props.showInfo, toggleInfo]);
+
+  const handleSortToggle = useCallback(() => {
+    const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
+    ReactGA.event({
+      category: "UI",
+      action: "Sort High Points",
+      label: nextOrder,
+    });
+    setPassSortOrder(nextOrder);
+  }, [passSortOrder]);
 
   const handleNavigation = useCallback(
     (direction) => {
       const targetFeature = direction === "next" ? nextDay() : prevDay();
       setIsToolsOpen(false);
       setShowTrekStats(false);
+
+      if (!map) return;
 
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
@@ -476,6 +503,7 @@ const Dashboard = (props) => {
   useEffect(() => {}, []);
 
   const toggleViewMode = () => {
+    if (!map) return;
     const routes = getDayWiseDataG();
 
     if (isSingleDayView) {
@@ -583,9 +611,9 @@ const Dashboard = (props) => {
   );
 
   return (
-    <Control position="bottomright">
+    <>
       <div
-        className={`dashboard-container dashboard-container--${isDesktop ? "desktop" : "mobile"}${showTrekStats ? " statistics-open" : ""}`}
+        className={`dashboard-container dashboard-container--${isDesktop ? "desktop" : "mobile"}${showTrekStats ? " statistics-open" : ""}${props.showInfo ? " info-open" : ""}`}
       >
         {/* Top Section: Main content row */}
         <div className="dashboard-top-section">
@@ -616,15 +644,16 @@ const Dashboard = (props) => {
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
+                          const newState = !showTrekStats;
                           ReactGA.event({
                             category: "UI",
                             action: "Toggle Stats",
-                            label: `${showTrekStats ? "Hide" : "Show"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                            label: `${newState ? "Show" : "Hide"} - ${isDesktop ? "Desktop" : "Mobile"}`,
                           });
-                          setShowTrekStats(!showTrekStats);
+                          setShowTrekStats(newState);
                         }}
                         className="tool-icon-button"
-                        title="Trek Statistics"
+                        title="Trek Stats"
                       >
                         <div 
                           className="tool-icon-image"
@@ -676,17 +705,23 @@ const Dashboard = (props) => {
                           e.stopPropagation();
                           ReactGA.event({
                             category: "UI",
-                            action: "Open Info",
+                            action: "Toggle Info",
+                            label: !props.showInfo ? "Open" : "Close"
                           });
                           toggleInfo();
                         }}
                         className="tool-icon-button"
+                        title="About This Trek"
                       >
                         <img
                           src={infoIcon}
                           width={iconSizes.toolIcon}
                           alt="Toggle Info"
                           className="tool-icon-image"
+                          style={{
+                            background: props.showInfo ? '#e3f2fd' : '#f9f9f9',
+                            border: props.showInfo ? '1.5px solid #2563eb' : '1.5px solid #bdc3c7'
+                          }}
                         />
                       </div>
 
@@ -707,13 +742,13 @@ const Dashboard = (props) => {
                                 : `calc(100% - ${isDesktop ? "29px" : "26px"})`,
                           }}
                         >
-                          {unit.toUpperCase()}
+                          {unit === "km" ? "M" : "FT"}
                         </div>
                         <div
                           className={`unit-toggle-labels unit-toggle-labels--${isDesktop ? "desktop" : "mobile"}`}
                         >
-                          <span>KM</span>
-                          <span>MI</span>
+                          <span>M</span>
+                          <span>FT</span>
                         </div>
                       </div>
                     </div>
@@ -742,7 +777,7 @@ const Dashboard = (props) => {
                     <div
                       className={`branding-title branding-title--${isDesktop ? "desktop" : "mobile"}`}
                     >
-                      Everest Base Camp 3 Pass Trek, Nepal
+                      Everest Base Camp 3 Trek, Nepal
                       {isDesktop && (
                         <span style={{ fontSize: "0.75em", opacity: 0.8, marginLeft: "8px" }}>
                           <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
@@ -812,20 +847,39 @@ const Dashboard = (props) => {
                           <div
                             className={`elevation-stats-row elevation-stats-row--${isDesktop ? "desktop" : "mobile"}`}
                           >
-                            {total_climb && total_climb !== "0" && (
-                              <span
-                                className={`elevation-gain elevation-gain--${isDesktop ? "desktop" : "mobile"}`}
-                              >
-                                ▲{formatAlt(total_climb)}
-                              </span>
-                            )}
-                            {descent && descent !== "0" && (
-                              <span
-                                className={`elevation-descent elevation-descent--${isDesktop ? "desktop" : "mobile"}`}
-                              >
-                                ▼{formatAlt(descent)}
-                              </span>
-                            )}
+                            {(() => {
+                              const climbNum = parseInt(total_climb?.toString().replace(/,/g, "") || "0");
+                              const descentNum = parseInt(descent?.toString().replace(/,/g, "") || "0");
+                              
+                              return (
+                                <>
+                                  {total_climb && total_climb !== "0" && (
+                                    <span
+                                      className={`elevation-gain elevation-gain--${isDesktop ? "desktop" : "mobile"}`}
+                                      style={{ 
+                                        fontSize: isDesktop 
+                                          ? (climbNum >= descentNum ? "17px" : "14px") 
+                                          : (climbNum >= descentNum ? "15px" : "12px") 
+                                      }}
+                                    >
+                                      {formatAlt(total_climb)}
+                                    </span>
+                                  )}
+                                  {descent && descent !== "0" && (
+                                    <span
+                                      className={`elevation-descent elevation-descent--${isDesktop ? "desktop" : "mobile"}`}
+                                      style={{ 
+                                        fontSize: isDesktop 
+                                          ? (descentNum >= climbNum ? "17px" : "14px") 
+                                          : (descentNum >= climbNum ? "15px" : "12px") 
+                                      }}
+                                    >
+                                      {formatAlt(descent)}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                         <div
@@ -858,12 +912,9 @@ const Dashboard = (props) => {
                       </div>
                     </div>
 
-                    {/* Desktop Only Divider */}
-                    {isDesktop && <div className="stats-divider" />}
-
                     {/* Day, Distance, Time - Desktop */}
                     {isDesktop && (
-                      <div className="metrics-bottom-row">
+                      <div className={`metrics-bottom-row ${props.showInfo ? 'info-active' : ''}`}>
                         {/* Day indicator */}
                         <div className="day-indicator">
                           <span className="day-label-desktop">DAY</span>
@@ -872,12 +923,15 @@ const Dashboard = (props) => {
                             <span
                               style={{
                                 marginLeft: '8px',
-                                padding: '2px 8px',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                fontWeight: '600',
+                                padding: '0px 5px',
+                                borderRadius: '3px',
+                                fontSize: '10px',
+                                fontWeight: '700',
                                 color: '#fff',
                                 backgroundColor: getPassInfo(props.day).color,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                height: '15px'
                               }}
                             >
                               Pass
@@ -887,12 +941,15 @@ const Dashboard = (props) => {
                             <span
                               style={{
                                 marginLeft: '8px',
-                                padding: '2px 8px',
-                                borderRadius: '4px',
-                                fontSize: '11px',
-                                fontWeight: '600',
+                                padding: '0px 5px',
+                                borderRadius: '3px',
+                                fontSize: '10px',
+                                fontWeight: '700',
                                 color: '#fff',
                                 backgroundColor: getSummitInfo(props.day).color,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                height: '15px'
                               }}
                             >
                               Summit
@@ -999,7 +1056,7 @@ const Dashboard = (props) => {
 
                 {/* Distance and Time, if present */}
                 {!isPlace && distance && time && distance !== "0 mi / 0 km" && (
-                  <>
+                  <div className="metrics-group-mobile">
                     <div className="metric-item-mobile">
                       <svg
                         width="10"
@@ -1032,7 +1089,7 @@ const Dashboard = (props) => {
                         <span className="time-asterisk">*</span>
                       </span>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             )}
@@ -1041,7 +1098,7 @@ const Dashboard = (props) => {
           {/* Right Side: Toolbar and Next Arrow */}
           <div className="right-side-container">
             {/* Toolbar Area */}
-            {(isDesktop || !isToolsOpen || props.showInfo) && <div className="toolbar-area">{ControlIcons}</div>}
+            {(isDesktop || !isToolsOpen) && <div className="toolbar-area">{ControlIcons}</div>}
 
             {/* Right Arrow Slab */}
             <div
@@ -1070,63 +1127,99 @@ const Dashboard = (props) => {
             onClick={() => setShowTrekStats(false)}
           />
           <div className="statistics-card">
-            <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="icon-triangle" style={{ transform: 'rotate(-90deg)', borderRightColor: '#2c3e50' }}></div>
-              TREK STATISTICS
+            <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'none' }}>
+              Trek Stats
             </h3>
-            <div className="statistics-content">
-              <div className="stat-row">
-                <span className="stat-label">TOTAL DISTANCE</span>
-                <span className="stat-value">
-                  {unit === "km" ? `${trekStats.totalDistance} km` : `${(trekStats.totalDistance * 0.621371).toFixed(1)} mi`}
-                </span>
+            
+            {/* Clickable section to toggle sorting - includes summary stats and the High Points header */}
+            <div 
+              className="clickable-sort-area" 
+              onClick={handleSortToggle}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="statistics-content">
+                <div className="stat-row">
+                  <span className="stat-label">Total Distance</span>
+                  <span className="stat-value">
+                    {unit === "km" ? `${trekStats.totalDistance} km` : `${(trekStats.totalDistance * 0.621371).toFixed(1)} mi`}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Total Ascent</span>
+                  <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
+                    {formatAlt(trekStats.totalClimb)}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Total Descent</span>
+                  <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
+                    {formatAlt(trekStats.totalDescent)}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Max Altitude</span>
+                  <span className="stat-value" style={{ fontWeight: '800' }}>{formatAlt(trekStats.maxAltitude)}</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Days (Active/Rest)</span>
+                  <span className="stat-value">{trekStats.activeDays}/{trekStats.restDays}</span>
+                </div>
               </div>
-              <div className="stat-row">
-                <span className="stat-label">TOTAL ASCENT</span>
-                <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
-                  ▲{formatAlt(trekStats.totalClimb)}
-                </span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">TOTAL DESCENT</span>
-                <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
-                  ▼{formatAlt(trekStats.totalDescent)}
-                </span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">MAX ALTITUDE</span>
-                <span className="stat-value" style={{ fontWeight: '800' }}>{formatAlt(trekStats.maxAltitude)}</span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">DAYS (ACTIVE/REST)</span>
-                <span className="stat-value">{trekStats.activeDays}/{trekStats.restDays}</span>
+
+              <div className="high-passes-section" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+                <h4 
+                  style={{ userSelect: 'none', margin: '15px 0 5px 0', textTransform: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+                >
+                  <span style={{ fontSize: isDesktop ? '1.1rem' : '1rem', fontWeight: '700' }}>High Points</span>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: passSortOrder === 'day' ? '#a0aec0' : '#3182ce',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    background: passSortOrder === 'day' ? '#f7fafc' : '#ebf8ff',
+                    border: passSortOrder === 'day' ? '1px solid #edf2f7' : '1px solid #bee3f8'
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                    </svg>
+                  </div>
+                </h4>
               </div>
             </div>
 
-            <div className="high-passes-section">
-              <h4 
-                onClick={() => {
-                  const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
-                  setPassSortOrder(nextOrder);
-                }}
-                style={{ cursor: 'pointer', userSelect: 'none', margin: '15px 0 5px 0' }}
-              >
-                <span style={{ opacity: 0.6, marginRight: '4px' }}>⇅</span>
-                HIGH POINTS {passSortOrder === 'desc' ? '↓' : passSortOrder === 'asc' ? '↑' : ''}
-              </h4>
-              <div className="high-passes-list">
-                {getSortedPasses(passSortOrder).map((pass, index) => (
-                  <div key={index} className="stat-row">
-                    <span className="stat-label">{pass.name}</span>
-                    <span className="stat-value">{formatAlt(pass.altitude)}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="high-passes-list">
+              {getSortedPasses(passSortOrder).map((pass, index) => (
+                <div key={index} className="stat-row">
+                  <span className="stat-label">{pass.name}</span>
+                  <span className="stat-value">{formatAlt(pass.altitude)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Close instruction text - at bottom */}
+            <div 
+              onClick={() => setShowTrekStats(false)}
+              style={{ 
+                borderTop: '1px solid #edf2f7',
+                marginTop: '12px',
+                paddingTop: '8px',
+                textAlign: 'center', 
+                fontSize: '10px', 
+                color: '#a0aec0', 
+                fontWeight: '300',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                cursor: 'pointer'
+              }}
+            >
+              Tap here to close
             </div>
           </div>
         </>
       )}
-    </Control>
+    </>
   );
 };
 
@@ -1149,10 +1242,11 @@ const mapStateToProps = (state) => ({
   paddingBottomRight: state.mapState.paddingBottomRight,
   isSingleDayView: state.mapState.isSingleDayView,
   showLegend: state.mapState.showLegend,
+  showInfo: state.mapState.showInfo,
   attribution: state.mapState.attribution,
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withLeaflet(Dashboard));
+)(Dashboard);

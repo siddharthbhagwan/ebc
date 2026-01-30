@@ -205,7 +205,7 @@ const POI = (props) => {
 
         let imgStyle = `width: ${imgSize}px; height: ${imgSize}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
         if (isSummit) {
-          imgStyle = `width: ${imgSize * 0.9}px; height: ${imgSize * 0.9}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
+          imgStyle = `width: ${imgSize * 0.8}px; height: ${imgSize * 0.8}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);`;
         }
 
         const pulseClass = isSingleDayView ? "pulsating-circle" : "";
@@ -233,7 +233,7 @@ const POI = (props) => {
 
         let imgStyle = "width: 100%; height: 100%;";
         if (isSummit) {
-          imgStyle = "width: 90%; height: 90%; margin: 5%;";
+          imgStyle = "width: 80%; height: 80%; margin: 10%;";
         }
 
         // Feature: Underscore/Underline for Starting House in Zoomed View

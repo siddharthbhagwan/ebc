@@ -58,25 +58,31 @@ const Legend = (props) => {
         >
           <div
             style={{
-              width: "18px",
-              height: "18px",
+              width: isDesktop ? "16px" : "14px",
+              height: isDesktop ? "16px" : "14px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: "#f5f5f5",
               borderRadius: "4px",
               border: "1px solid #eee",
+              boxSizing: "border-box",
             }}
           >
             <img
               src={ebcIcon}
               className="ebc-marker-icon"
-              width={isDesktop ? "12px" : "11px"}
+              width={isDesktop ? "10px" : "9px"}
               alt="Base Camp"
             />
           </div>
           <span
-            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+            style={{
+              fontSize: "10px",
+              fontWeight: "700",
+              color: "#34495e",
+              lineHeight: "1",
+            }}
           >
             Base Camp
           </span>
@@ -92,25 +98,31 @@ const Legend = (props) => {
         >
           <div
             style={{
-              width: "18px",
-              height: "18px",
+              width: isDesktop ? "16px" : "14px",
+              height: isDesktop ? "16px" : "14px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: "#f5f5f5",
               borderRadius: "4px",
               border: "1px solid #eee",
+              boxSizing: "border-box",
             }}
           >
             <img
               src={summitIcon}
               className="summit-marker-icon"
-              width={isDesktop ? "12px" : "11px"}
+              width={isDesktop ? "9px" : "8px"}
               alt="Summit"
             />
           </div>
           <span
-            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+            style={{
+              fontSize: "10px",
+              fontWeight: "700",
+              color: "#34495e",
+              lineHeight: "1",
+            }}
           >
             Summit
           </span>
@@ -126,25 +138,31 @@ const Legend = (props) => {
         >
           <div
             style={{
-              width: "18px",
-              height: "18px",
+              width: isDesktop ? "16px" : "14px",
+              height: isDesktop ? "16px" : "14px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: "#f5f5f5",
               borderRadius: "4px",
               border: "1px solid #eee",
+              boxSizing: "border-box",
             }}
           >
             <img
               src={passIcon}
               className="flag-marker-icon"
-              width={isDesktop ? "12px" : "11px"}
+              width={isDesktop ? "10px" : "9px"}
               alt="Pass"
             />
           </div>
           <span
-            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+            style={{
+              fontSize: "10px",
+              fontWeight: "700",
+              color: "#34495e",
+              lineHeight: "1",
+            }}
           >
             Pass
           </span>
@@ -160,24 +178,30 @@ const Legend = (props) => {
         >
           <div
             style={{
-              width: isDesktop ? "18px" : "12px",
-              height: isDesktop ? "18px" : "12px",
+              width: isDesktop ? "16px" : "14px",
+              height: isDesktop ? "16px" : "14px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: "#f5f5f5",
               borderRadius: "4px",
               border: "1px solid #eee",
+              boxSizing: "border-box",
             }}
           >
             <img
               src={tentIcon}
-              width={isDesktop ? "12px" : "11px"}
+              width={isDesktop ? "11px" : "10px"}
               alt="Lodging"
             />
           </div>
           <span
-            style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
+            style={{
+              fontSize: "10px",
+              fontWeight: "700",
+              color: "#34495e",
+              lineHeight: "1",
+            }}
           >
             Lodging
           </span>

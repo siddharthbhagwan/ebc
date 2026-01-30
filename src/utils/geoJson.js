@@ -2432,7 +2432,7 @@ const chhukung_to_kongma_la_to_lobuche_8 = {
       properties: {
         weight: 2,
         day: "8",
-        name: "Chhukung - Kongma La Pass - Lobuche",
+        name: "Chhukung - Kongma La - Lobuche",
         distance: "5.79 mi / 9.31 km",
         time: "11h 30m",
         startAlt: "15,535",
@@ -3134,7 +3134,7 @@ const dzongla_to_thangnak_14 = {
       properties: {
         weight: 2,
         day: "14",
-        name: "Dzongla - Cho La Pass - Thangnak",
+        name: "Dzongla - Cho La - Thangnak",
         distance: "4.98 mi / 8.01 km",
         time: "7h 00m",
         startAlt: "15,850",
@@ -3842,7 +3842,7 @@ const gokyo_to_marlung_18 = {
       properties: {
         weight: 2,
         day: "18",
-        name: "Gokyo - Renjo La Pass - Marlung",
+        name: "Gokyo - Renjo La - Marlung",
         distance: "8.25 mi / 13.27 km",
         time: "9h 00m",
         startAlt: "15,574",

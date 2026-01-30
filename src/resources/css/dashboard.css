@@ -541,7 +541,7 @@ generic-dashboard {
 
 .day-number {
   font-size: 16px;
-  font-weight: 900;
+  font-weight: 700;
   color: #2c3e50;
   line-height: 1;
 }
@@ -609,7 +609,7 @@ generic-dashboard {
 
 .elevation-gain {
   color: #27ae60;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .elevation-gain--desktop {
@@ -622,8 +622,8 @@ generic-dashboard {
 
 .elevation-descent {
   margin-left: 6px;
-  color: #c0392b;
-  font-weight: 900;
+  color: #8c2419;
+  font-weight: 700;
 }
 
 .elevation-descent--desktop {
@@ -652,13 +652,13 @@ generic-dashboard {
 
 /* Single altitude for rest/acclimatization days */
 .altitude-single {
-  font-weight: 900;
+  font-weight: 700;
   color: #2c3e50;
 }
 
 /* Trek Name */
 .trek-name {
-  font-weight: 750;
+  font-weight: 600;
   color: #2c3e50;
   text-align: center;
   line-height: 1.1;
@@ -673,10 +673,13 @@ generic-dashboard {
   width: 100%;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .stats-container--desktop {
-  gap: 8px;
+  flex: 1;
+  gap: 4px;
 }
 
 .stats-container--mobile {
@@ -701,8 +704,17 @@ generic-dashboard {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  min-height: 22px;
-  gap: 0;
+  height: 28px;
+  background: #fdfdfd;
+  border-top: 1px solid #edf2f7;
+  padding: 0 10px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.metrics-bottom-row.info-active {
+  background: #f0f7ff;
+  border-top: 1px solid #3182ce;
 }
 
 .day-indicator {
@@ -719,7 +731,7 @@ generic-dashboard {
 
 .day-value-desktop {
   font-size: 16px;
-  font-weight: 900;
+  font-weight: 700;
   color: #2c3e50;
   line-height: 1;
 }
@@ -770,6 +782,7 @@ generic-dashboard {
   gap: 15px;
   padding: 0 10px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .day-indicator-mobile {
@@ -777,6 +790,7 @@ generic-dashboard {
   align-items: center;
   gap: 3px;
   min-width: 55px;
+  flex-shrink: 0;
 }
 
 .day-label-mobile {
@@ -787,8 +801,15 @@ generic-dashboard {
 
 .day-value-mobile {
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   color: #34495e;
+}
+
+.metrics-group-mobile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .metric-item-mobile {
@@ -815,11 +836,11 @@ generic-dashboard {
 }
 
 .metrics-content--desktop {
-  padding: 8px 25px;
+  padding: 0;
 }
 
 .metrics-content--mobile {
-  padding: 8px 8px;
+  padding: 0;
 }
 
 .metrics-inner {
@@ -832,7 +853,8 @@ generic-dashboard {
 
 .metrics-inner--desktop {
   max-width: 100%;
-  gap: 8px;
+  gap: 0;
+  justify-content: flex-start;
 }
 
 .metrics-inner--mobile {
@@ -991,7 +1013,7 @@ generic-dashboard {
 
 .branding-title {
   color: #7f8c8d;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   white-space: nowrap;
@@ -1091,21 +1113,23 @@ generic-dashboard {
 /* Dashboard Container */
 .dashboard-container--desktop {
   width: 600px;
-  height: 160px;
+  height: 115px;
   padding-bottom: 0;
-  position: relative;
-  z-index: auto;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 30000;
 }
 
 .dashboard-container--mobile {
   width: 100vw;
-  height: 132px;
+  height: 138px;
   padding-bottom: env(safe-area-inset-bottom);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 30000;
 }
 
 /* Landscape mobile - shorter dashboard */
@@ -1244,7 +1268,7 @@ generic-dashboard {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 132px - env(safe-area-inset-bottom));
+  height: calc(100% - 138px - env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1268,18 +1292,18 @@ generic-dashboard {
 
 .statistics-card {
   position: fixed;
-  bottom: calc(112px + env(safe-area-inset-bottom));
-  left: 0;
-  right: 0;
+  bottom: calc(146px + env(safe-area-inset-bottom));
+  left: 10px;
+  right: 10px;
   background: white;
-  border-radius: 12px 12px 0 0;
+  border-radius: 12px;
   border: 2px solid #cbd5e0;
-  border-bottom: none;
+  border-bottom: 2px solid #cbd5e0;
   padding: 12px 16px;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   z-index: 10001;
-  width: 100%;
-  max-height: 60vh;
+  width: calc(100% - 20px);
+  max-height: 80vh;
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -1287,36 +1311,53 @@ generic-dashboard {
 @media (min-width: 1025px) {
   .statistics-card {
     bottom: 172px; /* 152px height + 20px bottom offset */
-    width: 320px;
+    width: 300px;
     left: auto;
     right: 20px;
-    border-radius: 12px 12px 0 0;
-    border-bottom: none;
+    border-radius: 12px;
+    border: 2px solid #cbd5e0;
   }
 }
 
 @media (max-width: 1024px) {
   .statistics-card {
-    bottom: calc(112px + env(safe-area-inset-bottom));
-    padding: 16px 20px 24px 20px;
+    bottom: calc(138px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 16px 24px 16px;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  @media (orientation: landscape) {
+    .statistics-card {
+      bottom: calc(100px + env(safe-area-inset-bottom));
+    }
   }
 
   .statistics-card h3 {
-    font-size: 14px;
+    font-size: 14.5px;
     letter-spacing: 0.5px;
-    color: #2c3e50;
-    margin-bottom: 2px;
+    color: #1a202c;
+    margin-bottom: 6px;
+    border-bottom: 1.5px solid #edf2f7;
+    padding-bottom: 6px;
   }
 
   .statistics-card .stat-row {
-    font-size: 11px;
-    padding: 4px 0;
-    border-bottom: 1px solid #f8f9fa;
+    font-size: 12px;
+    padding: 3px 0;
+    border-bottom: 1px solid #f7fafc;
   }
 
   .statistics-card .high-passes-section h4 {
-    font-size: 12px;
-    margin-top: 15px;
+    font-size: 13px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    color: #2d3748;
   }
 }
 
@@ -1352,17 +1393,21 @@ generic-dashboard {
 
 @media (min-width: 1025px) {
   .stat-row {
-    font-size: 12.5px;
-    padding: 2px 0;
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f7fafc;
   }
   
   .statistics-card h3 {
     font-size: 19px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #edf2f7;
+    padding-bottom: 10px;
   }
 
   .high-passes-section h4 {
     font-size: 16px;
+    margin-top: 15px;
   }
 }
 
@@ -1393,5 +1438,5 @@ generic-dashboard {
   display: flex;
   flex-direction: column;
   gap: 0px;
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
