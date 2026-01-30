@@ -5,6 +5,19 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-30
+
+### Added
+- **Mutual Exclusivity**: Stats and Info panels now automatically toggle each other off when opened.
+- **Floating UI Design**: Statistics and Info panels converted to modern floating cards on mobile for better safe-area compatibility.
+- **Analytics Integration**: Added ReactGA4 tracking for all major UI interactions including panel toggles and sorting.
+
+### Changed
+- **Branding**: Renamed "Trek Statistics" to "Trek Stats" and updated headings to normal case.
+- **Desktop Refinements**: Synchronized widths (480px) and 스타일 between Info and Stats panels.
+- **UI Height**: Reduced desktop dashboard height to 115px with optimized sticky metrics bar.
+- **Data Cleanup**: Removed " Pass" suffix from geo-data names for a cleaner interface.
+
 ## [1.5.1] - 2026-01-30
 
 ### Changed
