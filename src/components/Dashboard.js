@@ -1251,7 +1251,17 @@ const Dashboard = (props) => {
             <div className="high-passes-list">
               {getSortedPasses(passSortOrder).map((pass, index) => (
                 <div key={index} className="stat-row">
-                  <span className="stat-label">{pass.name}</span>
+                  <span className="stat-label">
+                    {pass.name}
+                    <span style={{ 
+                      fontSize: '0.75em', 
+                      color: '#7f8c8d', 
+                      marginLeft: '6px',
+                      fontWeight: '500'
+                    }}>
+                      Day {pass.day}
+                    </span>
+                  </span>
                   <span className="stat-value">{formatAlt(pass.altitude)}</span>
                 </div>
               ))}

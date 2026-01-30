@@ -30,32 +30,36 @@ const POI = (props) => {
     showLegend,
   } = props;
 
-  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : zoom);
-
   const derivedZoom = isDesktop ? zoom : ZOOM_MOBILE;
+  
+  // Initialize currentZoom with the correct value for the device
+  const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : derivedZoom);
 
-  // Listen for zoom changes
+  // Listen for zoom changes - track actual zoom level for detail control
   useEffect(() => {
     if (!map) return;
 
     const handleZoom = () => {
       const newZoom = map.getZoom();
-      const wasZoomedIn = currentZoom > derivedZoom + 0.5;
-      const isNowZoomedIn = newZoom > derivedZoom + 0.5;
-
-      if (wasZoomedIn !== isNowZoomedIn) {
-        setCurrentZoom(newZoom);
-      }
+      setCurrentZoom(newZoom);
     };
 
     map.on("zoom", handleZoom);
+    map.on("zoomend", handleZoom);
 
     return () => {
       map.off("zoom", handleZoom);
+      map.off("zoomend", handleZoom);
     };
-  }, [map, currentZoom, derivedZoom]);
+  }, [map]);
 
   const isZoomedIn = currentZoom > derivedZoom + 0.5;
+  
+  // Determine if label text should be shown
+  // Show all labels by default - icons and text always visible
+  const shouldShowLabelText = (labelPriority) => {
+    return true; // Always show all label text
+  };
 
   // Format altitude based on unit
   const formatAltitude = (altFt) => {
@@ -270,12 +274,6 @@ const POI = (props) => {
         });
       }
 
-      // Tooltip visibility: Permanent in Overview mode OR if it belongs to current day/start/dest
-      // This ensures names are always visible in Overview and for relevant POIs in Zoomed view
-      // Always show all names, even on mobile overview
-      const isTooltipPermanent =
-        !isSingleDayView || isDayMatch || isDest || isStart;
-
       arr.push(
         <Marker
           position={snappedPoint}
@@ -288,54 +286,63 @@ const POI = (props) => {
           properties={markerPoint.properties}
           keyboard={false} // Disable keyboard focus to prevent overlap with throb effect
         >
-          {isTooltipPermanent && (
-            <Tooltip
-              permanent={true}
-              className={"tooltipLabel"}
-              direction={markerPoint.properties.direction}
-              onclick={clickHandler}
-              // offset={markerPoint.properties.offset || [0, 0]}
-            >
-              <div
-                style={{
-                  fontSize: isZoomedIn ? "14px" : "11px",
-                  cursor: "pointer",
-                }}
-                onClick={(e) => {
-                  // Create a synthetic event that matches the marker click handler signature
-                  const syntheticEvent = {
-                    target: {
-                      options: {
-                        properties: markerPoint.properties,
-                      },
-                    },
-                    latlng: snappedPoint,
-                  };
-                  clickHandler(syntheticEvent);
-                }}
+          {(() => {
+            // Use pre-calculated label priority from marker data
+            const labelPriority = markerPoint.properties.labelPriority || 4;
+            const showLabelText = shouldShowLabelText(labelPriority);
+            
+            // In single day view, always show labels for relevant POIs
+            const isTooltipVisible = isSingleDayView 
+              ? (isDayMatch || isDest || isStart)
+              : showLabelText;
+            
+            if (!isTooltipVisible) return null;
+            
+            return (
+              <Tooltip
+                permanent={true}
+                className={"tooltipLabel"}
+                direction={markerPoint.properties.direction}
+                onclick={clickHandler}
               >
-                <div style={{ fontWeight: isZoomedIn ? "600" : "normal", display: "flex", alignItems: "baseline", gap: "4px" }}>
-                  <span>{markerPoint.properties.name}</span>
-                  {(isSummit || isPass || isEBC) && (
+                <div
+                  style={{
+                    fontSize: isZoomedIn ? "14px" : "11px",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => {
+                    const syntheticEvent = {
+                      target: {
+                        options: {
+                          properties: markerPoint.properties,
+                        },
+                      },
+                      latlng: snappedPoint,
+                    };
+                    clickHandler(syntheticEvent);
+                  }}
+                >
+                  <div style={{ fontWeight: isZoomedIn ? "600" : "normal", display: "flex", alignItems: "baseline", gap: "4px" }}>
+                    <span>{markerPoint.properties.name}</span>
                     <span style={{ fontSize: "0.75em", fontWeight: "normal", opacity: 0.6 }}>
                       D{markerPoint.properties.day}
                     </span>
+                  </div>
+                  {markerPoint.properties.startAlt && (
+                    <div
+                      style={{
+                        fontSize: "0.9em",
+                        opacity: 0.8,
+                        marginTop: "2px",
+                      }}
+                    >
+                      {formatAltitude(markerPoint.properties.startAlt)}
+                    </div>
                   )}
                 </div>
-                {markerPoint.properties.startAlt && (
-                  <div
-                    style={{
-                      fontSize: "0.9em",
-                      opacity: 0.8,
-                      marginTop: "2px",
-                    }}
-                  >
-                    {formatAltitude(markerPoint.properties.startAlt)}
-                  </div>
-                )}
-              </div>
-            </Tooltip>
-          )}
+              </Tooltip>
+            );
+          })()}
         </Marker>,
       );
     });
