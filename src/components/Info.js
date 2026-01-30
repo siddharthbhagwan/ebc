@@ -131,18 +131,22 @@ const Info = (props) => {
             </div>
             
             {/* Close instruction text - at bottom */}
-            <div style={{ 
-              borderTop: '1px solid #edf2f7',
-              marginTop: '8px',
-              paddingTop: '6px',
-              textAlign: 'center', 
-              fontSize: '10px', 
-              color: '#a0aec0', 
-              fontWeight: '300',
-              letterSpacing: '1px',
-              textTransform: 'uppercase'
-            }}>
-              Click here to close
+            <div 
+              onClick={handleToggle}
+              style={{ 
+                borderTop: '1px solid #edf2f7',
+                marginTop: '8px',
+                paddingTop: '6px',
+                textAlign: 'center', 
+                fontSize: '10px', 
+                color: '#a0aec0', 
+                fontWeight: '300',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                cursor: 'pointer'
+              }}
+            >
+              Tap here to close
             </div>
           </div>
         </div>

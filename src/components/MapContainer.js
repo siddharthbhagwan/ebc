@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Map, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
 import Dashboard from "./Dashboard";
@@ -11,6 +11,7 @@ import { isDesktop, useMobileOrientation } from "react-device-detect";
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url, attribution } = props;
   const { isLandscape = false } = useMobileOrientation();
+  const [leafletMap, setLeafletMap] = useState(null);
 
   // Calculate offset based on device type and orientation
   // Mobile portrait needs more offset to clear the dashboard
@@ -36,6 +37,7 @@ const MapContainer = (props) => {
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>
       <Map
+        ref={(m) => { if (!leafletMap && m) setLeafletMap(m.leafletElement); }}
         center={initialCenter}
         zoomSnap={zoomSnap}
         zoomDelta={zoomSnap}
@@ -48,9 +50,9 @@ const MapContainer = (props) => {
       >
         <TileLayer url={url} attribution={attribution} />
         <POI />
-        <Dashboard />
         <GeoJsonRoutes derivedZoom={derivedZoom} />
       </Map>
+      <Dashboard map={leafletMap} />
       <Legend />
       <Info />
     </div>

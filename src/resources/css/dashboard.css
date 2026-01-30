@@ -782,6 +782,7 @@ generic-dashboard {
   gap: 15px;
   padding: 0 10px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .day-indicator-mobile {
@@ -789,6 +790,7 @@ generic-dashboard {
   align-items: center;
   gap: 3px;
   min-width: 55px;
+  flex-shrink: 0;
 }
 
 .day-label-mobile {
@@ -801,6 +803,13 @@ generic-dashboard {
   font-size: 14px;
   font-weight: 900;
   color: #34495e;
+}
+
+.metrics-group-mobile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .metric-item-mobile {
@@ -1102,16 +1111,14 @@ generic-dashboard {
 }
 
 /* Dashboard Container */
-.dashboard-container.info-open {
-  z-index: 30000 !important;
-}
-
 .dashboard-container--desktop {
   width: 600px;
   height: 115px;
   padding-bottom: 0;
-  position: relative;
-  z-index: auto;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 30000;
 }
 
 .dashboard-container--mobile {
@@ -1122,7 +1129,7 @@ generic-dashboard {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 30000;
 }
 
 /* Landscape mobile - shorter dashboard */
@@ -1261,7 +1268,7 @@ generic-dashboard {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(100% - 132px - env(safe-area-inset-bottom));
+  height: calc(100% - 138px - env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -1296,7 +1303,7 @@ generic-dashboard {
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   z-index: 10001;
   width: calc(100% - 20px);
-  max-height: 60vh;
+  max-height: 80vh;
   overflow-y: auto;
   box-sizing: border-box;
 }
@@ -1304,7 +1311,7 @@ generic-dashboard {
 @media (min-width: 1025px) {
   .statistics-card {
     bottom: 172px; /* 152px height + 20px bottom offset */
-    width: 480px;
+    width: 520px;
     left: auto;
     right: 20px;
     border-radius: 12px;
@@ -1314,8 +1321,21 @@ generic-dashboard {
 
 @media (max-width: 1024px) {
   .statistics-card {
-    bottom: calc(146px + env(safe-area-inset-bottom));
-    padding: 10px 16px 12px 16px;
+    bottom: calc(138px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 16px 24px 16px;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  @media (orientation: landscape) {
+    .statistics-card {
+      bottom: calc(100px + env(safe-area-inset-bottom));
+    }
   }
 
   .statistics-card h3 {

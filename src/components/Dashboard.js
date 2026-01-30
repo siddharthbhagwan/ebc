@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { withLeaflet } from "react-leaflet";
 import { connect } from "react-redux";
 import ReactGA from "react-ga4";
 import L from "leaflet";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
-import Control from "react-leaflet-control";
 import arrowIcon from "../resources/images/leftArrow.svg";
 import locationIcon from "../resources/images/location.svg";
 import toolsIcon from "../resources/images/settings.svg";
@@ -134,7 +132,7 @@ const Dashboard = (props) => {
     setSingleDayView,
     showLegend,
   } = props;
-  const { map } = props.leaflet;
+  const map = props.map;
 
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [lastZoomedDay, setLastZoomedDay] = useState(null);
@@ -216,7 +214,7 @@ const Dashboard = (props) => {
       const val = parseInt(alt.toString().replace(/,/g, ""));
       if (isNaN(val)) return alt;
       return unit === "km"
-        ? `${Math.round(val * 0.3048).toLocaleString()} m`
+        ? `${Math.round(val * 0.3048).toLocaleString()}m`
         : `${val.toLocaleString()} ft`;
     },
     [unit],
@@ -420,11 +418,23 @@ const Dashboard = (props) => {
     });
   }, []);
 
+  const handleSortToggle = useCallback(() => {
+    const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
+    ReactGA.event({
+      category: "UI",
+      action: "Sort High Points",
+      label: nextOrder,
+    });
+    setPassSortOrder(nextOrder);
+  }, [passSortOrder]);
+
   const handleNavigation = useCallback(
     (direction) => {
       const targetFeature = direction === "next" ? nextDay() : prevDay();
       setIsToolsOpen(false);
       setShowTrekStats(false);
+
+      if (!map) return;
 
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
@@ -489,6 +499,7 @@ const Dashboard = (props) => {
   useEffect(() => {}, []);
 
   const toggleViewMode = () => {
+    if (!map) return;
     const routes = getDayWiseDataG();
 
     if (isSingleDayView) {
@@ -596,7 +607,7 @@ const Dashboard = (props) => {
   );
 
   return (
-    <Control position="bottomright">
+    <>
       <div
         className={`dashboard-container dashboard-container--${isDesktop ? "desktop" : "mobile"}${showTrekStats ? " statistics-open" : ""}${props.showInfo ? " info-open" : ""}`}
       >
@@ -832,20 +843,39 @@ const Dashboard = (props) => {
                           <div
                             className={`elevation-stats-row elevation-stats-row--${isDesktop ? "desktop" : "mobile"}`}
                           >
-                            {total_climb && total_climb !== "0" && (
-                              <span
-                                className={`elevation-gain elevation-gain--${isDesktop ? "desktop" : "mobile"}`}
-                              >
-                                ▲{formatAlt(total_climb)}
-                              </span>
-                            )}
-                            {descent && descent !== "0" && (
-                              <span
-                                className={`elevation-descent elevation-descent--${isDesktop ? "desktop" : "mobile"}`}
-                              >
-                                ▼{formatAlt(descent)}
-                              </span>
-                            )}
+                            {(() => {
+                              const climbNum = parseInt(total_climb?.toString().replace(/,/g, "") || "0");
+                              const descentNum = parseInt(descent?.toString().replace(/,/g, "") || "0");
+                              
+                              return (
+                                <>
+                                  {total_climb && total_climb !== "0" && (
+                                    <span
+                                      className={`elevation-gain elevation-gain--${isDesktop ? "desktop" : "mobile"}`}
+                                      style={{ 
+                                        fontSize: isDesktop 
+                                          ? (climbNum >= descentNum ? "17px" : "14px") 
+                                          : (climbNum >= descentNum ? "15px" : "12px") 
+                                      }}
+                                    >
+                                      {formatAlt(total_climb)}
+                                    </span>
+                                  )}
+                                  {descent && descent !== "0" && (
+                                    <span
+                                      className={`elevation-descent elevation-descent--${isDesktop ? "desktop" : "mobile"}`}
+                                      style={{ 
+                                        fontSize: isDesktop 
+                                          ? (descentNum >= climbNum ? "17px" : "14px") 
+                                          : (descentNum >= climbNum ? "15px" : "12px") 
+                                      }}
+                                    >
+                                      {formatAlt(descent)}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                         <div
@@ -1022,7 +1052,7 @@ const Dashboard = (props) => {
 
                 {/* Distance and Time, if present */}
                 {!isPlace && distance && time && distance !== "0 mi / 0 km" && (
-                  <>
+                  <div className="metrics-group-mobile">
                     <div className="metric-item-mobile">
                       <svg
                         width="10"
@@ -1055,7 +1085,7 @@ const Dashboard = (props) => {
                         <span className="time-asterisk">*</span>
                       </span>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
             )}
@@ -1064,7 +1094,7 @@ const Dashboard = (props) => {
           {/* Right Side: Toolbar and Next Arrow */}
           <div className="right-side-container">
             {/* Toolbar Area */}
-            {(isDesktop || !isToolsOpen || props.showInfo) && <div className="toolbar-area">{ControlIcons}</div>}
+            {(isDesktop || !isToolsOpen) && <div className="toolbar-area">{ControlIcons}</div>}
 
             {/* Right Arrow Slab */}
             <div
@@ -1094,80 +1124,98 @@ const Dashboard = (props) => {
           />
           <div className="statistics-card">
             <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'none' }}>
-              <div className="icon-triangle" style={{ transform: 'rotate(-90deg)', borderRightColor: '#2c3e50' }}></div>
               Trek Stats
             </h3>
-            <div className="statistics-content">
-              <div className="stat-row">
-                <span className="stat-label">Total Distance</span>
-                <span className="stat-value">
-                  {unit === "km" ? `${trekStats.totalDistance} km` : `${(trekStats.totalDistance * 0.621371).toFixed(1)} mi`}
-                </span>
+            
+            {/* Clickable section to toggle sorting - includes summary stats and the High Points header */}
+            <div 
+              className="clickable-sort-area" 
+              onClick={handleSortToggle}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="statistics-content">
+                <div className="stat-row">
+                  <span className="stat-label">Total Distance</span>
+                  <span className="stat-value">
+                    {unit === "km" ? `${trekStats.totalDistance} km` : `${(trekStats.totalDistance * 0.621371).toFixed(1)} mi`}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Total Ascent</span>
+                  <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
+                    {formatAlt(trekStats.totalClimb)}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Total Descent</span>
+                  <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
+                    {formatAlt(trekStats.totalDescent)}
+                  </span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Max Altitude</span>
+                  <span className="stat-value" style={{ fontWeight: '800' }}>{formatAlt(trekStats.maxAltitude)}</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">Days (Active/Rest)</span>
+                  <span className="stat-value">{trekStats.activeDays}/{trekStats.restDays}</span>
+                </div>
               </div>
-              <div className="stat-row">
-                <span className="stat-label">Total Ascent</span>
-                <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
-                  ▲{formatAlt(trekStats.totalClimb)}
-                </span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">Total Descent</span>
-                <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
-                  ▼{formatAlt(trekStats.totalDescent)}
-                </span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">Max Altitude</span>
-                <span className="stat-value" style={{ fontWeight: '800' }}>{formatAlt(trekStats.maxAltitude)}</span>
-              </div>
-              <div className="stat-row">
-                <span className="stat-label">Days (Active/Rest)</span>
-                <span className="stat-value">{trekStats.activeDays}/{trekStats.restDays}</span>
+
+              <div className="high-passes-section" style={{ borderBottom: 'none', paddingBottom: 0 }}>
+                <h4 
+                  style={{ userSelect: 'none', margin: '15px 0 5px 0', textTransform: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+                >
+                  <span style={{ fontSize: isDesktop ? '1.1rem' : '1rem', fontWeight: '700' }}>High Points</span>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: passSortOrder === 'day' ? '#a0aec0' : '#3182ce',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    background: passSortOrder === 'day' ? '#f7fafc' : '#ebf8ff',
+                    border: passSortOrder === 'day' ? '1px solid #edf2f7' : '1px solid #bee3f8'
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 5h10M11 9h7M11 13h4M3 17l3 3 3-3M6 18V4" />
+                    </svg>
+                  </div>
+                </h4>
               </div>
             </div>
 
-            <div className="high-passes-section">
-              <h4 
-                onClick={() => {
-                  const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
-                  ReactGA.event({
-                    category: "UI",
-                    action: "Sort High Points",
-                    label: nextOrder,
-                  });
-                  setPassSortOrder(nextOrder);
-                }}
-                style={{ cursor: 'pointer', userSelect: 'none', margin: '15px 0 5px 0', textTransform: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
-              >
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  lineHeight: '0.5', 
-                  fontSize: '10px',
-                  color: '#3182ce',
-                  background: '#ebf8ff',
-                  padding: '2px 4px',
-                  borderRadius: '3px',
-                  border: '1px solid #bee3f8'
-                }}>
-                  <span style={{ opacity: passSortOrder === 'asc' ? 1 : 0.3 }}>▲</span>
-                  <span style={{ opacity: passSortOrder === 'desc' ? 1 : 0.3 }}>▼</span>
+            <div className="high-passes-list">
+              {getSortedPasses(passSortOrder).map((pass, index) => (
+                <div key={index} className="stat-row">
+                  <span className="stat-label">{pass.name}</span>
+                  <span className="stat-value">{formatAlt(pass.altitude)}</span>
                 </div>
-                High Points<span style={{ color: '#a0aec0', marginLeft: '4px' }}>...</span>
-              </h4>
-              <div className="high-passes-list">
-                {getSortedPasses(passSortOrder).map((pass, index) => (
-                  <div key={index} className="stat-row">
-                    <span className="stat-label">{pass.name}</span>
-                    <span className="stat-value">{formatAlt(pass.altitude)}</span>
-                  </div>
-                ))}
-              </div>
+              ))}
+            </div>
+
+            {/* Close instruction text - at bottom */}
+            <div 
+              onClick={() => setShowTrekStats(false)}
+              style={{ 
+                borderTop: '1px solid #edf2f7',
+                marginTop: '12px',
+                paddingTop: '8px',
+                textAlign: 'center', 
+                fontSize: '10px', 
+                color: '#a0aec0', 
+                fontWeight: '300',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                cursor: 'pointer'
+              }}
+            >
+              Tap here to close
             </div>
           </div>
         </>
       )}
-    </Control>
+    </>
   );
 };
 
@@ -1197,4 +1245,4 @@ const mapStateToProps = (state) => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(withLeaflet(Dashboard));
+)(Dashboard);

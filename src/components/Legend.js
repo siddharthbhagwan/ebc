@@ -5,8 +5,6 @@ import { mapDispatchToProps } from "../utils/utils";
 
 import ebcIcon from "../resources/images/ebc.svg";
 import tentIcon from "../resources/images/tent.svg";
-import summitIcon from "../resources/images/summit.svg";
-import passIcon from "../resources/images/pass.svg";
 import "../resources/css/legend.css";
 
 const Legend = (props) => {
@@ -90,25 +88,21 @@ const Legend = (props) => {
             padding: "1px 4px",
           }}
         >
-          <div
+          <span
             style={{
-              width: "18px",
-              height: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f5f5f5",
-              borderRadius: "4px",
-              border: "1px solid #eee",
+              padding: '1px 5px',
+              borderRadius: '3px',
+              fontSize: '8px',
+              lineHeight: '1.2',
+              fontWeight: '700',
+              color: '#fff',
+              backgroundColor: '#C22848',
+              display: 'inline-flex',
+              alignItems: 'center',
             }}
           >
-            <img
-              src={summitIcon}
-              className="summit-marker-icon"
-              width={isDesktop ? "12px" : "11px"}
-              alt="Summit"
-            />
-          </div>
+            SUMMIT
+          </span>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
@@ -124,25 +118,21 @@ const Legend = (props) => {
             padding: "1px 4px",
           }}
         >
-          <div
+          <span
             style={{
-              width: "18px",
-              height: "18px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#f5f5f5",
-              borderRadius: "4px",
-              border: "1px solid #eee",
+              padding: '1px 5px',
+              borderRadius: '3px',
+              fontSize: '8px',
+              lineHeight: '1.2',
+              fontWeight: '700',
+              color: '#fff',
+              backgroundColor: '#C22848',
+              display: 'inline-flex',
+              alignItems: 'center',
             }}
           >
-            <img
-              src={passIcon}
-              className="flag-marker-icon"
-              width={isDesktop ? "12px" : "11px"}
-              alt="Pass"
-            />
-          </div>
+            PASS
+          </span>
           <span
             style={{ fontSize: "10px", fontWeight: "700", color: "#34495e" }}
           >
