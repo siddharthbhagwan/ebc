@@ -45,8 +45,8 @@ code {
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-/* Landscape orientation Lock */
-@media screen and (max-width: 900px) and (orientation: landscape) {
+/* Landscape orientation Lock - Only for touch devices (mobile/tablet), not desktop browsers */
+@media screen and (max-width: 900px) and (orientation: landscape) and (pointer: coarse) {
   #root {
     display: none !important;
   }

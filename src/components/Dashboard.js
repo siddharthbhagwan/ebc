@@ -140,19 +140,6 @@ const Dashboard = (props) => {
   const [passSortOrder, setPassSortOrder] = useState('day');
   const isInitialMount = useRef(true);
 
-  // Ensure About and Stats panels are mutually exclusive
-  useEffect(() => {
-    if (props.showInfo && showTrekStats) {
-      setShowTrekStats(false);
-    }
-  }, [props.showInfo, showTrekStats]);
-
-  useEffect(() => {
-    if (showTrekStats && props.showInfo) {
-      toggleInfo();
-    }
-  }, [showTrekStats, props.showInfo, toggleInfo]);
-
   // Calculate trek statistics once
   const trekStats = useMemo(() => calculateTrekStats(), []);
 
@@ -411,6 +398,11 @@ const Dashboard = (props) => {
   const handleToggleTools = useCallback(() => {
     setIsToolsOpen((prev) => {
       const newState = !prev;
+      ReactGA.event({
+        category: "UI",
+        action: "Toggle Tools Panel",
+        label: `${newState ? "Open" : "Close"} - Day ${props.day} - ${isDesktop ? "Desktop" : "Mobile"}`,
+      });
       if (!newState) {
         setShowTrekStats(false);
         // Close About/Info panel when toolbar closes on mobile
@@ -420,7 +412,7 @@ const Dashboard = (props) => {
       }
       return newState;
     });
-  }, [props.showInfo, toggleInfo]);
+  }, [props.showInfo, props.day, toggleInfo]);
 
   const handleSortToggle = useCallback(() => {
     const nextOrder = passSortOrder === 'day' ? 'desc' : passSortOrder === 'desc' ? 'asc' : 'day';
@@ -434,7 +426,14 @@ const Dashboard = (props) => {
 
   const handleNavigation = useCallback(
     (direction) => {
+      const fromDay = day;
       const targetFeature = direction === "next" ? nextDay() : prevDay();
+      const toDay = targetFeature?.properties?.day || "unknown";
+      ReactGA.event({
+        category: "Navigation",
+        action: direction === "next" ? "Next Day" : "Previous Day",
+        label: `Day ${fromDay} → Day ${toDay} - ${isDesktop ? "Desktop" : "Mobile"}`,
+      });
       setIsToolsOpen(false);
       setShowTrekStats(false);
 
@@ -465,6 +464,7 @@ const Dashboard = (props) => {
       prevDay,
       map,
       routes,
+      day,
       effectivePaddingTopLeft,
       effectivePaddingBottomRight,
       props.zoomDuration,
@@ -479,18 +479,23 @@ const Dashboard = (props) => {
     const handleKeyDown = (e) => {
       if (e.key === "ArrowRight") {
         e.preventDefault(); // Prevent default map scrolling
+        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowRight - Next Day" });
         handleNavigation("next");
       } else if (e.key === "ArrowLeft") {
         e.preventDefault(); // Prevent default map scrolling
+        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowLeft - Previous Day" });
         handleNavigation("prev");
       } else if (e.code === "Space" || e.key === "Enter") {
         e.preventDefault();
+        ReactGA.event({ category: "Navigation", action: "Keyboard", label: `${e.code === "Space" ? "Space" : "Enter"} - Reset Zoom` });
         resetZoom();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
+        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowUp - Zoom Out" });
         zoomOut();
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
+        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowDown - Zoom In" });
         zoomIn();
       }
     };
@@ -508,6 +513,11 @@ const Dashboard = (props) => {
 
     if (isSingleDayView) {
       // Switch TO "View All"
+      ReactGA.event({
+        category: "UI",
+        action: "Toggle View Mode",
+        label: `View All - from Day ${day} - ${isDesktop ? "Desktop" : "Mobile"}`,
+      });
       setLastZoomedDay(day);
       setSingleDayView(false);
 
@@ -524,6 +534,11 @@ const Dashboard = (props) => {
       map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
     } else {
       // Switch TO "Single Select"
+      ReactGA.event({
+        category: "UI",
+        action: "Toggle View Mode",
+        label: `Single Day - Day ${lastZoomedDay || day || "1"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+      });
       setSingleDayView(true);
 
       // Deciding which day to zoom into: last zoomed day, OR current day, OR default to Day 1
@@ -644,13 +659,17 @@ const Dashboard = (props) => {
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
-                          const newState = !showTrekStats;
+                          const willOpen = !showTrekStats;
                           ReactGA.event({
                             category: "UI",
                             action: "Toggle Stats",
-                            label: `${newState ? "Show" : "Hide"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                            label: `${willOpen ? "Show" : "Hide"} - ${isDesktop ? "Desktop" : "Mobile"}`,
                           });
-                          setShowTrekStats(newState);
+                          // If opening stats and info is open, close info first
+                          if (willOpen && props.showInfo) {
+                            toggleInfo();
+                          }
+                          setShowTrekStats(willOpen);
                         }}
                         className="tool-icon-button"
                         title="Trek Stats"
@@ -703,13 +722,14 @@ const Dashboard = (props) => {
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
+                          const willOpen = !props.showInfo;
                           ReactGA.event({
                             category: "UI",
                             action: "Toggle Info",
-                            label: !props.showInfo ? "Open" : "Close"
+                            label: willOpen ? "Open" : "Close"
                           });
-                          // Close stats panel if opening info
-                          if (!props.showInfo && showTrekStats) {
+                          // If opening info and stats is open, close stats first
+                          if (willOpen && showTrekStats) {
                             setShowTrekStats(false);
                           }
                           toggleInfo();
@@ -733,6 +753,11 @@ const Dashboard = (props) => {
                       <div
                         onClick={(e) => {
                           e.stopPropagation();
+                          ReactGA.event({
+                            category: "UI",
+                            action: "Toggle Unit",
+                            label: `${unit === "km" ? "FT" : "M"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                          });
                           toggleUnit();
                         }}
                         className={`unit-toggle-container unit-toggle-container--${isDesktop ? "desktop" : "mobile"}`}
@@ -761,8 +786,17 @@ const Dashboard = (props) => {
                     <div
                       onClick={(e) => {
                         e.stopPropagation();
+                        ReactGA.event({
+                          category: "UI",
+                          action: "Close Tools Panel",
+                          label: `Via X Button - Day ${props.day} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                        });
                         setIsToolsOpen(false);
                         setShowTrekStats(false);
+                        // Close About/Info panel when toolbar closes on mobile
+                        if (!isDesktop && props.showInfo) {
+                          toggleInfo();
+                        }
                       }}
                       className="close-button-wrapper"
                     >
@@ -821,6 +855,11 @@ const Dashboard = (props) => {
                         title={props.name}
                         onClick={(e) => {
                           e.stopPropagation();
+                          ReactGA.event({
+                            category: "Navigation",
+                            action: "Click Trek Name",
+                            label: `Day ${day} - ${isSingleDayView ? "Re-center" : "Enter Single Day"} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                          });
                           if (!isSingleDayView) {
                             toggleViewMode();
                           } else {
@@ -1128,9 +1167,16 @@ const Dashboard = (props) => {
         <>
           <div
             className="statistics-backdrop"
-            onClick={() => setShowTrekStats(false)}
+            onClick={() => {
+              ReactGA.event({
+                category: "UI",
+                action: "Close Stats Panel",
+                label: `Via Backdrop - ${isDesktop ? "Desktop" : "Mobile"}`,
+              });
+              setShowTrekStats(false);
+            }}
           />
-          <div className="statistics-card">
+          <div className={`statistics-card statistics-card--${isDesktop ? 'desktop' : 'mobile'}`}>
             <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px', textTransform: 'none' }}>
               Trek Stats
             </h3>
@@ -1174,7 +1220,7 @@ const Dashboard = (props) => {
                 <h4 
                   style={{ userSelect: 'none', margin: '15px 0 5px 0', textTransform: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
                 >
-                  <span style={{ fontSize: isDesktop ? '1.1rem' : '1rem', fontWeight: '700' }}>High Points</span>
+                  <span style={{ fontSize: isDesktop ? '1.1rem' : '1rem' }}>High Points</span>
                   <div style={{ 
                     display: 'flex', 
                     alignItems: 'center',
@@ -1204,7 +1250,14 @@ const Dashboard = (props) => {
 
             {/* Close instruction text - at bottom */}
             <div 
-              onClick={() => setShowTrekStats(false)}
+              onClick={() => {
+                ReactGA.event({
+                  category: "UI",
+                  action: "Close Stats Panel",
+                  label: `Via Tap Text - ${isDesktop ? "Desktop" : "Mobile"}`,
+                });
+                setShowTrekStats(false);
+              }}
               style={{ 
                 borderTop: '1px solid #edf2f7',
                 marginTop: '12px',

@@ -5,11 +5,23 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.8.1] - 2026-01-30
+## [1.9.0] - 2026-01-30
+
+### Added
+- **Responsive Panel Scaling**: Stats and About panels now scale proportionally with the dashboard during viewport resize, using JS-based device detection instead of CSS media queries.
+- **Narrow Desktop Backdrop**: About panel shows blur backdrop on desktop when window width < 700px.
+
+### Changed
+- **About Panel**: Width now matches dashboard (600px max), positioned directly above dashboard with 8px gap.
+- **About Panel Sizing**: Height is now auto-fit to content instead of fixed height, eliminating excess whitespace.
+- **Stats Panel**: Now uses JS-based device detection for consistent breakpoint behavior with dashboard.
+- **Panel Mutual Exclusivity**: Simplified logic by removing conflicting useEffects; mutual exclusivity now handled directly in click handlers.
+- **Metrics Row**: Removed background color from day/distance/time row for cleaner appearance.
 
 ### Fixed
 - **Trek Name**: Corrected to "Everest Base Camp 3 Pass Trek" in About section.
 - **Elevation Triangles**: Restored green (▲) and red (▼) indicators for climb/descent values.
+- **Mobile Toolbar Close**: Closing toolbar now properly closes both Stats and About panels on mobile.
 
 ## [1.8.0] - 2026-01-30
 

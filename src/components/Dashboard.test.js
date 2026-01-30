@@ -2452,3 +2452,112 @@ describe("Dashboard Unit Toggle", () => {
     expect(indicator.textContent).toBe('FT');
   });
 });
+
+describe("Panel Mutual Exclusivity", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        showInfo: false,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+  });
+
+  it("should close Stats when About is opened", async () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Open Stats panel
+    const statsButton = container.querySelector('.tool-icon-button');
+    fireEvent.click(statsButton);
+
+    // Stats should be visible
+    await waitFor(() => {
+      expect(container.querySelector('.statistics-card')).toBeInTheDocument();
+    });
+
+    // Click About button (info icon)
+    const infoButton = container.querySelector('img[alt="Toggle Info"]');
+    fireEvent.click(infoButton.parentElement);
+
+    // Stats should close
+    await waitFor(() => {
+      expect(container.querySelector('.statistics-card')).not.toBeInTheDocument();
+    });
+  });
+
+  it("should close About when Stats is opened", async () => {
+    // Start with showInfo: true
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        showInfo: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Click Stats button
+    const statsButton = container.querySelector('.tool-icon-button');
+    fireEvent.click(statsButton);
+
+    // Stats should be visible and About should close
+    await waitFor(() => {
+      expect(container.querySelector('.statistics-card')).toBeInTheDocument();
+      // showInfo state should be toggled (closed)
+      expect(store.getState().mapState.showInfo).toBe(false);
+    });
+  });
+});

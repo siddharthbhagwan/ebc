@@ -11,7 +11,16 @@ A comprehensive routine to prepare, commit, squash, push, update PR, and deploy 
    - If there are changes, run `git add .` and `git commit -m "<high-level summary>"` to commit all changes.
    - If no changes, proceed to next step.
 
-2. **Build and Test (Optimized)**:
+2. **Update Documentation (As Required)**:
+   - **SPEC.md**: Update the specification document if any design decisions, responsive behaviors, component structures, or UI patterns have changed.
+   - **CHANGELOG.md**: Add entries for new features, changes, and fixes under the appropriate version header.
+   - **Tests**: Update or add tests in respective `*.test.js` files when:
+     - New features or components are added.
+     - Existing behavior changes.
+     - Bug fixes require regression coverage.
+   - **instructions.md**: Update developer instructions if specification values or behaviors have changed.
+
+3. **Build and Test (Optimized)**:
    - **Parallel Execution**: Run `bun run build` and `bun run test --watchAll=false --maxWorkers=50%` concurrently where possible.
    - **Layout & Logic Checks**: Ensure tests cover critical UI behavior (e.g., Dashboard vs. Toolbar mutual exclusivity).
      - If deploying to production: Always run full test suite.
@@ -19,13 +28,13 @@ A comprehensive routine to prepare, commit, squash, push, update PR, and deploy 
      - If code changes detected: Run full test suite.
    - Stop and fix any build errors or test failures before proceeding.
 
-3. **Squash Commits**: Squash all commits since the last merge into a single commit. Use `git rebase -i HEAD~<n>` where <n> is the number of commits since the last merge. If conflicts arise, handle interactively.
+4. **Squash Commits**: Squash all commits since the last merge into a single commit. Use `git rebase -i HEAD~<n>` where <n> is the number of commits since the last merge. If conflicts arise, handle interactively.
 
-4. **Push Changes**: Push the squashed commit to the remote branch (e.g., `git push origin <branch> --force-with-lease`).
+5. **Push Changes**: Push the squashed commit to the remote branch (e.g., `git push origin <branch> --force-with-lease`).
 
-5. **Update PR**: Ensure the PR description includes a high-level list of all changes from the squashed commit.
+6. **Update PR**: Ensure the PR description includes a high-level list of all changes from the squashed commit.
 
-6. **Deploy**: Run `bun run deploy` to deploy to production.
+7. **Deploy**: Run `bun run deploy` to deploy to production.
 
 ## Usage
 
