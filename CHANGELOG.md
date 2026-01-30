@@ -5,6 +5,16 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-01-30
+
+### Added
+- **Altitude Always Visible**: POI tooltips now always display altitude under place names, not just when zoomed in.
+- **Day Labels on Highpoints**: Summit, pass, and EBC markers now show day number (e.g., "D12") in smaller, lighter font next to the name.
+
+### Changed
+- **Dashboard Height**: Increased desktop dashboard height from 115px to 120px for better content fit.
+- **Altitude Fallback**: Dashboard altitude display now falls back to route data if Redux props are null on initial load.
+
 ## [1.9.0] - 2026-01-30
 
 ### Added
