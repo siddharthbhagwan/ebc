@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import * as L from "leaflet";
 import { connect } from "react-redux";
 import ReactGA from "react-ga4";
@@ -17,6 +17,17 @@ import summitIcon from "../resources/images/summit.svg";
 
 const ZOOM_MOBILE = 10.7;
 
+// Collision detection helper - checks if two rectangles overlap
+const rectsOverlap = (rect1, rect2, padding = 4) => {
+  if (!rect1 || !rect2) return false;
+  return !(
+    rect1.right + padding < rect2.left - padding ||
+    rect1.left - padding > rect2.right + padding ||
+    rect1.bottom + padding < rect2.top - padding ||
+    rect1.top - padding > rect2.bottom + padding
+  );
+};
+
 const POI = (props) => {
   const { map } = props.leaflet;
   const {
@@ -34,6 +45,7 @@ const POI = (props) => {
   
   // Initialize currentZoom with the correct value for the device
   const [currentZoom, setCurrentZoom] = useState(map ? map.getZoom() : derivedZoom);
+  const collisionCheckRef = useRef(null);
 
   // Listen for zoom changes - track actual zoom level for detail control
   useEffect(() => {
@@ -53,13 +65,107 @@ const POI = (props) => {
     };
   }, [map]);
 
+  // Collision detection - hide overlapping labels, EBC always visible
+  const checkLabelCollisions = useCallback(() => {
+    if (!map) return;
+    
+    const tooltips = document.querySelectorAll('.leaflet-tooltip.tooltipLabel');
+    if (!tooltips.length) return;
+    
+    // Build array of tooltip data with bounding rects
+    const tooltipData = [];
+    tooltips.forEach((tooltip) => {
+      const rect = tooltip.getBoundingClientRect();
+      // Skip if tooltip is not visible or has no size
+      if (rect.width === 0 || rect.height === 0) return;
+      
+      const nameElement = tooltip.querySelector('div > div > span');
+      const name = nameElement ? nameElement.textContent : '';
+      
+      // EBC gets highest priority (1), everything else equal priority (2)
+      const priority = (name === 'Everest Base Camp' || name === 'EBC') ? 1 : 2;
+      
+      tooltipData.push({
+        element: tooltip,
+        rect,
+        priority,
+        name,
+      });
+    });
+    
+    // Sort by priority (EBC first), then by order in DOM
+    tooltipData.sort((a, b) => a.priority - b.priority);
+    
+    // Track visible label rectangles
+    const visibleRects = [];
+    
+    tooltipData.forEach((data) => {
+      // Check for collision with already-visible labels
+      let hasCollision = false;
+      for (const visibleRect of visibleRects) {
+        if (rectsOverlap(data.rect, visibleRect)) {
+          hasCollision = true;
+          break;
+        }
+      }
+      
+      if (hasCollision) {
+        // Hide this label
+        data.element.style.opacity = '0';
+        data.element.style.pointerEvents = 'none';
+      } else {
+        // Show this label
+        visibleRects.push(data.rect);
+        data.element.style.opacity = '1';
+        data.element.style.pointerEvents = 'auto';
+      }
+    });
+  }, [map]);
+
+  // Run collision detection on zoom/move/resize
+  useEffect(() => {
+    if (!map) return;
+    
+    const runCollisionCheck = () => {
+      if (collisionCheckRef.current) {
+        clearTimeout(collisionCheckRef.current);
+      }
+      collisionCheckRef.current = setTimeout(() => {
+        checkLabelCollisions();
+      }, 150);
+    };
+    
+    // Initial check after render
+    const initialCheck = setTimeout(() => {
+      checkLabelCollisions();
+    }, 400);
+    
+    map.on('zoomend', runCollisionCheck);
+    map.on('moveend', runCollisionCheck);
+    map.on('resize', runCollisionCheck);
+    window.addEventListener('resize', runCollisionCheck);
+    
+    return () => {
+      clearTimeout(initialCheck);
+      if (collisionCheckRef.current) {
+        clearTimeout(collisionCheckRef.current);
+      }
+      map.off('zoomend', runCollisionCheck);
+      map.off('moveend', runCollisionCheck);
+      map.off('resize', runCollisionCheck);
+      window.removeEventListener('resize', runCollisionCheck);
+    };
+  }, [map, checkLabelCollisions]);
+
+  // Re-run collision detection when view mode or day changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkLabelCollisions();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [isSingleDayView, currentDay, checkLabelCollisions]);
+
   const isZoomedIn = currentZoom > derivedZoom + 0.5;
-  
-  // Determine if label text should be shown
-  // Show all labels by default - icons and text always visible
-  const shouldShowLabelText = (labelPriority) => {
-    return true; // Always show all label text
-  };
 
   // Format altitude based on unit
   const formatAltitude = (altFt) => {
@@ -287,14 +393,11 @@ const POI = (props) => {
           keyboard={false} // Disable keyboard focus to prevent overlap with throb effect
         >
           {(() => {
-            // Use pre-calculated label priority from marker data
-            const labelPriority = markerPoint.properties.labelPriority || 4;
-            const showLabelText = shouldShowLabelText(labelPriority);
-            
-            // In single day view, always show labels for relevant POIs
+            // In single day view, only show labels for relevant POIs
+            // In overview, show all labels (collision detection will hide overlapping ones)
             const isTooltipVisible = isSingleDayView 
               ? (isDayMatch || isDest || isStart)
-              : showLabelText;
+              : true;
             
             if (!isTooltipVisible) return null;
             

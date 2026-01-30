@@ -3,7 +3,7 @@
 ## Overview
 
 **Product Name:** EBC Dashboard (Everest Base Camp Trek Map Blog)  
-**Version:** 1.10.0  
+**Version:** 1.11.0  
 **Last Updated:** January 30, 2026  
 **Live URL:** https://coderbear.com/ebc/  
 **Repository:** https://github.com/siddharthbhagwan/ebc
@@ -330,6 +330,20 @@ src/
 | Summit | Peak | 0.72 (reduced ~10%) |
 | Pass | Flag | 1.0 |
 | Airport | Plane | 1.0 |
+
+#### Label Collision Detection
+
+POI labels automatically hide when overlapping with other labels for a cleaner map appearance:
+
+| Behavior | Description |
+|----------|-------------|
+| **Priority** | Everest Base Camp always visible (highest priority) |
+| **Detection** | Bounding box overlap check with 4px padding |
+| **Trigger** | Runs on zoom, pan, resize, and view mode change |
+| **Animation** | Smooth 0.2s opacity fade transition |
+| **Zoom In** | More space reveals more labels |
+| **Zoom Out** | Overlapping labels hide automatically |
+| **Single Day View** | Only relevant POIs shown (no collision detection) |
 
 #### Legend Icon Sizes
 

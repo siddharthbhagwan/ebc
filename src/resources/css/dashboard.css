@@ -71,6 +71,7 @@ generic-dashboard {
   border: none;
   pointer-events: auto;
   cursor: pointer;
+  transition: opacity 0.2s ease-out;
 }
 
 .tooltipLabel:before {
