@@ -38,52 +38,69 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 1024px) {
-  .info-overlay {
-    padding-bottom: calc(138px + env(safe-area-inset-bottom));
-  }
+/* Mobile styling - applied via JS class */
+.info-overlay--mobile {
+  padding-bottom: calc(138px + env(safe-area-inset-bottom));
+}
 
-  .info-card {
-    width: 100%;
-    margin: 0;
-    border-radius: 12px 12px 0 0;
-    padding-bottom: 30px;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-  }
+.info-card--mobile {
+  width: 100%;
+  margin: 0;
+  border-radius: 12px 12px 0 0;
+  padding-bottom: 30px;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
 
-  @media (orientation: landscape) {
-    .info-overlay {
-      padding-bottom: calc(100px + env(safe-area-inset-bottom));
-    }
+/* Landscape mobile - only for touch devices */
+@media (orientation: landscape) and (pointer: coarse) {
+  .info-overlay--mobile {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
   }
 }
 
-@media (min-width: 1025px) {
-  .info-overlay {
-    justify-content: flex-start;
-    pointer-events: none;
-  }
+/* Desktop styling - applied via JS class */
+.info-overlay--desktop {
+  justify-content: flex-start;
+  pointer-events: none;
+}
 
-  .info-backdrop {
-    display: none;
-  }
+.info-overlay--desktop .info-backdrop {
+  display: none;
+}
 
-  .info-card {
-    position: fixed;
-    bottom: 172px;
-    width: 300px;
-    left: auto;
-    right: 20px;
-    border-radius: 12px;
-    border: 2px solid #cbd5e0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-    padding: 24px 20px;
-    padding-bottom: 24px;
+/* Show backdrop blur on desktop when window is narrow */
+@media (max-width: 700px) {
+  .info-overlay--desktop {
     pointer-events: auto;
-    max-height: 70vh;
   }
+  
+  .info-overlay--desktop .info-backdrop {
+    display: block;
+  }
+  
+  .info-card--desktop {
+    width: calc(100vw - 40px);
+  }
+}
+
+.info-card--desktop {
+  position: fixed;
+  bottom: calc(115px + min(20px, 2vh) + 8px);
+  width: min(600px, calc(100vw - 40px));
+  height: auto;
+  max-height: min(300px, 40vh);
+  left: auto;
+  right: min(20px, 2vw);
+  margin: 0;
+  border-radius: 12px;
+  border: 2px solid #cbd5e0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  padding: 24px 20px 6px 20px;
+  pointer-events: auto;
+  overflow: hidden;
+  transition: width 0.2s ease, height 0.2s ease, bottom 0.2s ease, right 0.2s ease;
 }
 
 .info-content {

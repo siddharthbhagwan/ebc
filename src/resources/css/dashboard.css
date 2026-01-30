@@ -267,21 +267,19 @@ generic-dashboard {
   margin: 0;
 }
 
-@media (min-width: 1025px) {
-  .dashboard-container {
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border: 2px solid #cbd5e0;
-  }
+/* Desktop styling - applied via JS class, not media query */
+.dashboard-container--desktop {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #cbd5e0;
 }
 
-@media (max-width: 1024px) {
-  .dashboard-container {
-    border-radius: 0;
-    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
-    border: 2px solid #d1d5db;
-    border-top: 2px solid #cbd5e0;
-  }
+/* Mobile styling - applied via JS class, not media query */
+.dashboard-container--mobile {
+  border-radius: 0;
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+  border: 2px solid #d1d5db;
+  border-top: 2px solid #cbd5e0;
 }
 
 .dashboard-top-section {
@@ -705,7 +703,7 @@ generic-dashboard {
   align-items: center;
   width: 100%;
   height: 28px;
-  background: #fdfdfd;
+  background: transparent;
   border-top: 1px solid #edf2f7;
   padding: 0 10px;
   box-sizing: border-box;
@@ -1110,15 +1108,16 @@ generic-dashboard {
   max-height: 18px;
 }
 
-/* Dashboard Container */
+/* Dashboard Container - positioning defined here (styling at top of file) */
 .dashboard-container--desktop {
-  width: 600px;
+  width: min(600px, calc(100vw - 40px));
   height: 115px;
   padding-bottom: 0;
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: min(20px, 2vh);
+  right: min(20px, 2vw);
   z-index: 30000;
+  transition: width 0.2s ease, bottom 0.2s ease, right 0.2s ease;
 }
 
 .dashboard-container--mobile {
@@ -1132,8 +1131,8 @@ generic-dashboard {
   z-index: 30000;
 }
 
-/* Landscape mobile - shorter dashboard */
-@media (max-width: 1024px) and (orientation: landscape) {
+/* Landscape mobile - shorter dashboard (only for touch devices) */
+@media (orientation: landscape) and (pointer: coarse) {
   .dashboard-container--mobile {
     height: 100px;
   }
@@ -1284,87 +1283,77 @@ generic-dashboard {
   }
 }
 
-@media (max-width: 1024px) and (orientation: landscape) {
+/* Landscape mobile - only for touch devices */
+@media (orientation: landscape) and (pointer: coarse) {
   .statistics-backdrop {
     height: calc(100% - 100px - env(safe-area-inset-bottom));
   }
 }
 
+/* Base statistics card styles */
 .statistics-card {
   position: fixed;
-  bottom: calc(146px + env(safe-area-inset-bottom));
-  left: 10px;
-  right: 10px;
   background: white;
-  border-radius: 12px;
-  border: 2px solid #cbd5e0;
-  border-bottom: 2px solid #cbd5e0;
-  padding: 12px 16px;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   z-index: 10001;
-  width: calc(100% - 20px);
   max-height: 80vh;
   overflow-y: auto;
   box-sizing: border-box;
 }
 
-@media (min-width: 1025px) {
-  .statistics-card {
-    bottom: 172px; /* 152px height + 20px bottom offset */
-    width: 300px;
-    left: auto;
-    right: 20px;
-    border-radius: 12px;
-    border: 2px solid #cbd5e0;
+/* Desktop styling - applied via JS class, not media query */
+.statistics-card--desktop {
+  bottom: calc(115px + min(20px, 2vh) + 12px);
+  width: min(300px, calc((100vw - 40px) * 0.5));
+  left: auto;
+  right: min(20px, 2vw);
+  border-radius: 12px;
+  border: 2px solid #cbd5e0;
+  padding: 12px 16px;
+  transition: width 0.2s ease, right 0.2s ease;
+}
+
+/* Mobile styling - applied via JS class, not media query */
+.statistics-card--mobile {
+  bottom: calc(138px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  width: 100%;
+  border-radius: 12px 12px 0 0;
+  padding: 10px 16px 24px 16px;
+  border: 2px solid #cbd5e0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* Landscape mobile - only for touch devices */
+@media (orientation: landscape) and (pointer: coarse) {
+  .statistics-card--mobile {
+    bottom: calc(100px + env(safe-area-inset-bottom));
   }
 }
 
-@media (max-width: 1024px) {
-  .statistics-card {
-    bottom: calc(138px + env(safe-area-inset-bottom));
-    left: 0;
-    right: 0;
-    width: 100%;
-    border-radius: 12px 12px 0 0;
-    padding: 10px 16px 24px 16px;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-  }
-
-  @media (orientation: landscape) {
-    .statistics-card {
-      bottom: calc(100px + env(safe-area-inset-bottom));
-    }
-  }
-
-  .statistics-card h3 {
-    font-size: 14.5px;
-    letter-spacing: 0.5px;
-    color: #1a202c;
-    margin-bottom: 6px;
-    border-bottom: 1.5px solid #edf2f7;
-    padding-bottom: 6px;
-  }
-
-  .statistics-card .stat-row {
-    font-size: 12px;
-    padding: 3px 0;
-    border-bottom: 1px solid #f7fafc;
-  }
-
-  .statistics-card .high-passes-section h4 {
-    font-size: 13px;
-    margin-top: 10px;
-    margin-bottom: 6px;
-    color: #2d3748;
-  }
+.statistics-card--mobile h3 {
+  font-size: 14.5px;
+  letter-spacing: 0.5px;
+  color: #1a202c;
+  margin-bottom: 6px;
+  border-bottom: 1.5px solid #edf2f7;
+  padding-bottom: 6px;
 }
 
-@media (max-width: 1024px) and (orientation: landscape) {
-  .statistics-card {
-    bottom: 84px;
-  }
+.statistics-card--mobile .stat-row {
+  font-size: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid #f7fafc;
+}
+
+.statistics-card--mobile .high-passes-section h4 {
+  font-size: 13px;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  color: #2d3748;
 }
 
 /* Top border on dashboard when statistics is open */
@@ -1391,24 +1380,22 @@ generic-dashboard {
   font-size: 10.5px;
 }
 
-@media (min-width: 1025px) {
-  .stat-row {
-    font-size: 13px;
-    padding: 6px 0;
-    border-bottom: 1px solid #f7fafc;
-  }
-  
-  .statistics-card h3 {
-    font-size: 19px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #edf2f7;
-    padding-bottom: 10px;
-  }
+/* Desktop stat-row styling - applied via parent class */
+.statistics-card--desktop .stat-row {
+  font-size: 13px;
+  padding: 3px 0;
+}
 
-  .high-passes-section h4 {
-    font-size: 16px;
-    margin-top: 15px;
-  }
+.statistics-card--desktop h3 {
+  font-size: 19px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 10px;
+}
+
+.statistics-card--desktop .high-passes-section h4 {
+  font-size: 16px;
+  margin-top: 15px;
 }
 
 .stat-label {

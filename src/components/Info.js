@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import ReactGA from "react-ga4";
+import { isDesktop } from "react-device-detect";
 import "../resources/css/dashboard.css";
 import "../resources/css/info.css";
 import { mapDispatchToProps } from "../utils/utils";
@@ -8,12 +9,12 @@ import { mapDispatchToProps } from "../utils/utils";
 const Info = (props) => {
   const { showInfo, toggleInfo } = props;
 
-  const handleToggle = (e) => {
+  const handleToggle = (e, source = "Backdrop") => {
     if (e) e.stopPropagation();
     ReactGA.event({
       category: "UI",
-      action: "Toggle Info",
-      label: "Close"
+      action: "Close Info Panel",
+      label: `Via ${source} - ${isDesktop ? "Desktop" : "Mobile"}`
     });
     toggleInfo();
   };
@@ -21,12 +22,12 @@ const Info = (props) => {
   return (
     <>
       {showInfo && (
-        <div className="info-overlay" onClick={handleToggle}>
+        <div className={`info-overlay info-overlay--${isDesktop ? "desktop" : "mobile"}`} onClick={handleToggle}>
           {/* Backdrop Blur - Full screen blur */}
           <div className="info-backdrop" />
 
           {/* Info Content Box - Actual card that stays clear */}
-          <div className="info-card" onClick={(e) => e.stopPropagation()}>
+          <div className={`info-card info-card--${isDesktop ? "desktop" : "mobile"}`} onClick={(e) => e.stopPropagation()}>
             <div className="info-content">
               <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
                 {/* Left column - Profile image and social links */}
@@ -34,6 +35,10 @@ const Info = (props) => {
                   <img 
                     src="https://coderbear.com/images/siddhartha.png" 
                     alt="Siddhartha Bhagwan"
+                    width={102}
+                    height={102}
+                    loading="lazy"
+                    decoding="async"
                     style={{ 
                       width: "102px", 
                       height: "102px", 
@@ -132,11 +137,11 @@ const Info = (props) => {
             
             {/* Close instruction text - at bottom */}
             <div 
-              onClick={handleToggle}
+              onClick={(e) => handleToggle(e, "Tap Text")}
               style={{ 
                 borderTop: '1px solid #edf2f7',
-                marginTop: '8px',
-                paddingTop: '6px',
+                marginTop: '4px',
+                paddingTop: '4px',
                 textAlign: 'center', 
                 fontSize: '10px', 
                 color: '#a0aec0', 

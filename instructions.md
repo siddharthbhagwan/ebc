@@ -26,6 +26,36 @@
   - Toolbar icon styling and accessibility.
   - Metric display order (Name > Elevation > Altitude).
 
+## Documentation Maintenance
+
+When making changes, ensure the following are kept up to date:
+
+### SPEC.md
+The comprehensive specification document. Update when:
+- Design system values change (colors, typography, spacing)
+- Responsive breakpoints or behaviors change
+- Component structures or patterns are modified
+- New features or interactions are added
+
+### CHANGELOG.md
+Semantic versioning changelog. Update when:
+- **Added**: New features or capabilities
+- **Changed**: Modifications to existing behavior
+- **Fixed**: Bug fixes
+- **Removed**: Deprecated features removed
+
+### Test Files
+Update tests (`*.test.js`) when:
+- New features require coverage
+- Existing behavior changes
+- Bug fixes need regression tests
+- UI interactions are modified
+
 ## Publishing
 - Use `npm run deploy` (or `bun run deploy`) to build and push to GitHub Pages.
 - Ensure all tests pass before deployment using `npm test`.
+- **Pre-publish checklist**:
+  1. SPEC.md is current
+  2. CHANGELOG.md has version entry
+  3. Tests cover new/changed behavior
+  4. Version in package.json is bumped appropriately

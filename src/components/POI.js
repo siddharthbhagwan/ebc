@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import * as L from "leaflet";
 import { connect } from "react-redux";
+import ReactGA from "react-ga4";
 import { isDesktop } from "react-device-detect";
 import "../resources/css/dashboard.css";
 import { getMarkers } from "../utils/markers";
@@ -343,6 +344,15 @@ const POI = (props) => {
       .map((d) => d.trim())
       .filter((d) => d !== "");
 
+    // Determine marker type for tracking
+    const getMarkerType = (props) => {
+      if (props.name?.toLowerCase().includes("base camp") || props.name === "EBC") return "Base Camp";
+      if (props.name?.toLowerCase().includes("pass")) return "Pass";
+      if (props.name?.toLowerCase().includes("peak") || props.name === "Gokyo Ri" || props.name === "Kala Patthar") return "Summit";
+      if (props.name === "Lukla") return "Airport";
+      return "Camp";
+    };
+
     // Logic: Identify which single numeric day to switch to.
     // If the marker has multiple days, and our current day is NOT one of them,
     // or our current day is a composite string, pick the first day from the marker.
@@ -356,6 +366,13 @@ const POI = (props) => {
     ) {
       targetDay = markerDays[0] || currentDay;
     }
+
+    // Track marker click
+    ReactGA.event({
+      category: "POI",
+      action: "Click Marker",
+      label: `${markerProps.name} (${getMarkerType(markerProps)}) - Day ${targetDay} - from Day ${currentDay} - ${isDesktop ? "Desktop" : "Mobile"}`,
+    });
 
     // Crucial: Update the payload to use the single numeric targetDay
     // instead of the composite string "2, 3, 19 & 20"

@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
 import L from "leaflet";
+import ReactGA from "react-ga4";
 import { getDayWiseDataG } from "../utils/geoJson";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { connect } from "react-redux";
@@ -145,6 +146,11 @@ const GeoJsonRoutes = (props) => {
             }}
             onclick={() => {
               if (properties.day !== "20") {
+                ReactGA.event({
+                  category: "Route",
+                  action: "Click Rest Day Point",
+                  label: `Day ${properties.day} - ${properties.name || "Rest Day"} - from Day ${currentDay} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                });
                 dispatchLayerDetails(properties);
                 setSingleDayView(true);
                 // Zoom to the point
@@ -179,6 +185,14 @@ const GeoJsonRoutes = (props) => {
 
       const clickHandler = () => {
         if (properties.day === "20") return;
+        
+        // Track route click
+        ReactGA.event({
+          category: "Route",
+          action: "Click Route Line",
+          label: `Day ${properties.day} - ${properties.name || "Route"} - from Day ${currentDay} - ${isDesktop ? "Desktop" : "Mobile"}`,
+        });
+        
         dispatchLayerDetails(properties);
 
         // Toggle behavior: if already in single day view on mobile and clicking current day, toggle back to overview
