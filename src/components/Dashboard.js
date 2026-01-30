@@ -708,6 +708,10 @@ const Dashboard = (props) => {
                             action: "Toggle Info",
                             label: !props.showInfo ? "Open" : "Close"
                           });
+                          // Close stats panel if opening info
+                          if (!props.showInfo && showTrekStats) {
+                            setShowTrekStats(false);
+                          }
                           toggleInfo();
                         }}
                         className="tool-icon-button"
