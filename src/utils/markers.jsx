@@ -81,7 +81,7 @@ const markers = [
       icon: tentIcon,
       name: "Lobuche",
       startAlt: "16,210",
-      direction: "auto",
+      direction: "right",
     },
   },
   {

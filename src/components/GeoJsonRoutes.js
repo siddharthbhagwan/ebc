@@ -248,7 +248,7 @@ const GeoJsonRoutes = (props) => {
 
         const highlightColor = segments[0]?.color || "#2c3e50";
 
-        // PASS 1: The "Depth" (Deep, wide shadow)
+        //  1: The "Depth" (Deep, wide shadow)
         highlightedLayers.push(
           <GeoJSON
             key={`depth-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
@@ -267,7 +267,7 @@ const GeoJsonRoutes = (props) => {
           />,
         );
 
-        // PASS 2: The "Inner Shadow" (Slightly darker version of the path color) - REMOVED per user request
+        //  2: The "Inner Shadow" (Slightly darker version of the path color) - REMOVED per user request
         // highlightedLayers.push(
         //   <GeoJSON
         //     key={`border-${day}-${featIdx}-${isZoomedIn}-${isDeepZoom}-${reduxZoom}-${showLegend}`}
@@ -286,7 +286,7 @@ const GeoJsonRoutes = (props) => {
         //   />,
         // );
 
-        // PASS 2: The "Glass Tube" (Semi-transparent Body)
+        //  2: The "Glass Tube" (Semi-transparent Body)
         highlightedLayers.push(
           <GeoJSON
             key={`outer-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
@@ -316,7 +316,7 @@ const GeoJsonRoutes = (props) => {
           />,
         );
 
-        // PASS 3: The "Sunlight" (Thin, offset-feeling white highlight)
+        //  3: The "Sunlight" (Thin, offset-feeling white highlight)
         highlightedLayers.push(
           <GeoJSON
             key={`inner-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}

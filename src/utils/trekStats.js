@@ -70,9 +70,9 @@ export const calculateTrekStats = () => {
  */
 export const getPassInfo = (day) => {
   const passes = {
-    8: { name: 'Kongma La', altitude: '18,159 ft', color: '#C22848' },
-    14: { name: 'Cho La', altitude: '17,782 ft', color: '#C22848' },
-    18: { name: 'Renjo La', altitude: '17,585 ft', color: '#C22848' }
+    8: { name: 'Kongma La', altitude: '18,159 ft', color: '#8E0000' },
+    14: { name: 'Cho La', altitude: '17,782 ft', color: '#8E0000' },
+    18: { name: 'Renjo La', altitude: '17,585 ft', color: '#8E0000' }
   };
   return passes[day] || null;
 };
@@ -82,9 +82,9 @@ export const getPassInfo = (day) => {
  */
 export const getSummitInfo = (day) => {
   const summits = {
-    7: { name: 'Chhukung Ri', altitude: '18,209 ft', color: '#C22848' },
-    12: { name: 'Kala Patthar', altitude: '18,514 ft', color: '#C22848' },
-    16: { name: 'Gokyo Ri', altitude: '17,575 ft', color: '#C22848' }
+    7: { name: 'Chhukung Ri', altitude: '18,209 ft', color: '#8E0000' },
+    12: { name: 'Kala Patthar', altitude: '18,514 ft', color: '#8E0000' },
+    16: { name: 'Gokyo Ri', altitude: '17,575 ft', color: '#8E0000' }
   };
   return summits[day] || null;
 };

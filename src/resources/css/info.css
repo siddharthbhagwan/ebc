@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  z-index: 500;
+  z-index: 20000;
 }
 
 .info-backdrop {
@@ -24,43 +24,70 @@
 .info-card {
   position: relative;
   background: white;
-  border-radius: 12px 12px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.12);
-  width: 100%;
-  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: calc(100% - 20px);
+  margin: 0 10px 10px 10px;
+  max-height: 75vh;
   overflow-y: auto;
   z-index: 1;
   padding: 24px 20px;
-  padding-bottom: 120px;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
-@media (min-width: 1025px) {
+@media (max-width: 1024px) {
+  .info-overlay {
+    padding-bottom: calc(138px + env(safe-area-inset-bottom));
+  }
+
   .info-card {
-    padding-bottom: 150px;
+    width: 100%;
+    margin: 0;
+    border-radius: 12px 12px 0 0;
+    padding-bottom: 30px;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  @media (orientation: landscape) {
+    .info-overlay {
+      padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
   }
 }
 
-.info-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #95a5a6;
-  font-size: 20px;
-  font-weight: 300;
-  z-index: 2;
+@media (min-width: 1025px) {
+  .info-overlay {
+    justify-content: flex-start;
+    pointer-events: none;
+  }
+
+  .info-backdrop {
+    display: none;
+  }
+
+  .info-card {
+    position: fixed;
+    bottom: 172px;
+    width: 300px;
+    left: auto;
+    right: 20px;
+    border-radius: 12px;
+    border: 2px solid #cbd5e0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    padding: 24px 20px;
+    padding-bottom: 24px;
+    pointer-events: auto;
+    max-height: 70vh;
+  }
 }
 
 .info-content {
-  margin-top: 35px;
+  margin-top: 5px;
   font-size: 15px;
   line-height: 1.7;
   text-align: left;

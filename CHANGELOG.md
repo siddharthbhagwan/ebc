@@ -5,6 +5,36 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-01-30
+
+### Added
+- **Unit Customization**: Updated toolbar toggle to display **M/FT** instead of KM/MI for altitude preference.
+- **Improved Alignment**: Fixed Lobuche marker text alignment to always appear on the right.
+- **Testing**: Created dedicated test files for Legend and markers utilities.
+
+### Changed
+- **Typography Polish**: Reduced dashboard font weight across branding, metrics, and navigation for a more sophisticated, less "fat" appearance.
+- **Desktop Refinement**: Slimmed down statistics and info cards to a 300px width on desktop (originally 520px) to maximize map visibility.
+- **Icon Alignment**: Fixed vertical centering of legend "tags" (Summit/Pass/Lodging) by normalizing icon container sizes and ensuring flexbox alignment without increasing bar height.
+- **Unit Formatting**: Removed whitespaces between values and units (e.g., `18,000ft`) for tighter data display.
+- **Icon Refinements**: Decreased summit and pass icon sizes by 1px for better balance with text labels and on-map circles.
+- **Summit/Pass Tag Color**: Changed tag colors to match elevation red (`#8E0000`) for visual consistency with high-altitude markers.
+- **Mobile UX**: Closing the toolbar now automatically closes the About panel on mobile devices.
+- **Test Reorganization**: Moved tests from `UIFixes.test.js` to respective component test files (`Legend.test.js`, `markers.test.js`).
+
+## [1.6.0] - 2026-01-30
+
+### Added
+- **Mutual Exclusivity**: Stats and Info panels now automatically toggle each other off when opened.
+- **Floating UI Design**: Statistics and Info panels converted to modern floating cards on mobile for better safe-area compatibility.
+- **Analytics Integration**: Added ReactGA4 tracking for all major UI interactions including panel toggles and sorting.
+
+### Changed
+- **Branding**: Renamed "Trek Statistics" to "Trek Stats" and updated headings to normal case.
+- **Desktop Refinements**: Synchronized widths (480px) and 스타일 between Info and Stats panels.
+- **UI Height**: Reduced desktop dashboard height to 115px with optimized sticky metrics bar.
+- **Data Cleanup**: Removed " Pass" suffix from geo-data names for a cleaner interface.
+
 ## [1.5.1] - 2026-01-30
 
 ### Changed

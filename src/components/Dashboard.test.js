@@ -1,14 +1,15 @@
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
-import { Provider } from "react-redux";
-import { combineReducers, createStore } from "redux";
-import Dashboard from "./Dashboard";
-import MapContainer from "./MapContainer";
-import { routeReducer } from "../reducers/routeReducer";
-import { mapStateReducer } from "../reducers/mapStateReducer";
+
+// Mock react-device-detect
+jest.mock("react-device-detect", () => ({
+  isBrowser: true,
+  isDesktop: true,
+  isMobile: false,
+  useMobileOrientation: () => ({ isLandscape: false }),
+}));
 
 // Declare mockMap before jest.mock so it can be referenced
-let mockMap = {
+const mockMap = {
   on: jest.fn(),
   off: jest.fn(),
   getZoom: jest.fn(() => 11.3),
@@ -21,12 +22,8 @@ let mockMap = {
 
 // Mock react-leaflet
 jest.mock("react-leaflet", () => ({
-  Map: ({ children, ...props }) => (
-    <div data-testid="leaflet-control">{children}</div>
-  ),
-  MapContainer: ({ children, ...props }) => (
-    <div data-testid="leaflet-control">{children}</div>
-  ),
+  Map: ({ children }) => <div data-testid="leaflet-control">{children}</div>,
+  MapContainer: ({ children }) => <div data-testid="leaflet-control">{children}</div>,
   TileLayer: () => null,
   Marker: () => null,
   Popup: () => null,
@@ -35,6 +32,14 @@ jest.mock("react-leaflet", () => ({
     <Component {...props} leaflet={{ map: mockMap }} />
   ),
 }));
+
+import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
+import { combineReducers, createStore } from "redux";
+import Dashboard from "./Dashboard";
+import MapContainer from "./MapContainer";
+import { routeReducer } from "../reducers/routeReducer";
+import { mapStateReducer } from "../reducers/mapStateReducer";
 
 // Mock Leaflet
 jest.mock("leaflet", () => ({
@@ -613,7 +618,7 @@ describe("Dashboard Toolbar Behavior", () => {
 
     await waitFor(() => {
       expect(
-        getByText("Everest Base Camp 3 Pass Trek, Nepal"),
+        getByText("Everest Base Camp 3 Trek, Nepal"),
       ).toBeInTheDocument();
     });
   });
@@ -634,7 +639,7 @@ describe("Dashboard Toolbar Behavior", () => {
     });
   });
 
-  it("should show unit toggle (KM/MI) in toolbar", async () => {
+  it("should show unit toggle (M/FT) in toolbar", async () => {
     const { getByAltText, getAllByText } = render(
       <Provider store={store}>
         <Dashboard />
@@ -645,9 +650,9 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(toolsBtn);
 
     await waitFor(() => {
-      // There are multiple KM/MI elements - the active unit indicator and the toggle labels
-      const kmElements = getAllByText("KM");
-      const miElements = getAllByText("MI");
+      // There are multiple M/FT elements - the active unit indicator and the toggle labels
+      const kmElements = getAllByText("M");
+      const miElements = getAllByText("FT");
       expect(kmElements.length).toBeGreaterThan(0);
       expect(miElements.length).toBeGreaterThan(0);
     });
@@ -681,7 +686,7 @@ describe("Dashboard Toolbar Behavior", () => {
 
     await waitFor(() => {
       expect(
-        getByText("Everest Base Camp 3 Pass Trek, Nepal"),
+        getByText("Everest Base Camp 3 Trek, Nepal"),
       ).toBeInTheDocument();
     });
 
@@ -691,7 +696,7 @@ describe("Dashboard Toolbar Behavior", () => {
 
     await waitFor(() => {
       expect(
-        queryByText("Everest Base Camp 3 Pass Trek, Nepal"),
+        queryByText("Everest Base Camp 3 Trek, Nepal"),
       ).not.toBeInTheDocument();
     });
   });
@@ -1412,7 +1417,7 @@ describe("Dashboard Font Size Adaptation", () => {
       },
       route: {
         day: "8",
-        name: "Chhukung - Kongma La Pass - Lobuche",
+        name: "Chhukung - Kongma La - Lobuche",
         time: "8h",
         distance: "6.5 mi / 10.5 km",
         startAlt: "15,535",
@@ -1429,7 +1434,7 @@ describe("Dashboard Font Size Adaptation", () => {
       </Provider>,
     );
 
-    const nameElement = getByText("Chhukung - Kongma La Pass - Lobuche");
+    const nameElement = getByText("Chhukung - Kongma La - Lobuche");
     // Long names (>30 chars) should have fontSize 15px on desktop
     expect(nameElement).toHaveStyle({ fontSize: "15px" });
   });
@@ -1825,7 +1830,7 @@ describe("Dashboard Altitude Display Format", () => {
       },
       route: {
         day: "8",
-        name: "Chhukung - Kongma La Pass - Lobuche",
+        name: "Chhukung - Kongma La - Lobuche",
         time: "8h",
         distance: "6.5 mi / 10.5 km",
         startAlt: "15,535",
@@ -2399,11 +2404,11 @@ describe("Dashboard Unit Toggle", () => {
     const toolsButton = container.querySelector('img[alt="Tools"]');
     fireEvent.click(toolsButton.parentElement);
 
-    // Unit toggle should show KM and MI labels (multiple elements expected)
-    const kmElements = getAllByText("KM");
-    const miElements = getAllByText("MI");
-    expect(kmElements.length).toBeGreaterThan(0);
-    expect(miElements.length).toBeGreaterThan(0);
+    // Unit toggle should show M and FT labels (multiple elements expected)
+    const mElements = getAllByText("M");
+    const ftElements = getAllByText("FT");
+    expect(mElements.length).toBeGreaterThan(0);
+    expect(ftElements.length).toBeGreaterThan(0);
   });
 
   it("should show current unit in toggle indicator", () => {
@@ -2441,9 +2446,9 @@ describe("Dashboard Unit Toggle", () => {
     const toolsButton = container.querySelector('img[alt="Tools"]');
     fireEvent.click(toolsButton.parentElement);
 
-    // Unit indicator should show MI
+    // Unit indicator should show FT
     const indicator = container.querySelector('.unit-toggle-indicator--desktop');
     expect(indicator).toBeInTheDocument();
-    expect(indicator.textContent).toBe('MI');
+    expect(indicator.textContent).toBe('FT');
   });
 });
