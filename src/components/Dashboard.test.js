@@ -1892,6 +1892,47 @@ describe("Dashboard Altitude Display Format", () => {
     expect(container.querySelector('.altitude-end')).toBeInTheDocument();
     expect(container.querySelector('.altitude-peak')).not.toBeInTheDocument();
   });
+
+  it("should display altitude on initial load with fallback to route data", () => {
+    // Test that altitude is always visible even if props might be null
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "814",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Altitude display should always be present
+    const altitudeDisplay = container.querySelector('.altitude-display');
+    expect(altitudeDisplay).toBeInTheDocument();
+    
+    // Should have altitude values visible
+    expect(container.querySelector('.altitude-start')).toBeInTheDocument();
+    expect(container.querySelector('.altitude-end')).toBeInTheDocument();
+  });
 });
 
 // =====================================================

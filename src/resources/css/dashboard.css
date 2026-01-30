@@ -638,6 +638,9 @@ generic-dashboard {
   text-align: center;
   white-space: nowrap;
   width: 100%;
+  display: block !important;
+  visibility: visible !important;
+  min-height: 14px;
 }
 
 .altitude-display--desktop {
@@ -687,6 +690,8 @@ generic-dashboard {
 /* Elevation Wrapper */
 .elevation-wrapper {
   width: 100%;
+  display: block !important;
+  visibility: visible !important;
 }
 
 /* Divider */
@@ -1111,7 +1116,7 @@ generic-dashboard {
 /* Dashboard Container - positioning defined here (styling at top of file) */
 .dashboard-container--desktop {
   width: min(600px, calc(100vw - 40px));
-  height: 115px;
+  height: 120px;
   padding-bottom: 0;
   position: fixed;
   bottom: min(20px, 2vh);

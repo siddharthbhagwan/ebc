@@ -143,8 +143,20 @@ const Dashboard = (props) => {
   // Calculate trek statistics once
   const trekStats = useMemo(() => calculateTrekStats(), []);
 
+  // Memoized routes data (cached) - moved up for altitude fallback
+  const routes = useMemo(() => getDayWiseDataG(), []);
+
+  // Get altitude from current day's route data as fallback
+  const currentDayRoute = routes[day];
+  const currentDayProps = currentDayRoute?.features?.[0]?.properties || {};
+  
+  // Use props if available, fallback to route data
+  const effectiveStartAlt = startAlt || currentDayProps.startAlt || null;
+  const effectiveEndAlt = endAlt || currentDayProps.endAlt || null;
+  const effectivePeakAlt = peakAlt || currentDayProps.peakAlt || null;
+
   //  no altitude data
-  const isPlace = startAlt === "0" && endAlt === "0";
+  const isPlace = effectiveStartAlt === "0" && effectiveEndAlt === "0";
   // Acclimatization / Rest days
   const isRestDay = time === "Rest Day";
   const { isLandscape = false } = useMobileOrientation();
@@ -220,9 +232,6 @@ const Dashboard = (props) => {
     () => getTitleFontSize(props.name || "", isDesktop),
     [props.name],
   );
-
-  // Memoized routes data (cached)
-  const routes = useMemo(() => getDayWiseDataG(), []);
 
   const resetZoom = useCallback(() => {
     if (!map) return;
@@ -931,23 +940,23 @@ const Dashboard = (props) => {
                           {isRestDay ? (
                             // Rest day: show only single altitude
                             <span className="altitude-single">
-                              {endAlt ? formatAlt(endAlt) : ""}
+                              {effectiveEndAlt ? formatAlt(effectiveEndAlt) : ""}
                             </span>
                           ) : (
                             // Normal day: show start → peak → end
                             <>
                               <span className="altitude-start">
-                                {startAlt ? formatAlt(startAlt) : ""}
+                                {effectiveStartAlt ? formatAlt(effectiveStartAlt) : ""}
                               </span>
-                              {peakAlt && (
+                              {effectivePeakAlt && (
                                 <span className="altitude-peak">
                                   {" "}
-                                  → {formatAlt(peakAlt)}
+                                  → {formatAlt(effectivePeakAlt)}
                                 </span>
                               )}
                               <span className="altitude-end">
                                 {" "}
-                                → {endAlt ? formatAlt(endAlt) : ""}
+                                → {effectiveEndAlt ? formatAlt(effectiveEndAlt) : ""}
                               </span>
                             </>
                           )}

@@ -314,10 +314,15 @@ const POI = (props) => {
                   clickHandler(syntheticEvent);
                 }}
               >
-                <div style={{ fontWeight: isZoomedIn ? "600" : "normal" }}>
-                  {markerPoint.properties.name}
+                <div style={{ fontWeight: isZoomedIn ? "600" : "normal", display: "flex", alignItems: "baseline", gap: "4px" }}>
+                  <span>{markerPoint.properties.name}</span>
+                  {(isSummit || isPass || isEBC) && (
+                    <span style={{ fontSize: "0.75em", fontWeight: "normal", opacity: 0.6 }}>
+                      D{markerPoint.properties.day}
+                    </span>
+                  )}
                 </div>
-                {(isSingleDayView || isZoomedIn) && markerPoint.properties.startAlt && (
+                {markerPoint.properties.startAlt && (
                   <div
                     style={{
                       fontSize: "0.9em",
