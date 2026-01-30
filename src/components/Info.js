@@ -8,15 +8,25 @@ import { mapDispatchToProps } from "../utils/utils";
 const Info = (props) => {
   const { showInfo, toggleInfo } = props;
 
+  const handleToggle = (e) => {
+    if (e) e.stopPropagation();
+    ReactGA.event({
+      category: "UI",
+      action: "Toggle Info",
+      label: "Close"
+    });
+    toggleInfo();
+  };
+
   return (
     <>
       {showInfo && (
-        <div className="info-overlay" onClick={toggleInfo}>
+        <div className="info-overlay" onClick={handleToggle}>
           {/* Backdrop Blur - Full screen blur */}
           <div className="info-backdrop" />
 
           {/* Info Content Box - Actual card that stays clear */}
-          <div className="info-card">
+          <div className="info-card" onClick={(e) => e.stopPropagation()}>
             <div className="info-content">
               <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
                 {/* Left column - Profile image and social links */}
@@ -100,7 +110,7 @@ const Info = (props) => {
                 <div style={{ flex: 1 }}>
                   <p style={{ marginTop: 0, marginBottom: "16px" }}>
                     This is a map-blog I designed and built to document the incredible 
-                    Everest Base Camp 3 Pass Trek my friend{" "}
+                    Everest Base Camp 3 Trek my friend{" "}
                     <a
                       href="https://x.com/binnyjohnk"
                       target="_blank"
@@ -123,8 +133,8 @@ const Info = (props) => {
             {/* Close instruction text - at bottom */}
             <div style={{ 
               borderTop: '1px solid #edf2f7',
-              marginTop: '30px',
-              paddingTop: '12px',
+              marginTop: '8px',
+              paddingTop: '6px',
               textAlign: 'center', 
               fontSize: '10px', 
               color: '#a0aec0', 
