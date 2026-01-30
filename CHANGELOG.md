@@ -5,6 +5,17 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-01-30
+
+### Changed
+- **Summit/Pass Tag Color**: Updated to elevation red (`#8E0000`) for visual consistency with high-altitude route segments.
+- **Summit Icon Size**: Reduced by ~10% for better visual balance on map markers and legend.
+- **Elevation Triangles**: Restored ▲/▼ indicators with smaller, more subtle sizing (70% of text).
+- **Stats Panel**: Removed faint line separators between rows on desktop for cleaner appearance.
+- **About Panel**: Increased width by 10% on desktop (300px → 330px) for better readability.
+- **Panel Mutual Exclusivity**: Fixed bug where clicking Info/Stats buttons wouldn't properly toggle the other panel closed.
+- **Mobile UX**: Closing toolbar now properly closes About panel.
+
 ## [1.7.0] - 2026-01-30
 
 ### Added
