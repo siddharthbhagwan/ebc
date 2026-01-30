@@ -866,7 +866,7 @@ const Dashboard = (props) => {
                                           : (climbNum >= descentNum ? "15px" : "12px") 
                                       }}
                                     >
-                                      {formatAlt(total_climb)}
+                                      <span style={{ fontSize: '0.7em' }}>▲</span>{formatAlt(total_climb)}
                                     </span>
                                   )}
                                   {descent && descent !== "0" && (
@@ -878,7 +878,7 @@ const Dashboard = (props) => {
                                           : (descentNum >= climbNum ? "15px" : "12px") 
                                       }}
                                     >
-                                      {formatAlt(descent)}
+                                      <span style={{ fontSize: '0.7em' }}>▼</span>{formatAlt(descent)}
                                     </span>
                                   )}
                                 </>

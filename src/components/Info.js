@@ -110,7 +110,7 @@ const Info = (props) => {
                 <div style={{ flex: 1 }}>
                   <p style={{ marginTop: 0, marginBottom: "16px" }}>
                     This is a map-blog I designed and built to document the incredible 
-                    Everest Base Camp 3 Trek my friend{" "}
+                    Everest Base Camp 3 Pass Trek my friend{" "}
                     <a
                       href="https://x.com/binnyjohnk"
                       target="_blank"

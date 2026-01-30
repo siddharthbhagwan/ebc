@@ -5,6 +5,12 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.1] - 2026-01-30
+
+### Fixed
+- **Trek Name**: Corrected to "Everest Base Camp 3 Pass Trek" in About section.
+- **Elevation Triangles**: Restored green (▲) and red (▼) indicators for climb/descent values.
+
 ## [1.8.0] - 2026-01-30
 
 ### Changed
