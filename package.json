@@ -1,6 +1,6 @@
 {
   "name": "ebc-dashboard",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "private": true,
   "homepage": "https://coderbear.com/ebc/",
   "dependencies": {

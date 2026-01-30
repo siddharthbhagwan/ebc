@@ -5,6 +5,21 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-01-30
+
+### Added
+- **Day Labels on All POIs**: All map markers now display day number (e.g., "D5") next to the name, not just summits and passes.
+
+### Changed
+- **Label Visibility**: All POI labels (name + altitude) now visible by default on both desktop and mobile. Icons always visible.
+
+### Fixed
+- **Day Assignments**: Corrected sleeping location days to only show nights actually spent at each location:
+  - Namche Bazaar: D2, 3 & 19 (removed day 20)
+  - Lobuche: D8, 9 & 12 (removed days 10, 11, 13)
+  - Gorak Shep: D10 & 11 (removed day 12)
+  - Marlung: D18 (removed day 19)
+
 ## [1.9.1] - 2026-01-30
 
 ### Added

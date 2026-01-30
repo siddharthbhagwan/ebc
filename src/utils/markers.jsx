@@ -4,6 +4,11 @@ import airportIcon from "../resources/images/airport.svg";
 import passIcon from "../resources/images/pass.svg";
 import ebcIcon from "../resources/images/ebc.svg";
 
+// Pre-calculated label visibility priorities and conflict groups
+// Based on geographic proximity - when labels would overlap at lower zoom levels
+// Priority: 1 = always show, 2 = show at medium zoom, 3 = show at higher zoom, 4 = only when zoomed in
+// Conflict groups: labels in same group may overlap - lower priority hides first
+
 const markers = [
   {
     // Phakding
@@ -17,6 +22,8 @@ const markers = [
       startAlt: "8,563",
       direction: "right",
       background: "white",
+      labelPriority: 3,
+      conflictGroup: "lower-trail",
     },
   },
   {
@@ -25,11 +32,13 @@ const markers = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "2, 3, 19 & 20",
+      day: "2, 3 & 19",
       icon: tentIcon,
       name: "Namche Bazaar",
       startAlt: "11,286",
       direction: "right",
+      labelPriority: 2,
+      conflictGroup: "namche-area",
     },
   },
   {
@@ -43,6 +52,8 @@ const markers = [
       name: "Tengboche",
       startAlt: "12,644",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "mid-trail",
     },
   },
   {
@@ -56,6 +67,8 @@ const markers = [
       name: "Dingboche",
       startAlt: "14,470",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "dingboche-chhukung",
     },
   },
   {
@@ -69,6 +82,8 @@ const markers = [
       name: "Chhukung",
       startAlt: "15,535",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "dingboche-chhukung",
     },
   },
   {
@@ -77,11 +92,13 @@ const markers = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "8, 9, 10, 11, 12 & 13",
+      day: "8, 9 & 12",
       icon: tentIcon,
       name: "Lobuche",
       startAlt: "16,210",
       direction: "right",
+      labelPriority: 2,
+      conflictGroup: "ebc-area",
     },
   },
   {
@@ -90,11 +107,13 @@ const markers = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "10, 11 & 12",
+      day: "10 & 11",
       icon: tentIcon,
       name: "Gorak Shep",
       startAlt: "16,942",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "ebc-area",
     },
   },
   {
@@ -108,6 +127,8 @@ const markers = [
       name: "Dzongla",
       startAlt: "15,850",
       direction: "bottom",
+      labelPriority: 3,
+      conflictGroup: "cho-la-area",
     },
   },
   {
@@ -121,6 +142,8 @@ const markers = [
       name: "Thangnak",
       startAlt: "15,420",
       direction: "bottom",
+      labelPriority: 3,
+      conflictGroup: "gokyo-area",
     },
   },
   {
@@ -134,6 +157,8 @@ const markers = [
       name: "Gokyo",
       startAlt: "15,720",
       direction: "bottom",
+      labelPriority: 3,
+      conflictGroup: "gokyo-area",
     },
   },
   {
@@ -142,11 +167,13 @@ const markers = [
     icon: tentIcon,
     size: [10, 10],
     properties: {
-      day: "18 & 19",
+      day: "18",
       icon: tentIcon,
       name: "Marlung",
       startAlt: "13,566",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "renjo-area",
     },
   },
   {
@@ -161,6 +188,8 @@ const markers = [
       name: "Chhukung Ri",
       startAlt: "18,058",
       direction: "right",
+      labelPriority: 3,
+      conflictGroup: "dingboche-chhukung",
     },
   },
   {
@@ -174,6 +203,8 @@ const markers = [
       name: "Everest Base Camp",
       startAlt: "17,600",
       direction: "right",
+      labelPriority: 1,
+      conflictGroup: "ebc-area",
     },
   },
   {
@@ -187,6 +218,8 @@ const markers = [
       name: "Kala Patthar",
       startAlt: "18,519",
       direction: "auto",
+      labelPriority: 2,
+      conflictGroup: "ebc-area",
     },
   },
   {
@@ -200,6 +233,8 @@ const markers = [
       name: "Gokyo Ri",
       startAlt: "17,989",
       direction: "top",
+      labelPriority: 2,
+      conflictGroup: "gokyo-area",
     },
   },
   {
@@ -213,6 +248,8 @@ const markers = [
       name: "Kongma La",
       startAlt: "18,058",
       direction: "bottom",
+      labelPriority: 3,
+      conflictGroup: "dingboche-chhukung",
     },
   },
   {
@@ -226,6 +263,8 @@ const markers = [
       name: "Cho La",
       startAlt: "17,625",
       direction: "top",
+      labelPriority: 2,
+      conflictGroup: "cho-la-area",
     },
   },
   {
@@ -239,6 +278,8 @@ const markers = [
       name: "Renjo La",
       startAlt: "17,680",
       direction: "left",
+      labelPriority: 2,
+      conflictGroup: "renjo-area",
     },
   },
   {
@@ -252,9 +293,22 @@ const markers = [
       name: "Lukla",
       startAlt: "9,383",
       direction: "auto",
+      labelPriority: 2,
+      conflictGroup: "lower-trail",
     },
   },
 ];
-const getMarkers = () => markers;
 
-export { getMarkers };
+// Pre-calculated zoom thresholds for label visibility
+// Values are added to baseZoom - negative means show even when zoomed out
+const LABEL_ZOOM_THRESHOLDS = {
+  1: -Infinity, // Always show (EBC)
+  2: -0.5,      // Show at base zoom and slightly zoomed out (major landmarks, passes, summits)
+  3: 0,         // Show at base zoom (secondary camps)
+  4: 0.5,       // Show when slightly zoomed in (minor camps)
+};
+
+const getMarkers = () => markers;
+const getLabelZoomThresholds = () => LABEL_ZOOM_THRESHOLDS;
+
+export { getMarkers, getLabelZoomThresholds };
