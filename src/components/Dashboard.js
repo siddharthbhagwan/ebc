@@ -70,10 +70,19 @@ const getFeatureBounds = (input, dayOverride = null, isDesktopView = true) => {
   }
 
   // Fallback: calculate bounds from GeoJSON (rarely needed)
+  // Filter to only include route features (LineString/MultiLineString), not POI Points
   try {
-    const layer = L.geoJSON(input);
-    const bounds = layer.getBounds();
-    if (bounds.isValid()) return bounds;
+    const routeOnlyInput = {
+      ...input,
+      features: (input.features || []).filter(f => 
+        f.geometry?.type === 'MultiLineString' || f.geometry?.type === 'LineString'
+      )
+    };
+    if (routeOnlyInput.features.length > 0) {
+      const layer = L.geoJSON(routeOnlyInput);
+      const bounds = layer.getBounds();
+      if (bounds.isValid()) return bounds;
+    }
   } catch (e) {
     // Silent fallback to manual calculation
   }
@@ -81,15 +90,12 @@ const getFeatureBounds = (input, dayOverride = null, isDesktopView = true) => {
   const features = input.features || (Array.isArray(input) ? input : [input]);
   const allLatlngs = [];
 
+  // Only include LineString and MultiLineString for bounds calculation, skip Points (POI icons)
   features.forEach((feature) => {
     if (!feature.geometry) return;
     const coords = feature.geometry.coordinates;
 
-    if (feature.geometry.type === "Point") {
-      if (Array.isArray(coords) && coords.length >= 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-        allLatlngs.push([coords[1], coords[0]]);
-      }
-    } else if (feature.geometry.type === "LineString") {
+    if (feature.geometry.type === "LineString") {
       coords.forEach((c) => {
         if (Array.isArray(c) && c.length >= 2 && !isNaN(c[0]) && !isNaN(c[1])) {
           allLatlngs.push([c[1], c[0]]);
@@ -1206,13 +1212,13 @@ const Dashboard = (props) => {
                 <div className="stat-row">
                   <span className="stat-label">Total Ascent</span>
                   <span className="stat-value" style={{ color: '#27ae60', fontWeight: '800' }}>
-                    {formatAlt(trekStats.totalClimb)}
+                    <span style={{ fontSize: '0.8em' }}>▲</span> {formatAlt(trekStats.totalClimb)}
                   </span>
                 </div>
                 <div className="stat-row">
                   <span className="stat-label">Total Descent</span>
-                  <span className="stat-value" style={{ color: '#c0392b', fontWeight: '800' }}>
-                    {formatAlt(trekStats.totalDescent)}
+                  <span className="stat-value" style={{ color: '#8c2419', fontWeight: '800' }}>
+                    <span style={{ fontSize: '0.8em' }}>▼</span> {formatAlt(trekStats.totalDescent)}
                   </span>
                 </div>
                 <div className="stat-row">

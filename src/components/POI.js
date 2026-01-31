@@ -393,13 +393,12 @@ const POI = (props) => {
           keyboard={false} // Disable keyboard focus to prevent overlap with throb effect
         >
           {(() => {
-            // In single day view, only show labels for relevant POIs
+            // In single day view on desktop, show all POIs but with different styling:
+            // - Current day POIs: full details (name, day, altitude) in larger font
+            // - Other POIs: just name in smaller font
             // In overview, show all labels (collision detection will hide overlapping ones)
-            const isTooltipVisible = isSingleDayView 
-              ? (isDayMatch || isDest || isStart)
-              : true;
-            
-            if (!isTooltipVisible) return null;
+            const isCurrentDayPOI = isDayMatch || isDest || isStart;
+            const isOtherDayInSingleView = isSingleDayView && isDesktop && !isCurrentDayPOI;
             
             return (
               <Tooltip
@@ -410,7 +409,7 @@ const POI = (props) => {
               >
                 <div
                   style={{
-                    fontSize: isZoomedIn ? "14px" : "11px",
+                    fontSize: isOtherDayInSingleView ? "9px" : (isZoomedIn ? "14px" : "11px"),
                     cursor: "pointer",
                   }}
                   onClick={(e) => {
@@ -425,22 +424,32 @@ const POI = (props) => {
                     clickHandler(syntheticEvent);
                   }}
                 >
-                  <div style={{ fontWeight: isZoomedIn ? "600" : "normal", display: "flex", alignItems: "baseline", gap: "4px" }}>
-                    <span>{markerPoint.properties.name}</span>
-                    <span style={{ fontSize: "0.75em", fontWeight: "normal", opacity: 0.6 }}>
-                      D{markerPoint.properties.day}
-                    </span>
-                  </div>
-                  {markerPoint.properties.startAlt && (
-                    <div
-                      style={{
-                        fontSize: "0.9em",
-                        opacity: 0.8,
-                        marginTop: "2px",
-                      }}
-                    >
-                      {formatAltitude(markerPoint.properties.startAlt)}
+                  {isOtherDayInSingleView ? (
+                    // Other day POIs in single view: just name, smaller but readable
+                    <div style={{ fontWeight: "500", opacity: 0.85 }}>
+                      {markerPoint.properties.name}
                     </div>
+                  ) : (
+                    // Current day POIs or overview: full details
+                    <>
+                      <div style={{ fontWeight: isZoomedIn ? "600" : "normal", display: "flex", alignItems: "baseline", gap: "4px" }}>
+                        <span>{markerPoint.properties.name}</span>
+                        <span style={{ fontSize: "0.75em", fontWeight: "normal", opacity: 0.6 }}>
+                          D{isSingleDayView ? currentDay : markerPoint.properties.day}
+                        </span>
+                      </div>
+                      {markerPoint.properties.startAlt && (
+                        <div
+                          style={{
+                            fontSize: "0.9em",
+                            opacity: 0.8,
+                            marginTop: "2px",
+                          }}
+                        >
+                          {formatAltitude(markerPoint.properties.startAlt)}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </Tooltip>
@@ -513,17 +522,27 @@ const POI = (props) => {
     const effectivePaddingBottomRight = isDesktop ? [650, 180] : [40, 190];
 
     if (targetRoute) {
-      // Create bounds from all features in the day
-      const layer = L.geoJSON(targetRoute);
-      const bounds = layer.getBounds();
+      // Create bounds from only LineString/MultiLineString features (route points),
+      // not Point features (POI icons) to ensure bounding box matches route only
+      const routeOnlyFeatures = {
+        ...targetRoute,
+        features: targetRoute.features.filter(f => 
+          f.geometry.type === 'MultiLineString' || f.geometry.type === 'LineString'
+        )
+      };
+      
+      if (routeOnlyFeatures.features.length > 0) {
+        const layer = L.geoJSON(routeOnlyFeatures);
+        const bounds = layer.getBounds();
 
-      if (bounds.isValid()) {
-        map.flyToBounds(bounds, {
-          paddingTopLeft: effectivePaddingTopLeft,
-          paddingBottomRight: effectivePaddingBottomRight,
-          duration: props.zoomDuration,
-        });
-        return;
+        if (bounds.isValid()) {
+          map.flyToBounds(bounds, {
+            paddingTopLeft: effectivePaddingTopLeft,
+            paddingBottomRight: effectivePaddingBottomRight,
+            duration: props.zoomDuration,
+          });
+          return;
+        }
       }
     }
 
@@ -537,6 +556,12 @@ const POI = (props) => {
   };
 
   const mouseoverHandler = (e) => {
+    // In single day view on desktop, disable hover to prevent day switching
+    // User must click the button to exit single day view
+    if (isSingleDayView && isDesktop) {
+      return;
+    }
+
     const markerProps = e.target.options.properties;
     const markerDays = (markerProps.day || "")
       .split(/[,&]/)

@@ -3,8 +3,8 @@
 ## Overview
 
 **Product Name:** EBC Dashboard (Everest Base Camp Trek Map Blog)  
-**Version:** 1.11.0  
-**Last Updated:** January 30, 2026  
+**Version:** 1.11.1  
+**Last Updated:** January 31, 2026  
 **Live URL:** https://coderbear.com/ebc/  
 **Repository:** https://github.com/siddharthbhagwan/ebc
 
