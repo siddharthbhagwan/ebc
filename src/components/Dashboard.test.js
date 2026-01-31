@@ -2554,6 +2554,36 @@ describe("Panel Mutual Exclusivity", () => {
     });
   });
 
+  it("should display triangles in stats panel for ascent and descent", async () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Open Stats panel
+    const statsButton = container.querySelector('.tool-icon-button');
+    fireEvent.click(statsButton);
+
+    // Stats should be visible with triangles
+    await waitFor(() => {
+      const statsCard = container.querySelector('.statistics-card');
+      expect(statsCard).toBeInTheDocument();
+      
+      // Check for triangles in ascent/descent values
+      const statValues = statsCard.querySelectorAll('.stat-value');
+      const ascentValue = Array.from(statValues).find(el => el.textContent.includes('▲'));
+      const descentValue = Array.from(statValues).find(el => el.textContent.includes('▼'));
+      
+      expect(ascentValue).toBeInTheDocument();
+      expect(descentValue).toBeInTheDocument();
+    });
+  });
+
   it("should close About when Stats is opened", async () => {
     // Start with showInfo: true
     store = createMockStore({

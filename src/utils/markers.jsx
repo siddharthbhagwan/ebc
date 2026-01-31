@@ -66,7 +66,7 @@ const markers = [
       icon: tentIcon,
       name: "Dingboche",
       startAlt: "14,470",
-      direction: "right",
+      direction: "bottom",
       labelPriority: 3,
       conflictGroup: "dingboche-chhukung",
     },
