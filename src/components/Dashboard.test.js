@@ -74,6 +74,28 @@ jest.mock("../utils/geoJson", () => ({
   }),
 }));
 
+// Mock preCalculatedBounds to ensure consistent test behavior
+jest.mock("../utils/preCalculatedBounds", () => ({
+  preCalculatedBounds: {
+    "1": {
+      desktop: [[27.68, 86.71], [27.74, 86.73]],
+      mobile: [[27.67, 86.70], [27.75, 86.74]],
+    },
+    "2": {
+      desktop: [[27.73, 86.70], [27.81, 86.72]],
+      mobile: [[27.72, 86.70], [27.82, 86.73]],
+    },
+    "3": {
+      desktop: [[27.80, 86.70], [27.82, 86.72]],
+      mobile: [[27.79, 86.70], [27.83, 86.73]],
+    },
+    "7": {
+      desktop: [[27.89, 86.83], [27.93, 86.88]],
+      mobile: [[27.88, 86.82], [27.94, 86.89]],
+    },
+  },
+}));
+
 jest.mock("../hooks/useDays", () => ({
   __esModule: true,
   default: () => ({
@@ -2551,6 +2573,36 @@ describe("Panel Mutual Exclusivity", () => {
     // Stats should close
     await waitFor(() => {
       expect(container.querySelector('.statistics-card')).not.toBeInTheDocument();
+    });
+  });
+
+  it("should display triangles in stats panel for ascent and descent", async () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel
+    const toolsButton = container.querySelector('img[alt="Tools"]');
+    fireEvent.click(toolsButton.parentElement);
+
+    // Open Stats panel
+    const statsButton = container.querySelector('.tool-icon-button');
+    fireEvent.click(statsButton);
+
+    // Stats should be visible with triangles
+    await waitFor(() => {
+      const statsCard = container.querySelector('.statistics-card');
+      expect(statsCard).toBeInTheDocument();
+      
+      // Check for triangles in ascent/descent values
+      const statValues = statsCard.querySelectorAll('.stat-value');
+      const ascentValue = Array.from(statValues).find(el => el.textContent.includes('▲'));
+      const descentValue = Array.from(statValues).find(el => el.textContent.includes('▼'));
+      
+      expect(ascentValue).toBeInTheDocument();
+      expect(descentValue).toBeInTheDocument();
     });
   });
 

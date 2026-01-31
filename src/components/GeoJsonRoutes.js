@@ -140,6 +140,8 @@ const GeoJsonRoutes = (props) => {
               shadowUrl: null,
             })}
             onmouseover={() => {
+              // In single day view on desktop, disable hover to prevent day switching
+              if (isZoomedIn && isDesktop) return;
               if (properties.day !== "20") {
                 dispatchLayerDetails(properties);
               }
@@ -319,6 +321,8 @@ const GeoJsonRoutes = (props) => {
             onEachFeature={(feature, layer) => {
               layer.on({
                 mouseover: () => {
+                  // In single day view on desktop, disable hover to prevent day switching
+                  if (isZoomedIn && isDesktop) return;
                   if (properties.day !== "20") {
                     dispatchLayerDetails(properties);
                   }
@@ -393,6 +397,8 @@ const GeoJsonRoutes = (props) => {
               onEachFeature={(feature, layer) => {
                 layer.on({
                   mouseover: () => {
+                    // In single day view on desktop, disable hover to prevent day switching
+                    if (isZoomedIn && isDesktop) return;
                     if (properties.day !== "20") {
                       dispatchLayerDetails(properties);
                     }
@@ -433,6 +439,8 @@ const GeoJsonRoutes = (props) => {
           onEachFeature={(feature, layer) => {
             layer.on({
               mouseover: () => {
+                // In single day view on desktop, disable hover to prevent day switching
+                if (isZoomedIn && isDesktop) return;
                 if (properties.day !== "20") {
                   dispatchLayerDetails(properties);
                 }

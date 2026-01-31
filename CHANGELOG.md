@@ -5,6 +5,18 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.1] - 2026-01-31
+
+### Added
+- **Stats Panel Triangles**: Added ▲/▼ triangle indicators to Total Ascent and Total Descent in the Trek Stats panel for visual consistency with the main dashboard.
+
+### Changed
+- **Descent Color**: Updated Total Descent color in stats panel to match main dashboard (#8c2419 dark red).
+- **Single Day View Labels**: Other-day POIs now show only name (no D# or altitude) in smaller 9px font for cleaner display on both desktop and mobile.
+
+### Fixed
+- **Bounds Calculation**: Regenerated preCalculatedBounds from route-only coordinates, excluding POI icons. This ensures single-day view zooms to show only the actual route, not distant markers.
+
 ## [1.11.0] - 2026-01-30
 
 ### Added
