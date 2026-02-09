@@ -4250,6 +4250,32 @@ const marlung_to_namche_bazaar_19 = {
 };
 
 const dayWiseDataG = {
+  0: {
+    type: "FeatureCollection",
+    bbox: [86.68934, 27.68693, 86.85934, 27.98594],
+    features: [
+      {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [86.76420972837559, 27.840457443855108, 0],
+        },
+        properties: {
+          weight: 2,
+          day: "0",
+          name: "Everest Base Camp 3 Pass Trek",
+          distance: "",
+          time: "",
+          startAlt: "",
+          endAlt: "",
+          peakAlt: "",
+          total_climb: "",
+          descent: "",
+          isOverview: true,
+        },
+      },
+    ],
+  },
   1: lukla_to_phakding_1,
   2: phakding_to_namche_bazaar_2,
   3: {
@@ -4348,7 +4374,7 @@ const dayWiseDataG = {
         properties: {
           weight: 2,
           day: "17",
-          name: "Gokyo Acclimatization",
+          name: "Gokyo Chill Day",
           distance: "0 mi / 0 km",
           time: "Rest Day",
           startAlt: "15,584",

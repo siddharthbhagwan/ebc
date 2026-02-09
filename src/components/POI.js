@@ -265,11 +265,14 @@ const POI = (props) => {
       }
 
       // Determine circle logic:
-      // In Overview, circle all Houses & Airports.
       // In Single Day View, Circle only the destination and airports.
+      // In Overview, only circle airports (not houses to avoid duplication).
       const shouldCircle = !isSingleDayView
-        ? isHouse || isAirport
+        ? isAirport
         : isDest || isAirport;
+      
+      // Houses always get white background circles for visibility, but not pulsating circles
+      const shouldHaveWhiteCircle = isHouse;
 
       // Altitude-based border color
       const altFt = parseInt(
@@ -331,6 +334,33 @@ const POI = (props) => {
           html: `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
                   <div class="rest-day-circle ${pulseClass} ${rippleClass}" style="border-color: ${borderColor}; border-width: 1.5px; width: ${wrapSize}px; height: ${wrapSize}px; position: relative;">
                     <img src="${markerPoint.icon}" class="${imgClass}" style="${imgStyle}" />
+                  </div>
+                 </div>`,
+          shadowUrl: null,
+        });
+      } else if (shouldHaveWhiteCircle && !shouldCircle) {
+        // Houses without pulsating circles, but with white background for visibility
+        const wrapSize = isDesktop ? 16 : 16;
+        const imgSize = isDesktop ? 9 : 10;
+        
+        // Altitude-based border color
+        const altFt = parseInt(
+          (markerPoint.properties.startAlt || "0").replace(/,/g, ""),
+          10,
+        );
+        const altM = altFt * 0.3048;
+        const borderColor = getColorForElevation(altM);
+
+        // Create larger tap target on mobile for better accessibility
+        const tapTargetSize = !isDesktop ? Math.max(wrapSize + 20, 44) : wrapSize;
+
+        icon = L.divIcon({
+          className: "house-white-circle-wrapper",
+          iconSize: [tapTargetSize, tapTargetSize],
+          iconAnchor: [tapTargetSize / 2, tapTargetSize / 2],
+          html: `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
+                  <div class="rest-day-circle" style="border-color: ${borderColor}; border-width: 1.5px; width: ${wrapSize}px; height: ${wrapSize}px; position: relative;">
+                    <img src="${markerPoint.icon}" style="width: ${imgSize}px; height: ${imgSize}px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />
                   </div>
                  </div>`,
           shadowUrl: null,
