@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { GeoJSON, withLeaflet } from "react-leaflet";
+import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
 import L from "leaflet";
 import ReactGA from "react-ga4";
 import { getDayWiseDataG } from "../utils/geoJson";
@@ -7,7 +7,12 @@ import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { connect } from "react-redux";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
 import { mapDispatchToProps } from "../utils/utils";
-import { createGradientSegments } from "../utils/heightGradient";
+import {
+  createGradientSegments,
+  getColorForElevation,
+} from "../utils/heightGradient";
+import tentIcon from "../resources/images/tent.svg";
+import airportIcon from "../resources/images/airport.svg";
 
 const GeoJsonRoutes = (props) => {
   const { map } = props.leaflet;
@@ -110,10 +115,78 @@ const GeoJsonRoutes = (props) => {
     features.forEach((featureData, featIdx) => {
       const { geometry, properties, segments } = featureData;
 
-      // Skip Point features (Rest Days, Day 0 overview) - these are already 
-      // rendered by POI.js as part of the markers.jsx data set. Rendering them
-      // here causes duplicate "big circle" markers at locations like Lobuche.
+      // Handle Point features (Rest Days or specialized markers)
+      // Note: We hide these here because they are already rendered by POI.js
+      // as part of the markers.jsx data set. This prevents "double" icons
+      // and double ripples on rest days like Gorak Shep.
       if (geometry.type === "Point") {
+        // Show rest day circular border if zoomed in AND it's the current rest day,
+        // OR if zoomed out AND it's selected (for Rest Days)
+        const isSelectedPoint = properties.day === currentDay;
+        const shouldShowBorder = isZoomedIn ? isSelectedPoint : isSelectedPoint;
+
+        if (!shouldShowBorder) {
+          return;
+        }
+
+        // Validate coordinates
+        if (!geometry.coordinates || geometry.coordinates.length < 2 || isNaN(geometry.coordinates[0]) || isNaN(geometry.coordinates[1])) {
+          return;
+        }
+
+        const pointLatlng = [geometry.coordinates[1], geometry.coordinates[0]];
+        const elevation = geometry.coordinates[2];
+        const color = getColorForElevation(elevation);
+
+        routeLayers.push(
+          <Marker
+            key={"rest-day-" + properties.day + "-" + featIdx}
+            position={pointLatlng}
+            interactive={properties.day !== "20"}
+            icon={L.divIcon({
+              className: "rest-day-border-only",
+              iconSize: [32, 32],
+              iconAnchor: [16, 16],
+              html: `<div class="rest-day-circle" style="border-color: ${color};">
+                      ${
+                        properties.day === "20"
+                          ? `<img src="${airportIcon}" style="width: 14px; height: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />`
+                          : `<img src="${tentIcon}" style="width: 14px; height: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />`
+                      }
+                     </div>`,
+              shadowUrl: null,
+            })}
+            onmouseover={() => {
+              // In single day view on desktop, disable hover to prevent day switching
+              if (isZoomedIn && isDesktop) return;
+              if (properties.day !== "20") {
+                dispatchLayerDetails(properties);
+              }
+            }}
+            onclick={() => {
+              if (properties.day !== "20") {
+                ReactGA.event({
+                  category: "Route",
+                  action: "Click Rest Day Point",
+                  label: `Day ${properties.day} - ${properties.name || "Rest Day"} - from Day ${currentDay} - ${isDesktop ? "Desktop" : "Mobile"}`,
+                });
+                dispatchLayerDetails(properties);
+                setSingleDayView(true);
+                // Zoom to the point
+                const offset = 0.005;
+                const bounds = L.latLngBounds(
+                  [pointLatlng[0] - offset, pointLatlng[1] - offset],
+                  [pointLatlng[0] + offset, pointLatlng[1] + offset],
+                );
+                map.flyToBounds(bounds, {
+                  paddingTopLeft: effectivePaddingTopLeft,
+                  paddingBottomRight: effectivePaddingBottomRight,
+                  duration: zoomDuration,
+                });
+              }
+            }}
+          />,
+        );
         return;
       }
 
