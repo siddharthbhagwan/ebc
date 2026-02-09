@@ -165,6 +165,8 @@ const Dashboard = (props) => {
   const isPlace = effectiveStartAlt === "0" && effectiveEndAlt === "0";
   // Acclimatization / Rest days
   const isRestDay = time === "Rest Day";
+  // Day 0 is the overview page
+  const isDayZero = day === "0";
   const { isLandscape = false } = useMobileOrientation();
 
   // Derived zoom based on device and orientation
@@ -175,7 +177,17 @@ const Dashboard = (props) => {
 
   const { nextDay, prevDay } = useDays(day, dispatchLayerDetails);
 
+  // Dynamic padding based on viewport height for better small screen support
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  
+  useEffect(() => {
+    const handleResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Memoized padding values - optimized for various screen sizes
+  // Desktop: scale bottom padding based on viewport height
   const effectivePaddingTopLeft = useMemo(() => {
     if (isDesktop) {
       return [120, showLegend ? 180 : 120];
@@ -188,11 +200,19 @@ const Dashboard = (props) => {
 
   const effectivePaddingBottomRight = useMemo(() => {
     if (isDesktop) {
-      return [650, 180];
+      // Dynamic bottom padding based on screen size
+      // For smaller screens (< 700px), use minimal padding
+      // For normal screens, use proportional scaling
+      if (viewportHeight < 700) {
+        return [Math.max(200, Math.floor(viewportHeight * 0.25)), 180];
+      }
+      // Standard calculation for larger screens
+      const dynamicBottom = Math.min(650, Math.max(300, Math.floor(viewportHeight * 0.45)));
+      return [dynamicBottom, 180];
     }
     // Mobile: landscape needs less bottom padding due to shorter dashboard
     return isLandscape ? [60, 120] : [40, 150];
-  }, [isLandscape]);
+  }, [isLandscape, viewportHeight]);
 
   // Memoized legend offset calculation
   const currentOffset = useMemo(() => {
@@ -349,8 +369,9 @@ const Dashboard = (props) => {
   }, [map, isSingleDayView, day, center, derivedZoom, showLegend]);
 
   // Re-apply bounds when padding-affecting states change or view mode changes
+  // Skip for Day 0 (overview page)
   useEffect(() => {
-    if (isSingleDayView && day && routes[day] && map) {
+    if (isSingleDayView && day && day !== "0" && routes[day] && map) {
       const bounds = getFeatureBounds(routes[day], day, isDesktop);
       if (bounds) {
         // Skip animation on initial mount to prevent jitter
@@ -454,6 +475,13 @@ const Dashboard = (props) => {
 
       if (!map) return;
 
+      // Day 0 special handling - zoom out to overview
+      if (toDay === "0") {
+        const initialCenter = calculateCenterOffset(center, currentOffset);
+        map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
+        return;
+      }
+
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
           ? routes[targetFeature.properties.day]
@@ -483,6 +511,9 @@ const Dashboard = (props) => {
       effectivePaddingTopLeft,
       effectivePaddingBottomRight,
       props.zoomDuration,
+      center,
+      currentOffset,
+      derivedZoom,
     ],
   );
 
@@ -823,31 +854,77 @@ const Dashboard = (props) => {
                     </div>
                   </div>
 
-                  {/* Branding Strip */}
+                  {/* Branding Strip - Version only */}
                   <div
                     className={`branding-strip branding-strip--${isDesktop ? "desktop" : "mobile"}`}
                   >
                     <div
                       className={`branding-title branding-title--${isDesktop ? "desktop" : "mobile"}`}
                     >
-                      Everest Base Camp 3 Trek, Nepal
-                      {isDesktop && (
-                        <span style={{ fontSize: "0.75em", opacity: 0.8, marginLeft: "8px" }}>
-                          <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
-                        </span>
-                      )}
-                    </div>
-                    {!isDesktop && (
-                      <div style={{ fontSize: "9px", color: "#7f8c8d", fontWeight: 700, letterSpacing: "0.8px" }}>
+                      <span style={{ fontSize: isDesktop ? "12px" : "9px", color: "#7f8c8d", fontWeight: 700, letterSpacing: "0.8px" }}>
                         <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
-                      </div>
-                    )}
+                      </span>
+                    </div>
                     {props.attribution && (
                       <div
                         className={`branding-attribution branding-attribution--${isDesktop ? "desktop" : "mobile"}`}
                         dangerouslySetInnerHTML={{ __html: props.attribution }}
                       />
                     )}
+                  </div>
+                </div>
+              ) : isDayZero ? (
+                /* Day 0 Overview Content - Special display */
+                <div
+                  className={`metrics-content metrics-content--${isDesktop ? "desktop" : "mobile"}`}
+                >
+                  <div
+                    className={`metrics-inner metrics-inner--${isDesktop ? "desktop" : "mobile"}`}
+                    style={{ justifyContent: 'center' }}
+                  >
+                    <div
+                      className={`stats-container stats-container--${isDesktop ? "desktop" : "mobile"}`}
+                      style={{ textAlign: 'center' }}
+                    >
+                      {/* Line 1: Trek Name (larger font, refined styling) */}
+                      <div
+                        style={{ 
+                          fontSize: isDesktop ? '17px' : '14px',
+                          fontWeight: '600',
+                          marginBottom: isDesktop ? '6px' : '4px',
+                          letterSpacing: '2.5px',
+                          color: '#2d3748',
+                          fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+                        }}
+                      >
+                        EVEREST BASE CAMP 3 PASS TREK
+                      </div>
+                      {/* Line 2: Sagarmatha National Park (smaller font, elegant) */}
+                      <div
+                        style={{ 
+                          fontSize: isDesktop ? '12px' : '10.5px',
+                          fontWeight: '400',
+                          color: '#718096',
+                          marginBottom: isDesktop ? '2px' : '1px',
+                          letterSpacing: '1.5px',
+                          fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+                        }}
+                      >
+                        SAGARMATHA NATIONAL PARK
+                      </div>
+                      {/* Line 3: Nepal (same styling as line 2) */}
+                      <div
+                        style={{ 
+                          fontSize: isDesktop ? '12px' : '10.5px',
+                          fontWeight: '400',
+                          color: '#718096',
+                          letterSpacing: '1.5px',
+                          fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
+                        }}
+                      >
+                        NEPAL
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -1067,8 +1144,8 @@ const Dashboard = (props) => {
               )}
             </div>
 
-            {/* Mobile Metrics Row */}
-            {!isDesktop && !isToolsOpen && (
+            {/* Mobile Metrics Row - hide on Day 0 */}
+            {!isDesktop && !isToolsOpen && !isDayZero && (
               <div className="mobile-metrics-row">
                 {/* Day indicator */}
                 <div className="day-indicator-mobile">

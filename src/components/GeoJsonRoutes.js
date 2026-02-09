@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
 import L from "leaflet";
 import ReactGA from "react-ga4";
@@ -29,6 +29,15 @@ const GeoJsonRoutes = (props) => {
   // Get landscape orientation for mobile
   const { isLandscape = false } = useMobileOrientation();
 
+  // Dynamic padding based on viewport height for better small screen support
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  
+  useEffect(() => {
+    const handleResize = () => setViewportHeight(window.innerHeight);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Memoized padding values - optimized for various screen sizes
   const effectivePaddingTopLeft = useMemo(() => {
     if (isDesktop) {
@@ -40,11 +49,19 @@ const GeoJsonRoutes = (props) => {
 
   const effectivePaddingBottomRight = useMemo(() => {
     if (isDesktop) {
-      return [650, 180];
+      // Dynamic bottom padding based on screen size
+      // For smaller screens (< 700px), use minimal padding
+      // For normal screens, use proportional scaling
+      if (viewportHeight < 700) {
+        return [Math.max(200, Math.floor(viewportHeight * 0.25)), 180];
+      }
+      // Standard calculation for larger screens
+      const dynamicBottom = Math.min(650, Math.max(300, Math.floor(viewportHeight * 0.45)));
+      return [dynamicBottom, 180];
     }
     // Mobile: landscape needs less bottom padding due to shorter dashboard
     return isLandscape ? [60, 120] : [40, 150];
-  }, [isLandscape]);
+  }, [isLandscape, viewportHeight]);
 
   const routes = getDayWiseDataG();
 

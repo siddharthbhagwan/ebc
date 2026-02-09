@@ -1,14 +1,14 @@
 const initialState = {
   icon: "",
-  day: "1",
-  name: "Lukla - Phakding",
-  time: "3h 30m",
-  distance: "4.66 mi / 7.5 km",
-  startAlt: "9,373",
-  endAlt: "8,563",
+  day: "0",
+  name: "Everest Base Camp 3 Pass Trek",
+  time: "",
+  distance: "",
+  startAlt: "",
+  endAlt: "",
   peakAlt: "",
-  total_climb: "0",
-  descent: "814",
+  total_climb: "",
+  descent: "",
 };
 
 export const routeReducer = (state = initialState, action) => {
