@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { GeoJSON, withLeaflet, Marker } from "react-leaflet";
+import { GeoJSON, withLeaflet } from "react-leaflet";
 import L from "leaflet";
 import ReactGA from "react-ga4";
 import { getDayWiseDataG } from "../utils/geoJson";
@@ -7,12 +7,7 @@ import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { connect } from "react-redux";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
 import { mapDispatchToProps } from "../utils/utils";
-import {
-  createGradientSegments,
-  getColorForElevation,
-} from "../utils/heightGradient";
-import tentIcon from "../resources/images/tent.svg";
-import airportIcon from "../resources/images/airport.svg";
+import { createGradientSegments } from "../utils/heightGradient";
 
 const GeoJsonRoutes = (props) => {
   const { map } = props.leaflet;
