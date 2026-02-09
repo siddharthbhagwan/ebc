@@ -5,6 +5,47 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.0] - 2026-02-10
+
+### Removed
+- **Enzyme Test Dependencies**: Removed unused Enzyme testing libraries (`enzyme`, `@wojtekmaj/enzyme-adapter-react-17`, `jest-enzyme`) in favor of React Testing Library
+- **App.test.jsx**: Removed legacy test file (covered by Dashboard and component tests)
+
+## [1.13.0] - 2026-01-31
+
+### Added
+- **Comprehensive Test Suite**: Added 7 new test files covering all utilities, reducers, hooks, and data integrity:
+  - `useDays.test.js` - Day navigation hook with Day 0 wrapping and boundary conditions
+  - `routeReducer.test.js` - Route state management with Day 0 initial state
+  - `mapStateReducer.test.js` - Map state toggles and cookie-based preference persistence
+  - `cookies.test.js` - Cookie CRUD operations and preference roundtrip
+  - `heightGradient.test.js` - Elevation color mapping, gradient segments, and color continuity
+  - `trekStats.test.js` - Trek statistics, pass/summit info, and sorting
+  - `geoJson.test.js` - GeoJSON data integrity, Day 0 structure, rest days, and day continuity
+- **Dashboard Day 0 Tests**: Added Day 0 landing page tests, branding strip version-only tests, and Day 0 default state transitions to `Dashboard.test.js`
+
+### Changed
+- **Updated SPEC.md**: Comprehensive documentation update for v1.12.0+ features including Day 0, dynamic padding, POI circle logic, and corrected day-by-day route table
+- **Dashboard Tests**: Updated mock geoJson to include Day 0 entry; fixed branding strip tests to match version-only display (removed references to old "Everest Base Camp 3 Trek, Nepal" text)
+
+## [1.12.0] - 2026-01-31
+
+### Added
+- **Day 0 Landing Page**: New overview landing page showing all-caps trek name ("EVEREST BASE CAMP 3 PASS TREK"), "SAGARMATHA NATIONAL PARK", and "NEPAL" with refined typography (letter-spacing 2.5px title, 1.5px subtitles, lighter font weight)
+- **Navigation Wrapping**: Day navigation now wraps cyclically (Day 20 → Day 0 → Day 1), with Day 0 included in the sequence
+- **Dynamic Viewport Padding**: Map bounds padding dynamically adjusts based on viewport height for proper route framing on screens < 700px tall
+- **House White Circles**: Lodge/camp POI icons now render with a white circle background (without pulsation) for visibility in overview mode
+
+### Changed
+- **Default Landing State**: App now starts on Day 0 (overview) instead of Day 1; route reducer initial state is day "0"
+- **Branding Strip**: Replaced "Everest Base Camp 3 Trek, Nepal" text with version number only (e.g., "v1.12.0") in toolbar branding strip
+- **Gokyo Acclimatization**: Renamed Day 17 from "Gokyo Acclimatization" to "Gokyo Chill Day"
+- **POI Circle Logic**: In overview mode, only airports show pulsating circles; houses show static white circles; other POIs have no circle wrapper
+
+### Fixed
+- **Bounding Box on Small Screens**: Routes now frame correctly on small viewport heights (e.g., VS Code embedded browser) using dynamic padding calculations
+- **Tengboche Double Icons**: Fixed duplicate POI icons at Tengboche by changing `shouldCircle` logic to exclude houses from overview-mode circling
+
 ## [1.11.1] - 2026-01-31
 
 ### Added

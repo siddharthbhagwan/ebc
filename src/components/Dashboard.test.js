@@ -62,6 +62,27 @@ jest.mock("leaflet", () => ({
 // Mock other dependencies
 jest.mock("../utils/geoJson", () => ({
   getDayWiseDataG: () => ({
+    0: {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [86.764, 27.840, 0] },
+          properties: {
+            day: "0",
+            name: "Everest Base Camp 3 Pass Trek",
+            distance: "",
+            time: "",
+            startAlt: "",
+            endAlt: "",
+            peakAlt: "",
+            total_climb: "",
+            descent: "",
+            isOverview: true,
+          },
+        },
+      ],
+    },
     1: { features: [{ properties: { day: "1", name: "Lukla - Phakding" } }] },
     2: { features: [{ properties: { day: "2", name: "Phakding - Namche Bazaar" } }] },
     3: { features: [{ properties: { day: "3", name: "Namche Bazaar Acclimatization" } }] },
@@ -607,7 +628,7 @@ describe("Dashboard Toolbar Behavior", () => {
   });
 
   it("should open tools panel when clicking Tools button", async () => {
-    const { getByAltText, getByText } = render(
+    const { getByAltText, container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
@@ -617,9 +638,9 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(toolsBtn);
 
     await waitFor(() => {
-      expect(
-        getByText("Everest Base Camp 3 Trek, Nepal"),
-      ).toBeInTheDocument();
+      // Branding strip now shows version only (no trek name)
+      const brandingStrip = container.querySelector('.branding-strip');
+      expect(brandingStrip).toBeInTheDocument();
     });
   });
 
@@ -674,7 +695,7 @@ describe("Dashboard Toolbar Behavior", () => {
   });
 
   it("should close toolbar when clicking close button", async () => {
-    const { getByAltText, getByText, queryByText } = render(
+    const { getByAltText, getByText, container } = render(
       <Provider store={store}>
         <Dashboard />
       </Provider>,
@@ -685,9 +706,8 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(toolsBtn);
 
     await waitFor(() => {
-      expect(
-        getByText("Everest Base Camp 3 Trek, Nepal"),
-      ).toBeInTheDocument();
+      // Branding strip should be visible
+      expect(container.querySelector('.branding-strip')).toBeInTheDocument();
     });
 
     // Close toolbar
@@ -695,9 +715,8 @@ describe("Dashboard Toolbar Behavior", () => {
     fireEvent.click(closeBtn);
 
     await waitFor(() => {
-      expect(
-        queryByText("Everest Base Camp 3 Trek, Nepal"),
-      ).not.toBeInTheDocument();
+      // Branding strip should be gone
+      expect(container.querySelector('.branding-strip')).not.toBeInTheDocument();
     });
   });
 
@@ -2629,6 +2648,361 @@ describe("Panel Mutual Exclusivity", () => {
       expect(container.querySelector('.statistics-card')).toBeInTheDocument();
       // showInfo state should be toggled (closed)
       expect(store.getState().mapState.showInfo).toBe(false);
+    });
+  });
+});
+
+// =====================================================
+// DAY 0 (LANDING PAGE / OVERVIEW) TESTS
+// =====================================================
+
+describe("Dashboard Day 0 Landing Page", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockMap.getZoom.mockReturnValue(11.3);
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "0",
+        name: "Everest Base Camp 3 Pass Trek",
+        time: "",
+        distance: "",
+        startAlt: "",
+        endAlt: "",
+        peakAlt: "",
+        total_climb: "",
+        descent: "",
+      },
+    });
+  });
+
+  it("should render the trek name on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.textContent).toContain("EVEREST BASE CAMP 3 PASS TREK");
+  });
+
+  it("should render Sagarmatha National Park on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.textContent).toContain("SAGARMATHA NATIONAL PARK");
+  });
+
+  it("should render Nepal on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.textContent).toContain("NEPAL");
+  });
+
+  it("should render three text lines in all caps on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    const content = container.textContent;
+    // All three lines should appear in order
+    const trekIndex = content.indexOf("EVEREST BASE CAMP 3 PASS TREK");
+    const parkIndex = content.indexOf("SAGARMATHA NATIONAL PARK");
+    const nepalIndex = content.indexOf("NEPAL");
+
+    expect(trekIndex).toBeGreaterThan(-1);
+    expect(parkIndex).toBeGreaterThan(-1);
+    expect(nepalIndex).toBeGreaterThan(-1);
+    expect(trekIndex).toBeLessThan(parkIndex);
+    expect(parkIndex).toBeLessThan(nepalIndex);
+  });
+
+  it("should NOT show elevation stats on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.textContent).not.toContain("▲");
+    expect(container.textContent).not.toContain("▼");
+  });
+
+  it("should NOT show altitude display on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.querySelector(".altitude-display")).toBeNull();
+  });
+
+  it("should NOT show distance or time on Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(container.querySelector(".metric-value-desktop")).toBeNull();
+    expect(container.querySelector(".time-value-desktop")).toBeNull();
+  });
+
+  it("should still show navigation arrows on Day 0", () => {
+    const { getByAltText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(getByAltText("Previous")).toBeInTheDocument();
+    expect(getByAltText("Next")).toBeInTheDocument();
+  });
+
+  it("should still show control icons on Day 0", () => {
+    const { getByAltText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    expect(getByAltText("Reset")).toBeInTheDocument();
+    expect(getByAltText("Tools")).toBeInTheDocument();
+  });
+
+  it("should NOT show day indicator on desktop Day 0", () => {
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Day 0 renders the special overview content, not the normal metrics
+    // The day indicator is inside metrics-bottom-row which is inside the normal metrics branch
+    // On Day 0, the isDayZero branch renders instead, which has no day indicator
+    const dayLabel = container.querySelector(".day-label-desktop");
+    expect(dayLabel).toBeNull();
+  });
+});
+
+// =====================================================
+// DAY 0 AS DEFAULT STATE TESTS
+// =====================================================
+
+describe("Dashboard Day 0 as Default State", () => {
+  it("should start on Day 0 when initial route state has day '0'", () => {
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "0",
+        name: "Everest Base Camp 3 Pass Trek",
+        time: "",
+        distance: "",
+        startAlt: "",
+        endAlt: "",
+        peakAlt: "",
+        total_climb: "",
+        descent: "",
+      },
+    });
+
+    const { container } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Day 0 overview content should be visible
+    expect(container.textContent).toContain("EVEREST BASE CAMP 3 PASS TREK");
+    expect(container.textContent).toContain("SAGARMATHA NATIONAL PARK");
+    expect(container.textContent).toContain("NEPAL");
+  });
+
+  it("should transition from Day 0 to Day 1 content", () => {
+    // Start on Day 0
+    const store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "0",
+        name: "Everest Base Camp 3 Pass Trek",
+        time: "",
+        distance: "",
+        startAlt: "",
+        endAlt: "",
+        peakAlt: "",
+        total_climb: "",
+        descent: "",
+      },
+    });
+
+    const { container, rerender } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Verify Day 0 content
+    expect(container.textContent).toContain("EVEREST BASE CAMP 3 PASS TREK");
+
+    // Now update store to Day 1
+    const store2 = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+
+    rerender(
+      <Provider store={store2}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Should now show Day 1 content instead of Day 0
+    expect(container.textContent).toContain("Lukla - Phakding");
+    expect(container.textContent).not.toContain("SAGARMATHA NATIONAL PARK");
+  });
+});
+
+// =====================================================
+// BRANDING STRIP (VERSION ONLY) TESTS
+// =====================================================
+
+describe("Dashboard Branding Strip", () => {
+  let store;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    store = createMockStore({
+      mapState: {
+        isSingleDayView: false,
+        zoom: 11.3,
+        center: [27.840457443855108, 86.76420972837559],
+        showLegend: true,
+        zoomDuration: 1.25,
+        paddingTopLeft: [50, 110],
+        paddingBottomRight: [50, 50],
+        unit: "km",
+        attribution: "&copy; OpenStreetMap",
+      },
+      route: {
+        day: "1",
+        name: "Lukla - Phakding",
+        time: "3h 30m",
+        distance: "4.66 mi / 7.5 km",
+        startAlt: "9,373",
+        endAlt: "8,563",
+        peakAlt: "",
+        total_climb: "500",
+        descent: "814",
+      },
+    });
+  });
+
+  it("should show version number in branding strip (not trek name)", async () => {
+    const { container, getByAltText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    // Open tools panel to see branding strip
+    const toolsBtn = getByAltText("Tools");
+    fireEvent.click(toolsBtn);
+
+    await waitFor(() => {
+      const brandingStrip = container.querySelector('.branding-strip');
+      expect(brandingStrip).toBeInTheDocument();
+      // Should contain version number (v prefix)
+      expect(brandingStrip.textContent).toMatch(/v\d+\.\d+\.\d+/);
+    });
+  });
+
+  it("should NOT show 'Everest Base Camp 3 Trek, Nepal' in branding strip", async () => {
+    const { container, getByAltText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    const toolsBtn = getByAltText("Tools");
+    fireEvent.click(toolsBtn);
+
+    await waitFor(() => {
+      const brandingStrip = container.querySelector('.branding-strip');
+      expect(brandingStrip).toBeInTheDocument();
+      expect(brandingStrip.textContent).not.toContain("Everest Base Camp 3 Trek, Nepal");
+    });
+  });
+
+  it("should show attribution in branding strip", async () => {
+    const { container, getByAltText } = render(
+      <Provider store={store}>
+        <Dashboard />
+      </Provider>,
+    );
+
+    const toolsBtn = getByAltText("Tools");
+    fireEvent.click(toolsBtn);
+
+    await waitFor(() => {
+      expect(container.innerHTML).toContain("OpenStreetMap");
     });
   });
 });

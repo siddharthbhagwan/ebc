@@ -3,14 +3,14 @@
 ## Overview
 
 **Product Name:** EBC Dashboard (Everest Base Camp Trek Map Blog)  
-**Version:** 1.11.1  
-**Last Updated:** January 31, 2026  
+**Version:** 1.14.0  
+**Last Updated:** February 10, 2026  
 **Live URL:** https://coderbear.com/ebc/  
 **Repository:** https://github.com/siddharthbhagwan/ebc
 
 ### Description
 
-EBC Dashboard is an interactive map-based blog documenting the Everest Base Camp 3 Pass Trek. It provides a day-by-day visualization of the 19-day trek route through the Himalayas, featuring elevation profiles, route highlighting, and points of interest.
+EBC Dashboard is an interactive map-based blog documenting the Everest Base Camp 3 Pass Trek. It provides a day-by-day visualization of the 20-day trek route through the Himalayas, featuring elevation profiles, route highlighting, and points of interest. The app opens to a Day 0 landing page showing an overview of the entire trek before users navigate through individual days.
 
 ---
 
@@ -71,6 +71,7 @@ src/
 ├── store/
 │   └── store.jsx           # Redux store configuration
 ├── utils/
+│   ├── cookies.js          # Cookie-based preference persistence
 │   ├── geoJson.js          # Trek route data (GeoJSON)
 │   ├── heightGradient.js   # Elevation color gradients
 │   ├── markers.jsx         # POI marker definitions
@@ -99,7 +100,7 @@ src/
 
 | Property      | Type     | Description               |
 | ------------- | -------- | ------------------------- |
-| `day`         | `string` | Current day number (1-19) |
+| `day`         | `string` | Current day number (0-20) |
 | `name`        | `string` | Route segment name        |
 | `time`        | `string` | Estimated time            |
 | `distance`    | `string` | Route distance            |
@@ -151,7 +152,30 @@ src/
 
 ## Features
 
-### 1. Interactive Map
+### 1. Day 0 - Landing Page (Overview)
+
+The app opens to Day 0, a dedicated landing page that displays the full trek overview.
+
+#### Display
+
+| Line | Content | Desktop Font | Mobile Font | Style |
+|------|---------|-------------|-------------|-------|
+| 1 | EVEREST BASE CAMP 3 PASS TREK | 17px | 14px | weight 600, letter-spacing 2.5px, color #2d3748 |
+| 2 | SAGARMATHA NATIONAL PARK | 12px | 10.5px | weight 400, letter-spacing 1.5px, color #718096 |
+| 3 | NEPAL | 12px | 10.5px | weight 400, letter-spacing 1.5px, color #718096 |
+
+- **Text Transform:** All uppercase (hardcoded, not CSS textTransform)
+- **Font Family:** 'Segoe UI', 'Helvetica Neue', Arial, sans-serif
+- **Alignment:** Centered
+- **Hidden Elements:** No elevation stats, altitude, distance, time, or mobile metrics row on Day 0
+
+#### Map State
+
+- Shows all routes in overview mode
+- No route highlighting (no active day)
+- Full trek bounds displayed
+
+### 2. Interactive Map
 
 #### Base Map
 
@@ -201,8 +225,8 @@ src/
 - **Location:** Next to day indicator
 - **Color:** `#8E0000` (same as elevation red)
 - **Style:** Small rounded badge with white text
-- **Pass Days:** 9, 13, 15
-- **Summit Days:** 12, 14
+- **Pass Days:** 8, 14, 18
+- **Summit Days:** 7, 12, 16
 
 #### Rest Day / Acclimatization Day Display
 
@@ -210,7 +234,7 @@ src/
 - **Elevation:** Hidden (no ▲ or ▼)
 - **Altitude:** Single altitude only (no start → end progression)
 - **Distance/Time:** Hidden
-- **Rest Days:** 4, 8, 11
+- **Rest Days:** 3, 9, 11, 17 (Gokyo Chill Day)
 
 ### 3. Tools Panel
 
@@ -313,6 +337,23 @@ src/
 | Overview | 10.6 (mobile) / 11.3 (desktop) | Full trek visible |
 | Single Day | ~13+ | Zoomed to current day's route |
 
+#### Day 0 Navigation
+
+- **Initial state:** App starts on Day 0 (landing page)
+- **Day 0 → Next:** Goes to Day 1
+- **Day 0 → Prev:** Wraps to Day 20
+- **Day 20 → Next:** Wraps to Day 0
+- **Day 1 → Prev:** Goes to Day 0
+
+#### Dynamic Viewport Padding
+
+Map bounds padding adjusts dynamically based on viewport height for proper route framing on smaller screens:
+
+| Viewport Height | Bottom Padding (Desktop) |
+|----------------|-------------------------|
+| < 700px | `max(200, viewportHeight × 0.25)` |
+| ≥ 700px | `min(650, max(300, viewportHeight × 0.45))` |
+
 #### Target Button Behavior
 
 - **From Overview:** Zooms to currently highlighted route
@@ -323,13 +364,20 @@ src/
 
 #### POI Types
 
-| Type | Icon | Size Multiplier |
-|------|------|-----------------|
-| Lodge/Camp | Tent | 1.0 |
-| Base Camp | EBC | 1.0 |
-| Summit | Peak | 0.72 (reduced ~10%) |
-| Pass | Flag | 1.0 |
-| Airport | Plane | 1.0 |
+| Type | Icon | Size Multiplier | Circle Behavior |
+|------|------|-----------------|----------------|
+| Lodge/Camp | Tent | 1.0 | White circle background (no pulse) |
+| Base Camp | EBC | 1.0 | No circle |
+| Summit | Peak | 0.72 (reduced ~10%) | No circle |
+| Pass | Flag | 1.0 | No circle |
+| Airport | Plane | 1.0 | Pulsating circle in overview |
+
+#### Overview Mode Circle Logic
+
+- **Airports:** Show pulsating animated circle in overview mode
+- **Houses/Lodges:** Show white circle background (no pulsation) for visibility
+- **Other POIs:** No circle wrapper in overview mode
+- **Single Day View:** Destinations and airports show pulsating circles
 
 #### Label Collision Detection
 
@@ -448,9 +496,9 @@ This allows desktop panels to scale down gracefully when the browser window is r
 | Property | Value |
 |----------|-------|
 | Trek Name | Everest Base Camp 3 Pass Trek |
-| Total Days | 19 |
+| Total Days | 21 (Day 0 overview + 20 trek days) |
 | Active Days | 16 |
-| Rest Days | 3 (Days 4, 8, 11) |
+| Rest Days | 4 (Days 3, 9, 11, 17) |
 | Total Distance | ~130 km / 80 mi |
 | Total Ascent | ~9,500m |
 | Total Descent | ~9,500m |
@@ -461,40 +509,43 @@ This allows desktop panels to scale down gracefully when the browser window is r
 
 | Pass | Altitude | Day |
 |------|----------|-----|
-| Kongma La | 18,136 ft (5,528 m) | Day 9 |
-| Cho La | 17,782 ft (5,420 m) | Day 13 |
-| Renjo La | 17,585 ft (5,360 m) | Day 15 |
+| Kongma La | 18,136 ft (5,528 m) | Day 8 |
+| Cho La | 17,782 ft (5,420 m) | Day 14 |
+| Renjo La | 17,585 ft (5,360 m) | Day 18 |
 
 ### Summits
 
 | Summit | Altitude | Day |
 |--------|----------|-----|
+| Chhukung Ri | 18,209 ft (5,550 m) | Day 7 |
 | Kala Patthar | 18,514 ft (5,644 m) | Day 12 |
-| Gokyo Ri | 17,575 ft (5,357 m) | Day 14 |
+| Gokyo Ri | 17,575 ft (5,357 m) | Day 16 |
 
 ### Day-by-Day Routes
 
 | Day | Route | Distance | Start Alt | End Alt |
-|-----|-------|----------|-----------|---------|
+|-----|-------|----------|-----------|---------|  
+| 0 | Overview (Landing Page) | - | - | - |
 | 1 | Lukla → Phakding | 7.5 km | 9,373 ft | 8,563 ft |
 | 2 | Phakding → Namche Bazaar | 10 km | 8,563 ft | 11,286 ft |
-| 3 | Namche → Khumjung → Namche | 8 km | 11,286 ft | 11,286 ft |
-| 4 | Namche Bazaar (Rest Day) | - | 11,286 ft | 11,286 ft |
-| 5 | Namche → Tengboche | 10 km | 11,286 ft | 12,687 ft |
-| 6 | Tengboche → Dingboche | 11 km | 12,687 ft | 14,469 ft |
-| 7 | Dingboche → Chhukung | 5 km | 14,469 ft | 15,518 ft |
-| 8 | Chhukung (Rest Day) | - | 15,518 ft | 15,518 ft |
-| 9 | Chhukung → Kongma La → Lobuche | 9 km | 15,518 ft | 16,175 ft |
+| 3 | Namche Bazaar Acclimatization (Rest) | - | 11,286 ft | 11,286 ft |
+| 4 | Namche → Tengboche | 10 km | 11,286 ft | 12,687 ft |
+| 5 | Tengboche → Dingboche | 11 km | 12,687 ft | 14,469 ft |
+| 6 | Dingboche → Chhukung | 5 km | 14,469 ft | 15,518 ft |
+| 7 | Chhukung → Chhukung Ri → Chhukung | 8 km | 15,518 ft | 15,518 ft |
+| 8 | Chhukung → Kongma La → Lobuche | 9 km | 15,518 ft | 16,175 ft |
+| 9 | Lobuche Acclimatization (Rest) | - | 16,142 ft | 16,142 ft |
 | 10 | Lobuche → Gorak Shep → EBC | 13 km | 16,175 ft | 17,598 ft |
-| 11 | Gorak Shep (Rest Day) | - | 17,598 ft | 17,598 ft |
-| 12 | Gorak Shep → Kala Patthar → Dzongla | 12 km | 17,598 ft | 15,951 ft |
-| 13 | Dzongla → Cho La → Gokyo | 11 km | 15,951 ft | 15,583 ft |
-| 14 | Gokyo → Gokyo Ri → Gokyo | 4 km | 15,583 ft | 15,583 ft |
-| 15 | Gokyo → Renjo La → Lungden | 10 km | 15,583 ft | 14,632 ft |
-| 16 | Lungden → Thame | 10 km | 14,632 ft | 12,467 ft |
-| 17 | Thame → Namche Bazaar | 10 km | 12,467 ft | 11,286 ft |
-| 18 | Namche → Lukla | 19 km | 11,286 ft | 9,373 ft |
-| 19 | Lukla (Departure) | - | 9,373 ft | - |
+| 11 | Gorak Shep Acclimatization (Rest) | - | 16,942 ft | 16,942 ft |
+| 12 | Gorak Shep → Kala Patthar → Lobuche | 12 km | 17,598 ft | 15,951 ft |
+| 13 | Lobuche → Dzongla | 6 km | 16,109 ft | 15,951 ft |
+| 14 | Dzongla → Cho La → Thangnak | 11 km | 15,951 ft | 15,583 ft |
+| 15 | Thangnak → Gokyo | 4 km | 15,583 ft | 15,583 ft |
+| 16 | Gokyo → Gokyo Ri → Gokyo | 4 km | 15,583 ft | 15,583 ft |
+| 17 | Gokyo Chill Day (Rest) | - | 15,584 ft | 15,584 ft |
+| 18 | Gokyo → Renjo La → Marlung | 10 km | 15,583 ft | 14,632 ft |
+| 19 | Marlung → Namche Bazaar | 10 km | 14,632 ft | 11,286 ft |
+| 20 | Namche Bazaar → Lukla | 19 km | 11,286 ft | 9,373 ft |
 
 ---
 
@@ -526,9 +577,16 @@ This allows desktop panels to scale down gracefully when the browser window is r
 
 | File | Coverage |
 |------|----------|
-| `Dashboard.test.js` | Dashboard behaviors, navigation, metrics display |
+| `Dashboard.test.js` | Dashboard behaviors, navigation, metrics display, Day 0 landing page, branding strip |
 | `Legend.test.js` | Legend rendering, icon display |
 | `markers.test.js` | Marker data structure, icon assignments |
+| `useDays.test.js` | Day navigation hook, Day 0 wrapping, boundary conditions |
+| `routeReducer.test.js` | Route state, initial Day 0 state, UPDATE_LAYER_DETAILS |
+| `mapStateReducer.test.js` | Map state, unit/legend/info toggles, cookie persistence |
+| `cookies.test.js` | Cookie CRUD, preference loading/saving |
+| `heightGradient.test.js` | Elevation color mapping, gradient segment creation |
+| `trekStats.test.js` | Trek statistics, pass/summit info, sorting |
+| `geoJson.test.js` | GeoJSON data integrity, Day 0 structure, rest days |
 
 ### Test Infrastructure
 
@@ -556,7 +614,7 @@ npm run deploy     # Deploy to gh-pages (auto-amends commit)
 ### Version Management
 
 - Version stored in `package.json`
-- Displayed in dashboard branding strip
+- Displayed in dashboard branding strip (version number only, e.g., "v1.13.0")
 - Updated in CHANGELOG.md for releases
 
 ---

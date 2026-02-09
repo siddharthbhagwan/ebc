@@ -1,6 +1,6 @@
 {
   "name": "ebc-dashboard",
-  "version": "1.12.0",
+  "version": "1.14.0",
   "private": true,
   "homepage": "https://coderbear.com/ebc/",
   "dependencies": {
@@ -54,11 +54,8 @@
     ]
   },
   "devDependencies": {
-    "@wojtekmaj/enzyme-adapter-react-17": "^0.6.7",
     "ajv": "^8.12.0",
     "cheerio": "1.0.0-rc.12",
-    "cjs": "^0.0.11",
-    "enzyme": "^3.11.0",
-    "jest-enzyme": "^7.1.2"
+    "cjs": "^0.0.11"
   }
 }
