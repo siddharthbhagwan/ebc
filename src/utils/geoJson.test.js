@@ -99,6 +99,38 @@ describe("GeoJSON Route Data", () => {
         const props = routes[dayNum].features[0].properties;
         expect(props.startAlt).toBe(props.endAlt);
       });
+
+      it(`Day ${dayNum} should have Point geometry (rendered by POI.js, not GeoJsonRoutes)`, () => {
+        // ARCHITECTURE NOTE: Rest day Point features are for metadata only.
+        // Visual markers are rendered by POI.js from markers.jsx.
+        // GeoJsonRoutes.js skips Point features to prevent duplicate markers.
+        const feature = routes[dayNum].features[0];
+        expect(feature.geometry.type).toBe("Point");
+      });
+    });
+  });
+
+  describe("Point Feature Architecture", () => {
+    // CRITICAL: This test documents an important architectural rule
+    // Point features in geoJson.js are used for route metadata ONLY.
+    // POI.js (using markers.jsx) is the sole renderer of all map markers.
+    // GeoJsonRoutes.js must skip Point features to prevent duplicate markers.
+
+    it("should have Point geometry for Day 0 (overview center, not rendered by GeoJsonRoutes)", () => {
+      expect(routes[0].features[0].geometry.type).toBe("Point");
+    });
+
+    it("should have Point geometry for all rest days (metadata only)", () => {
+      [3, 9, 11, 17].forEach((dayNum) => {
+        expect(routes[dayNum].features[0].geometry.type).toBe("Point");
+      });
+    });
+
+    it("should have MultiLineString geometry for all active trek days", () => {
+      const activeDays = [1, 2, 4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 18, 19, 20];
+      activeDays.forEach((dayNum) => {
+        expect(routes[dayNum].features[0].geometry.type).toBe("MultiLineString");
+      });
     });
   });
 

@@ -57,11 +57,11 @@ src/
 ├── index.jsx               # Application entry point
 ├── components/
 │   ├── Dashboard.js        # Main dashboard with metrics & controls
-│   ├── GeoJsonRoutes.js    # Route rendering with elevation gradients
+│   ├── GeoJsonRoutes.js    # Route line rendering only (no markers)
 │   ├── Legend.js           # Map legend component
 │   ├── Info.js             # About/Info modal
 │   ├── MapContainer.js     # Leaflet map wrapper
-│   ├── POI.js              # Points of Interest markers
+│   ├── POI.js              # ALL map markers (sole marker renderer)
 │   └── Reset.js            # Map reset control
 ├── hooks/
 │   └── useDays.js          # Day navigation hook
@@ -361,6 +361,14 @@ Map bounds padding adjusts dynamically based on viewport height for proper route
 - **Priority:** Current day → Last zoomed day → Day 1
 
 ### 7. Points of Interest (POI)
+
+#### Architecture: Marker Rendering Responsibility
+
+**CRITICAL:** `POI.js` is the **sole component** responsible for rendering ALL map markers. This includes lodges, camps, summits, passes, airports, and all other POIs defined in `markers.jsx`.
+
+`GeoJsonRoutes.js` renders **route lines only** (MultiLineString features). It explicitly skips all Point features (rest days, Day 0 overview) to prevent duplicate markers. The geoJson.js file contains Point features for rest days (Days 3, 9, 11, 17) and Day 0, but these are used only for route metadata—their visual markers are rendered by POI.js.
+
+This separation prevents "double icon" bugs at locations like Lobuche where a rest day Point feature would otherwise duplicate the POI marker.
 
 #### POI Types
 
