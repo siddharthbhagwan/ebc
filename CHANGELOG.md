@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Dashboard Tests**: Pass the map mock directly to Dashboard to ensure map interactions are exercised consistently
 
+### Fixed
+- **Rest Day Ripple Visibility**: Allow Leaflet marker wrappers to overflow so ripple halos render fully
+
 ## [1.14.2] - 2026-02-10
 
 ### Fixed

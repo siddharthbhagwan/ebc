@@ -40,6 +40,11 @@ body {
   border: none !important;
 }
 
+.leaflet-marker-icon,
+.leaflet-marker-icon > div {
+  overflow: visible !important;
+}
+
 code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
