@@ -25,7 +25,8 @@
     "test": "bun run react-scripts test",
     "eject": "bun run react-scripts eject",
     "predeploy": "bun run build",
-    "deploy": "git add . && git commit --amend --no-edit && bun run gh-pages -d build"
+    "deploy": "git add . && git commit --amend --no-edit && bun run gh-pages -d build",
+    "watch:dev": "node scripts/watch-dev-server.js"
   },
   "eslintConfig": {
     "extends": "react-app"
