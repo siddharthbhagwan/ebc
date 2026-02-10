@@ -7,9 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.14.3] - 2026-02-10
 
-### Added
-- **Dev Server Watchdog**: Added `watch:dev` script to health-check the local dev server and restart it if it stops
-
 ### Changed
 - **Dashboard Tests**: Pass the map mock directly to Dashboard to ensure map interactions are exercised consistently
 
