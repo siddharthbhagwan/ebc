@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Rest Day Ripple Visibility**: Allow Leaflet marker wrappers to overflow so ripple halos render fully
 
+### Added
+- **Dev Server Watch**: Added `watch:dev` script to keep the local dev server running during development
+
 ## [1.14.2] - 2026-02-10
 
 ### Fixed
