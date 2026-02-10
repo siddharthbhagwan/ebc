@@ -386,6 +386,7 @@ This separation prevents "double icon" bugs at locations like Lobuche where a re
 - **Houses/Lodges:** Show white circle background (no pulsation) for visibility
 - **Other POIs:** No circle wrapper in overview mode
 - **Single Day View:** Destinations and airports show pulsating circles
+- **Rest Days:** Destination lodge shows a ripple wave halo on single day view
 
 #### Label Collision Detection
 

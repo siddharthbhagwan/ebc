@@ -254,6 +254,13 @@ const POI = (props) => {
         .map((d) => d.trim())
         .includes(currentDayStr);
 
+      // On acclimatization days (Rest Days), only show the destination house
+      if (isZoomedIn && isCurrentDayRestDay) {
+        if (!isDest || !isHouse) {
+          return;
+        }
+      }
+
       // Snap to route coordinates if it's the start or end of the current day
       let snappedPoint = markerPoint.point;
       if (isZoomedIn) {
@@ -283,7 +290,7 @@ const POI = (props) => {
       const borderColor = getColorForElevation(altM);
 
       const rippleClass =
-        isCurrentDayRestDay && isDest && isHouse ? "rest-day-ripple" : "";
+        isCurrentDayRestDay && isDayMatch && isHouse ? "rest-day-ripple" : "";
 
       let icon;
       if (shouldCircle) {

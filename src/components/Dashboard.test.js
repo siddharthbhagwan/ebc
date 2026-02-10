@@ -27,6 +27,8 @@ jest.mock("react-leaflet", () => ({
   TileLayer: () => null,
   Marker: () => null,
   Popup: () => null,
+  Tooltip: ({ children }) => <div>{children}</div>,
+  GeoJSON: () => null,
   useMap: () => mockMap,
   withLeaflet: (Component) => (props) => (
     <Component {...props} leaflet={{ map: mockMap }} />
@@ -37,7 +39,7 @@ import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { combineReducers, createStore } from "redux";
 import Dashboard from "./Dashboard";
-import MapContainer from "./MapContainer";
+import POI from "./POI";
 import { routeReducer } from "../reducers/routeReducer";
 import { mapStateReducer } from "../reducers/mapStateReducer";
 
@@ -56,7 +58,7 @@ jest.mock("leaflet", () => ({
     getSouthWest: () => ({ lat: 27.8, lng: 86.7 }),
   }),
   icon: (options) => ({ options }),
-  divIcon: (options) => ({ options }),
+  divIcon: jest.fn((options) => ({ options })),
 }));
 
 // Mock other dependencies
@@ -86,7 +88,26 @@ jest.mock("../utils/geoJson", () => ({
     1: { features: [{ properties: { day: "1", name: "Lukla - Phakding" } }] },
     2: { features: [{ properties: { day: "2", name: "Phakding - Namche Bazaar" } }] },
     3: { features: [{ properties: { day: "3", name: "Namche Bazaar Acclimatization" } }] },
-    7: { features: [{ properties: { day: "7", name: "Dingboche - Chhukung" } }] },
+    7: {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [86.8001, 27.8702, 0],
+              [86.81, 27.88, 0],
+            ],
+          },
+          properties: {
+            day: "7",
+            name: "Dingboche Acclimatization",
+            time: "Rest Day",
+          },
+        },
+      ],
+    },
   }),
   getFeatureBounds: () => ({
     isValid: () => true,
@@ -116,6 +137,16 @@ jest.mock("../resources/images/summit.svg", () => "summit.svg");
 // Mock markers
 jest.mock("../utils/markers", () => ({
   getMarkers: () => [
+    {
+      point: [27.88, 86.81],
+      icon: "tent.svg",
+      size: [10, 10],
+      properties: {
+        day: "7",
+        name: "Dingboche",
+        startAlt: "14,469",
+      },
+    },
     {
       point: [27.98094, 86.82939],
       icon: "tent.svg",
@@ -175,7 +206,7 @@ describe("Dashboard Component Behaviors", () => {
 
       render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -197,7 +228,7 @@ describe("Dashboard Component Behaviors", () => {
 
       render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -213,7 +244,7 @@ describe("Dashboard Component Behaviors", () => {
     it("should handle left arrow navigation", async () => {
       render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -228,7 +259,7 @@ describe("Dashboard Component Behaviors", () => {
     it("should toggle to single view and zoom when pressed in overview", async () => {
       render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -253,7 +284,7 @@ describe("Dashboard Component Behaviors", () => {
 
       render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -269,7 +300,7 @@ describe("Dashboard Component Behaviors", () => {
     it("should toggle to single view when in overview", async () => {
       const { getByAltText } = render(
         <Provider store={store}>
-          <Dashboard />
+          <Dashboard map={mockMap} />
         </Provider>,
       );
 
@@ -331,7 +362,7 @@ describe("Dashboard Elevation Stats Styling", () => {
   it("should render elevation stats with correct font sizes on desktop", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -360,7 +391,7 @@ describe("Dashboard Elevation Stats Styling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -381,7 +412,7 @@ describe("Dashboard Elevation Stats Styling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -402,7 +433,7 @@ describe("Dashboard Elevation Stats Styling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -414,7 +445,7 @@ describe("Dashboard Elevation Stats Styling", () => {
   it("should render elevation stats with correct colors", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -434,7 +465,7 @@ describe("Dashboard Elevation Stats Styling", () => {
   it("should render elevation stats before altitude in DOM order", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -454,7 +485,7 @@ describe("Dashboard Elevation Stats Styling", () => {
   it("should render altitude with smaller font size than elevation gain", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -514,7 +545,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render trek name in dashboard", () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -524,7 +555,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render navigation arrows", () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -535,7 +566,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render control icons (Reset and Tools)", () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -546,7 +577,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render altitude in correct unit (km/m)", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -562,7 +593,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render distance in correct unit (km)", () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -572,7 +603,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render day indicator", () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -583,7 +614,7 @@ describe("Dashboard Basic Rendering", () => {
   it("should render time with asterisk", () => {
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -630,7 +661,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should open tools panel when clicking Tools button", async () => {
     const { getByAltText, container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -647,7 +678,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should show legend and info icons in toolbar", async () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -663,7 +694,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should show unit toggle (M/FT) in toolbar", async () => {
     const { getByAltText, getAllByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -682,7 +713,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should show close button (✕) in toolbar", async () => {
     const { getByAltText, getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -697,7 +728,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should close toolbar when clicking close button", async () => {
     const { getByAltText, getByText, container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -723,7 +754,7 @@ describe("Dashboard Toolbar Behavior", () => {
   it("should show branding strip with attribution in toolbar", async () => {
     const { getByAltText, container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -769,7 +800,7 @@ describe("Dashboard Unit Conversion", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -808,7 +839,7 @@ describe("Dashboard Unit Conversion", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -847,7 +878,7 @@ describe("Dashboard Unit Conversion", () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -881,7 +912,7 @@ describe("Dashboard Unit Conversion", () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -928,7 +959,7 @@ describe("Dashboard Keyboard Navigation", () => {
 
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -944,7 +975,7 @@ describe("Dashboard Keyboard Navigation", () => {
 
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -958,7 +989,7 @@ describe("Dashboard Keyboard Navigation", () => {
   it("should handle Space key for reset zoom", async () => {
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1009,7 +1040,7 @@ describe("Dashboard Click Navigation", () => {
 
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1026,7 +1057,7 @@ describe("Dashboard Click Navigation", () => {
 
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1041,7 +1072,7 @@ describe("Dashboard Click Navigation", () => {
   it("should toggle view mode when clicking Reset button", async () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1088,7 +1119,7 @@ describe("Dashboard Rest Day Display", () => {
 
     const { queryByText, getByText, container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1136,7 +1167,7 @@ describe("Dashboard Rest Day Display", () => {
 
     const { container, queryByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1145,6 +1176,42 @@ describe("Dashboard Rest Day Display", () => {
     
     // Should not show time (Rest Day)
     expect(queryByText("Rest Day")).not.toBeInTheDocument();
+  });
+
+  it("should apply rest-day ripple class for destination house POI", () => {
+    const leaflet = require("leaflet");
+    const defaultMapState = mapStateReducer(undefined, { type: "@@INIT" });
+    const store = createMockStore({
+      mapState: {
+        ...defaultMapState,
+        isSingleDayView: true,
+        zoom: 12,
+        center: [27.88, 86.81],
+        showLegend: true,
+      },
+      route: {
+        day: "7",
+        name: "Dingboche Acclimatization",
+        time: "Rest Day",
+        distance: "",
+        startAlt: "14,469",
+        endAlt: "14,469",
+        peakAlt: "",
+        total_climb: "0",
+        descent: "0",
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <POI />
+      </Provider>,
+    );
+
+    const rippleCall = leaflet.divIcon.mock.calls.find(
+      ([options]) => options?.html?.includes("rest-day-ripple"),
+    );
+    expect(rippleCall).toBeTruthy();
   });
 
   it("should handle place markers (startAlt=0, endAlt=0)", () => {
@@ -1174,7 +1241,7 @@ describe("Dashboard Rest Day Display", () => {
 
     const { getByText, queryByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1215,7 +1282,7 @@ describe("Dashboard Zero Elevation Hiding", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1253,7 +1320,7 @@ describe("Dashboard Zero Elevation Hiding", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1291,7 +1358,7 @@ describe("Dashboard Zero Elevation Hiding", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1339,7 +1406,7 @@ describe("Dashboard Enter Key Navigation", () => {
   it("should handle Enter key same as Space key for toggle", async () => {
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1363,7 +1430,7 @@ describe("Dashboard Enter Key Navigation", () => {
 
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1407,7 +1474,7 @@ describe("Dashboard Single Day View", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1436,7 +1503,7 @@ describe("Dashboard Font Size Adaptation", () => {
       },
       route: {
         day: "8",
-        name: "Chhukung - Kongma La - Lobuche",
+        name: "Chhukung - Kongma La - Lobuche Pass",
         time: "8h",
         distance: "6.5 mi / 10.5 km",
         startAlt: "15,535",
@@ -1449,11 +1516,11 @@ describe("Dashboard Font Size Adaptation", () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
-    const nameElement = getByText("Chhukung - Kongma La - Lobuche");
+    const nameElement = getByText("Chhukung - Kongma La - Lobuche Pass");
     // Long names (>30 chars) should have fontSize 15px on desktop
     expect(nameElement).toHaveStyle({ fontSize: "15px" });
   });
@@ -1485,7 +1552,7 @@ describe("Dashboard Font Size Adaptation", () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1531,7 +1598,7 @@ describe("Dashboard Metrics Display Order", () => {
   it("should display metrics in order: Name, Elevation, Altitude", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1551,7 +1618,7 @@ describe("Dashboard Metrics Display Order", () => {
   it("should always show both elevation gain and descent together", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1592,7 +1659,7 @@ describe("Dashboard Acclimatization Day Display", () => {
 
     const { container, getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1631,7 +1698,7 @@ describe("Dashboard Acclimatization Day Display", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1677,7 +1744,7 @@ describe("Dashboard Zero Elevation Handling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1714,7 +1781,7 @@ describe("Dashboard Zero Elevation Handling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1751,7 +1818,7 @@ describe("Dashboard Zero Elevation Handling", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1800,7 +1867,7 @@ describe("Dashboard Keyboard Navigation", () => {
   it("should handle Enter key same as Space key (resetZoom)", async () => {
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1817,7 +1884,7 @@ describe("Dashboard Keyboard Navigation", () => {
   it("should handle Space key for resetZoom", async () => {
     render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1862,7 +1929,7 @@ describe("Dashboard Altitude Display Format", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1902,7 +1969,7 @@ describe("Dashboard Altitude Display Format", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1940,7 +2007,7 @@ describe("Dashboard Altitude Display Format", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -1986,7 +2053,7 @@ describe("Dashboard Day Indicator Position", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2026,7 +2093,7 @@ describe("Dashboard Day Indicator Position", () => {
 
     const { getByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2074,7 +2141,7 @@ describe("Dashboard Target Button Behavior", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2117,7 +2184,7 @@ describe("Dashboard Target Button Behavior", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2154,7 +2221,7 @@ describe("Dashboard Target Button Behavior", () => {
 
     const { container, rerender } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2191,7 +2258,7 @@ describe("Dashboard Target Button Behavior", () => {
 
     rerender(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2234,7 +2301,7 @@ describe("Dashboard Target Button Behavior", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2282,7 +2349,7 @@ describe("Dashboard Time Display", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2319,7 +2386,7 @@ describe("Dashboard Time Display", () => {
 
     const { container, queryByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2364,7 +2431,7 @@ describe("Dashboard Toolbar Icons", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2410,7 +2477,7 @@ describe("Dashboard Toolbar Icons", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2456,7 +2523,7 @@ describe("Dashboard Unit Toggle", () => {
 
     const { container, getAllByText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2498,7 +2565,7 @@ describe("Dashboard Unit Toggle", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2546,7 +2613,7 @@ describe("Panel Mutual Exclusivity", () => {
   it("should close Stats when About is opened", async () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2576,7 +2643,7 @@ describe("Panel Mutual Exclusivity", () => {
   it("should display triangles in stats panel for ascent and descent", async () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2631,7 +2698,7 @@ describe("Panel Mutual Exclusivity", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2690,7 +2757,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should render the trek name on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2700,7 +2767,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should render Sagarmatha National Park on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2710,7 +2777,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should render Nepal on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2720,7 +2787,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should render three text lines in all caps on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2740,7 +2807,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should NOT show elevation stats on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2751,7 +2818,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should NOT show altitude display on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2761,7 +2828,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should NOT show distance or time on Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2772,7 +2839,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should still show navigation arrows on Day 0", () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2783,7 +2850,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should still show control icons on Day 0", () => {
     const { getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2794,7 +2861,7 @@ describe("Dashboard Day 0 Landing Page", () => {
   it("should NOT show day indicator on desktop Day 0", () => {
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2838,7 +2905,7 @@ describe("Dashboard Day 0 as Default State", () => {
 
     const { container } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2876,7 +2943,7 @@ describe("Dashboard Day 0 as Default State", () => {
 
     const { container, rerender } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2910,7 +2977,7 @@ describe("Dashboard Day 0 as Default State", () => {
 
     rerender(
       <Provider store={store2}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2958,7 +3025,7 @@ describe("Dashboard Branding Strip", () => {
   it("should show version number in branding strip (not trek name)", async () => {
     const { container, getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2977,7 +3044,7 @@ describe("Dashboard Branding Strip", () => {
   it("should NOT show 'Everest Base Camp 3 Trek, Nepal' in branding strip", async () => {
     const { container, getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
@@ -2994,7 +3061,7 @@ describe("Dashboard Branding Strip", () => {
   it("should show attribution in branding strip", async () => {
     const { container, getByAltText } = render(
       <Provider store={store}>
-        <Dashboard />
+        <Dashboard map={mockMap} />
       </Provider>,
     );
 
