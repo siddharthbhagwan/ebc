@@ -207,6 +207,11 @@ generic-dashboard {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important;
 }
 
+.dest-circle-wrapper,
+.house-white-circle-wrapper {
+  overflow: visible;
+}
+
 /* Pulsating Ripple (Wave) for Rest Days */
 .rest-day-ripple::before {
   content: "";
