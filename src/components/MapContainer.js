@@ -17,6 +17,14 @@ import { isDesktop, useMobileOrientation } from "react-device-detect";
 // module worker; only .cjs is treated as classic.
 setWorkerUrl(`${process.env.PUBLIC_URL}/maplibre-gl-worker.js`);
 
+// Half the previous zoom-out again: 0.8 levels under the desktop overview (11.2).
+// Mobile overview is 10.5, so this floor stays reachable. Box is half the last one.
+const NEPAL_BOUNDS = [
+  [27.23, 85.64],
+  [28.45, 87.89],
+];
+const MIN_ZOOM = 10.4;
+
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url } = props;
   const { isLandscape = false } = useMobileOrientation();
@@ -59,6 +67,9 @@ const MapContainer = (props) => {
         zoomSnap={zoomSnap}
         zoomDelta={zoomSnap}
         zoom={initialZoom}
+        minZoom={MIN_ZOOM}
+        maxBounds={NEPAL_BOUNDS}
+        maxBoundsViscosity={1}
         style={style}
         zoomControl={false}
         attributionControl={false}
