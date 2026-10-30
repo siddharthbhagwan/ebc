@@ -4,10 +4,12 @@
   "private": true,
   "homepage": "https://coderbear.com/ebc/",
   "dependencies": {
+    "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "decode-google-map-polyline": "^1.0.1",
     "gh-pages": "^6.3.0",
     "leaflet": "^1.9.4",
     "leaflet-easybutton": "^2.4.0",
+    "maplibre-gl": "^6.16.0",
     "react": "^17.0.2",
     "react-bootstrap": "^1.6.8",
     "react-device-detect": "^2.2.3",
@@ -20,8 +22,8 @@
     "redux": "^4.2.1"
   },
   "scripts": {
-    "start": "bun run react-scripts --openssl-legacy-provider start",
-    "build": "bun run react-scripts --openssl-legacy-provider build",
+    "start": "cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre-gl-worker.js && bun run react-scripts --openssl-legacy-provider start",
+    "build": "cp node_modules/maplibre-gl/dist/maplibre-gl-worker.mjs public/maplibre-gl-worker.js && bun run react-scripts --openssl-legacy-provider build",
     "test": "bun run react-scripts test",
     "eject": "bun run react-scripts eject",
     "predeploy": "bun run build",

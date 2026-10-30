@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { Map, TileLayer } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import { Map } from "react-leaflet";
+import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
+import { setWorkerUrl } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { connect } from "react-redux";
 import Dashboard from "./Dashboard";
 import GeoJsonRoutes from "./GeoJsonRoutes";
@@ -8,10 +11,24 @@ import Info from "./Info";
 import POI from "./POI";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
 
+// Webpack rewrites MapLibre's import.meta.url to a file:// path, so the
+// default worker URL is empty and vector tiles never paint (background only).
+// start/build copy dist/maplibre-gl-worker.mjs here. .js is still loaded as a
+// module worker; only .cjs is treated as classic.
+setWorkerUrl(`${process.env.PUBLIC_URL}/maplibre-gl-worker.js`);
+
 const MapContainer = (props) => {
-  const { center, zoomSnap, zoom, style, url, attribution } = props;
+  const { center, zoomSnap, zoom, style, url } = props;
   const { isLandscape = false } = useMobileOrientation();
   const [leafletMap, setLeafletMap] = useState(null);
+
+  useEffect(() => {
+    if (!leafletMap || !url) return undefined;
+    const layer = maplibreGL({ style: url }).addTo(leafletMap);
+    return () => {
+      leafletMap.removeLayer(layer);
+    };
+  }, [leafletMap, url]);
 
   // Calculate offset based on device type and orientation
   // Mobile portrait needs more offset to clear the dashboard
@@ -48,7 +65,6 @@ const MapContainer = (props) => {
         keyboard={false}
         preferCanvas={true}
       >
-        <TileLayer url={url} attribution={attribution} />
         <POI />
         <GeoJsonRoutes derivedZoom={derivedZoom} />
       </Map>

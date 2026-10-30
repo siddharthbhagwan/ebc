@@ -46,15 +46,15 @@ describe("mapStateReducer", () => {
       expect(state.showLegend).toBe(true);
     });
 
-    it("should have map URL for CartoDB basemap", () => {
+    it("should have map URL for the OpenFreeMap Positron basemap", () => {
       const state = mapStateReducer(undefined, { type: "@@INIT" });
-      expect(state.url).toContain("basemaps.cartocdn.com");
+      expect(state.url).toContain("tiles.openfreemap.org/styles/positron");
     });
 
-    it("should have attribution with OpenStreetMap and Leaflet", () => {
+    it("should have attribution with OpenStreetMap and OpenFreeMap", () => {
       const state = mapStateReducer(undefined, { type: "@@INIT" });
       expect(state.attribution).toContain("OpenStreetMap");
-      expect(state.attribution).toContain("Leaflet");
+      expect(state.attribution).toContain("OpenFreeMap");
     });
 
     it("should have zoomDuration of 1.25", () => {

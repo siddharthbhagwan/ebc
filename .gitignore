@@ -9,6 +9,9 @@ node_modules/
 # Production
 /build
 
+# Generated from maplibre-gl on start/build. Webpack cannot bundle the worker.
+/public/maplibre-gl-worker.js
+
 # Misc
 .DS_Store
 .env.local

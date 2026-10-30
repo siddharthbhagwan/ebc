@@ -8,9 +8,9 @@ import {
 const savedPreferences = loadPreferences();
 
 const initialState = {
-  url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+  url: "https://tiles.openfreemap.org/styles/positron",
   attribution:
-    '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> | <a href="https://leafletjs.com/">Leaflet</a>',
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | <a href="https://openfreemap.org/">OpenFreeMap</a>',
   center: [27.840457443855108, 86.76420972837559],
   zoom: 11.2,
   zoomSnap: 0.1,
