@@ -2,7 +2,7 @@
   "name": "ebc-dashboard",
   "version": "1.14.1",
   "private": true,
-  "homepage": "https://coderbear.com/ebc/",
+  "homepage": "https://sidbhagwan.com/ebc/",
   "dependencies": {
     "@maplibre/maplibre-gl-leaflet": "^0.1.4",
     "decode-google-map-polyline": "^1.0.1",

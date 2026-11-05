@@ -5,7 +5,7 @@
 **Product Name:** EBC Dashboard (Everest Base Camp Trek Map Blog)  
 **Version:** 1.14.0  
 **Last Updated:** February 10, 2026  
-**Live URL:** https://coderbear.com/ebc/  
+**Live URL:** https://sidbhagwan.com/ebc/  
 **Repository:** https://github.com/siddharthbhagwan/ebc
 
 ### Description
@@ -609,7 +609,7 @@ This allows desktop panels to scale down gracefully when the browser window is r
 ### Hosting
 
 - **Platform:** GitHub Pages
-- **Domain:** coderbear.com/ebc/
+- **Domain:** sidbhagwan.com/ebc/
 - **Branch:** gh-pages
 
 ### Build Process
@@ -654,4 +654,4 @@ Private project - All rights reserved.
 
 - Twitter: [@siddhartha_b](https://twitter.com/siddhartha_b)
 - GitHub: [siddharthbhagwan](https://github.com/siddharthbhagwan)
-- Website: [coderbear.com](https://coderbear.com)
+- Website: [sidbhagwan.com](https://sidbhagwan.com)

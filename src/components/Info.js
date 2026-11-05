@@ -52,7 +52,7 @@ const Info = (props) => {
                   }}
                 >
                   <img
-                    src="https://coderbear.com/images/siddhartha.png"
+                    src="https://sidbhagwan.com/images/siddhartha.png"
                     alt="Siddhartha Bhagwan"
                     width={102}
                     height={102}
@@ -142,7 +142,7 @@ const Info = (props) => {
                       </svg>
                     </a>
                     <a
-                      href="https://coderbear.com"
+                      href="https://sidbhagwan.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
