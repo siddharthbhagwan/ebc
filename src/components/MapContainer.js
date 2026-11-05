@@ -25,6 +25,20 @@ const NEPAL_BOUNDS = [
 ];
 const MIN_ZOOM = 10.4;
 
+// Hide place, road, and water names that ship in the basemap tiles.
+// Icon-only symbols stay. The trek's own marker labels are Leaflet tooltips, not these layers.
+const hideBasemapTextLabels = (glMap) => {
+  if (!glMap || !glMap.getStyle()) return;
+  const layers = glMap.getStyle().layers || [];
+  layers.forEach((layer) => {
+    if (layer.type !== "symbol") return;
+    const layout = layer.layout || {};
+    if (layout["text-field"] == null) return;
+    if (!glMap.getLayer(layer.id)) return;
+    glMap.setLayoutProperty(layer.id, "visibility", "none");
+  });
+};
+
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url } = props;
   const { isLandscape = false } = useMobileOrientation();
@@ -33,7 +47,14 @@ const MapContainer = (props) => {
   useEffect(() => {
     if (!leafletMap || !url) return undefined;
     const layer = maplibreGL({ style: url }).addTo(leafletMap);
+    const glMap = layer.getMaplibreMap();
+    const onStyle = () => hideBasemapTextLabels(glMap);
+    glMap.on("load", onStyle);
+    glMap.on("style.load", onStyle);
+    if (glMap.isStyleLoaded && glMap.isStyleLoaded()) onStyle();
     return () => {
+      glMap.off("load", onStyle);
+      glMap.off("style.load", onStyle);
       leafletMap.removeLayer(layer);
     };
   }, [leafletMap, url]);
