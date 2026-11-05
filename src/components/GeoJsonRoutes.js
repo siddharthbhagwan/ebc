@@ -15,7 +15,6 @@ const GeoJsonRoutes = (props) => {
     zoomDuration,
     dispatchLayerDetails,
     currentDay,
-    zoom: reduxZoom,
     isSingleDayView,
     setSingleDayView,
     showLegend,
@@ -77,7 +76,15 @@ const GeoJsonRoutes = (props) => {
       result[day] = route.features.map((feature) => {
         if (feature.geometry.type === "MultiLineString") {
           return {
-            segments: createGradientSegments(feature.geometry.coordinates),
+            segments: createGradientSegments(feature.geometry.coordinates).map(
+              (segment) => ({
+                color: segment.color,
+                geojson: {
+                  type: "LineString",
+                  coordinates: segment.latlngs.map((ll) => [ll[1], ll[0]]),
+                },
+              }),
+            ),
             properties: feature.properties,
             geometry: feature.geometry,
           };
@@ -212,7 +219,7 @@ const GeoJsonRoutes = (props) => {
         //  1: The "Depth" (Deep, wide shadow)
         highlightedLayers.push(
           <GeoJSON
-            key={`depth-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
+            key={`depth-${day}-${featIdx}-${isZoomedIn}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -250,7 +257,7 @@ const GeoJsonRoutes = (props) => {
         //  2: The "Glass Tube" (Semi-transparent Body)
         highlightedLayers.push(
           <GeoJSON
-            key={`outer-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
+            key={`outer-${day}-${featIdx}-${isZoomedIn}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -282,7 +289,7 @@ const GeoJsonRoutes = (props) => {
         //  3: The "Sunlight" (Thin, offset-feeling white highlight)
         highlightedLayers.push(
           <GeoJSON
-            key={`inner-${day}-${featIdx}-${isZoomedIn}-${reduxZoom}-${showLegend}`}
+            key={`inner-${day}-${featIdx}-${isZoomedIn}-${showLegend}`}
             data={geometry}
             className="pulsating-path"
             style={{
@@ -307,12 +314,6 @@ const GeoJsonRoutes = (props) => {
             weight *= 1.15;
           }
 
-          // Convert segment.latlngs to GeoJSON LineString
-          const segmentGeoJSON = {
-            type: "LineString",
-            coordinates: segment.latlngs.map((ll) => [ll[1], ll[0]]),
-          };
-
           routeLayers.push(
             <GeoJSON
               key={
@@ -324,11 +325,9 @@ const GeoJsonRoutes = (props) => {
                 "-" +
                 isZoomedIn +
                 "-" +
-                reduxZoom +
-                "-" +
                 showLegend
               }
-              data={segmentGeoJSON}
+              data={segment.geojson}
               style={{
                 color: segment.color,
                 weight: weight,
@@ -368,8 +367,6 @@ const GeoJsonRoutes = (props) => {
             "-" +
             isZoomedIn +
             "-" +
-            reduxZoom +
-            "-" +
             showLegend
           }
           data={geometry}
@@ -407,8 +404,6 @@ const mapStateToProps = (state) => ({
   paddingTopLeft: state.mapState.paddingTopLeft,
   paddingBottomRight: state.mapState.paddingBottomRight,
   currentDay: state.route.day,
-  zoom: state.mapState.zoom,
-  derivedZoom: state.mapState.zoom, // Will be overridden by MapContainer
   isSingleDayView: state.mapState.isSingleDayView,
   showLegend: state.mapState.showLegend,
 });
