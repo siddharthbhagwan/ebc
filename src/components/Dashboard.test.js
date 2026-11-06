@@ -20,6 +20,9 @@ const mockMap = {
   zoomOut: jest.fn(),
 };
 
+// three.js examples ship as ESM and jsdom has no WebGL.
+jest.mock("./Terrain3D", () => () => null);
+
 // Mock react-leaflet
 jest.mock("react-leaflet", () => ({
   Map: ({ children }) => <div data-testid="leaflet-control">{children}</div>,

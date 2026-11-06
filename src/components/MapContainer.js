@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Map } from "react-leaflet";
 import { maplibreGL } from "@maplibre/maplibre-gl-leaflet";
 import { setWorkerUrl } from "maplibre-gl";
@@ -10,6 +10,9 @@ import Legend from "./Legend";
 import Info from "./Info";
 import POI from "./POI";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
+
+// three.js only loads when 3D is shown.
+const Terrain3D = lazy(() => import("./Terrain3D"));
 
 // Webpack rewrites MapLibre's import.meta.url to a file:// path, so the
 // default worker URL is empty and vector tiles never paint (background only).
@@ -39,10 +42,99 @@ const hideBasemapTextLabels = (glMap) => {
   });
 };
 
+const TerrainToggle = ({ is3D, onChange }) => {
+  const ref = useRef(null);
+  const [place, setPlace] = useState({ right: 12, height: 22 });
+
+  useLayoutEffect(() => {
+    let host = null;
+    let hostRight = null;
+    const align = () => {
+      const legend = document.querySelector(".legend");
+      const self = ref.current;
+      if (!legend || !self) return;
+      host = legend.parentElement;
+      const box = legend.getBoundingClientRect();
+      const gap = 8;
+      const inset = 10;
+      const width = self.offsetWidth;
+      const fullBleed = host && host.style.left === "0px";
+      if (!fullBleed && host) {
+        if (hostRight == null) hostRight = host.style.right;
+        host.style.right = `${width + gap + inset}px`;
+      }
+      setPlace({
+        right: inset,
+        height: Math.max(22, Math.round(box.height)),
+      });
+    };
+    align();
+    const observer = new MutationObserver(align);
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", align);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", align);
+      if (host && hostRight != null) host.style.right = hostRight;
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        position: "fixed",
+        top: 0,
+        right: place.right,
+        height: place.height,
+        zIndex: 10000,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        padding: "0 4px",
+        boxSizing: "border-box",
+        background: "rgba(255, 255, 255, 0.95)",
+        borderRadius: "0 0 8px 8px",
+        fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+      }}
+    >
+      {[
+        { id: false, label: "2D" },
+        { id: true, label: "3D" },
+      ].map((mode) => {
+        const active = is3D === mode.id;
+        return (
+          <button
+            key={mode.label}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(mode.id)}
+            style={{
+              border: active ? "1.5px solid #2563eb" : "1.5px solid transparent",
+              background: active ? "#2563eb" : "transparent",
+              color: active ? "#fff" : "#4a5568",
+              borderRadius: 4,
+              padding: "1px 8px",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.04em",
+              cursor: "pointer",
+              lineHeight: 1.2,
+            }}
+          >
+            {mode.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 const MapContainer = (props) => {
   const { center, zoomSnap, zoom, style, url } = props;
   const { isLandscape = false } = useMobileOrientation();
   const [leafletMap, setLeafletMap] = useState(null);
+  const [is3D, setIs3D] = useState(true);
 
   useEffect(() => {
     if (!leafletMap || !url) return undefined;
@@ -100,6 +192,12 @@ const MapContainer = (props) => {
         <POI />
         <GeoJsonRoutes derivedZoom={derivedZoom} />
       </Map>
+      {is3D && (
+        <Suspense fallback={null}>
+          <Terrain3D />
+        </Suspense>
+      )}
+      <TerrainToggle is3D={is3D} onChange={setIs3D} />
       <Dashboard map={leafletMap} />
       <Legend />
       <Info />
