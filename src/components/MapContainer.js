@@ -10,6 +10,7 @@ import Legend from "./Legend";
 import Info from "./Info";
 import POI from "./POI";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
+import { dayTravel } from "../utils/routeBearing";
 
 // three.js only loads when 3D is shown.
 const Terrain3D = lazy(() => import("./Terrain3D"));
@@ -156,26 +157,72 @@ const TerrainToggle = ({ is3D, onChange }) => {
   );
 };
 
+// Route and marker panes follow the MapLibre bearing so they stay on the basemap.
+// The basemap itself is turned with setBearing, not a CSS spin of the whole map.
+const OVERLAY_PANES = ["overlayPane", "shadowPane", "markerPane", "tooltipPane", "popupPane"];
+
+const applyOverlayBearing = (map, bearing) => {
+  if (!map) return;
+  OVERLAY_PANES.forEach((name) => {
+    const pane = map.getPane(name);
+    if (!pane) return;
+    if (!bearing) {
+      pane.style.transform = "";
+      return;
+    }
+    const center = map.latLngToLayerPoint(map.getCenter());
+    pane.style.transform = `translate(${center.x}px, ${center.y}px) rotate(${-bearing}deg) translate(${-center.x}px, ${-center.y}px)`;
+  });
+};
+
 const MapContainer = (props) => {
-  const { center, zoomSnap, zoom, style, url } = props;
+  const { center, zoomSnap, zoom, style, url, day, isSingleDayView } = props;
   const { isLandscape = false } = useMobileOrientation();
   const [leafletMap, setLeafletMap] = useState(null);
   const [is3D, setIs3D] = useState(true);
+  const [glReady, setGlReady] = useState(false);
+  const glRef = useRef(null);
+  const bearingRef = useRef(0);
 
   useEffect(() => {
     if (!leafletMap || !url) return undefined;
     const layer = maplibreGL({ style: url }).addTo(leafletMap);
     const glMap = layer.getMaplibreMap();
+    glRef.current = glMap;
     const onStyle = () => hideBasemapTextLabels(glMap);
+    const keepBearing = () => {
+      const gl = glRef.current;
+      if (!gl) return;
+      const desired = bearingRef.current;
+      if (Math.abs(gl.getBearing() - desired) > 0.5) gl.setBearing(desired);
+      applyOverlayBearing(leafletMap, desired);
+    };
     glMap.on("load", onStyle);
     glMap.on("style.load", onStyle);
+    glMap.on("moveend", keepBearing);
+    leafletMap.on("move zoom zoomend viewreset resize", keepBearing);
     if (glMap.isStyleLoaded && glMap.isStyleLoaded()) onStyle();
+    setGlReady(true);
+    keepBearing();
     return () => {
       glMap.off("load", onStyle);
       glMap.off("style.load", onStyle);
+      glMap.off("moveend", keepBearing);
+      leafletMap.off("move zoom zoomend viewreset resize", keepBearing);
+      applyOverlayBearing(leafletMap, 0);
+      glRef.current = null;
+      setGlReady(false);
       leafletMap.removeLayer(layer);
     };
   }, [leafletMap, url]);
+
+  useEffect(() => {
+    const travel = isSingleDayView ? dayTravel(day) : null;
+    bearingRef.current = travel ? travel.bearing : 0;
+    const gl = glRef.current;
+    if (gl) gl.setBearing(bearingRef.current);
+    applyOverlayBearing(leafletMap, bearingRef.current);
+  }, [day, isSingleDayView, leafletMap, glReady]);
 
   // Calculate offset based on device type and orientation
   // Mobile portrait needs more offset to clear the dashboard
@@ -232,6 +279,8 @@ const MapContainer = (props) => {
 };
 
 const mapStateToProps = (state) => ({
+  day: state.route.day,
+  isSingleDayView: state.mapState.isSingleDayView,
   url: state.mapState.url,
   zoom: state.mapState.zoom,
   style: state.mapState.style,

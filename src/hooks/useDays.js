@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { getDayWiseDataG } from "../utils/geoJson";
 
 const routes = getDayWiseDataG();
@@ -13,44 +13,31 @@ const DAY_0_INDEX = DAYS.indexOf(0);
 const MAX_DAY_INDEX = DAYS.length - 1; // Day 20
 
 const useDays = (currentDay, dispatcher) => {
-  const currentDayInt = parseInt(currentDay);
-  const initialIndex = DAYS.indexOf(currentDayInt);
-
-  const [dayIndex, setDayIndex] = useState(
-    initialIndex !== -1 ? initialIndex : DAY_1_INDEX,
-  );
-
-  if (DAYS[dayIndex] !== currentDayInt && initialIndex !== -1) {
-    setDayIndex(initialIndex);
+  // Read at call time so a key handler closed over an older render still
+  // steps from the day on screen, including a second press before re-render.
+  const dayRef = useRef(currentDay);
+  const seenProp = useRef(currentDay);
+  if (seenProp.current !== currentDay) {
+    seenProp.current = currentDay;
+    dayRef.current = currentDay;
   }
 
-  const nextDay = () => {
-    let newIndex = dayIndex + 1;
-    // From Day 20 (max), wrap to Day 0
-    if (newIndex > MAX_DAY_INDEX) {
-      newIndex = DAY_0_INDEX;
-    }
-    const targetDay = DAYS[newIndex];
-    const targetFeature = routes[targetDay].features[0];
-    setDayIndex(newIndex);
+  const step = (delta) => {
+    let index = DAYS.indexOf(parseInt(dayRef.current, 10));
+    if (index === -1) index = DAY_1_INDEX;
+    let newIndex = index + delta;
+    if (newIndex > MAX_DAY_INDEX) newIndex = DAY_0_INDEX;
+    if (newIndex < DAY_0_INDEX) newIndex = MAX_DAY_INDEX;
+    const targetFeature = routes[DAYS[newIndex]].features[0];
+    dayRef.current = String(DAYS[newIndex]);
     dispatcher(targetFeature.properties);
     return targetFeature;
   };
 
-  const prevDay = () => {
-    let newIndex = dayIndex - 1;
-    // From Day 0, wrap to Day 20 (max)
-    if (newIndex < DAY_0_INDEX) {
-      newIndex = MAX_DAY_INDEX;
-    }
-    const targetDay = DAYS[newIndex];
-    const targetFeature = routes[targetDay].features[0];
-    setDayIndex(newIndex);
-    dispatcher(targetFeature.properties);
-    return targetFeature;
+  return {
+    nextDay: () => step(1),
+    prevDay: () => step(-1),
   };
-
-  return { nextDay, prevDay };
 };
 
 export default useDays;

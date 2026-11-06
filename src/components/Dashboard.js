@@ -520,35 +520,49 @@ const Dashboard = (props) => {
   const zoomIn = useCallback(() => map?.zoomIn(), [map]);
   const zoomOut = useCallback(() => map?.zoomOut(), [map]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
+  // Latest handlers. The window listener stays mounted so it cannot close over
+  // a day index from before the last click.
+  const onKeyRef = useRef(null);
+  onKeyRef.current = (e) => {
+    const target = e.target;
+    const tag = target && target.tagName;
+    const typing =
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      (target && target.isContentEditable);
+    if (typing) return;
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      e.stopPropagation();
       if (e.key === "ArrowRight") {
-        e.preventDefault(); // Prevent default map scrolling
         ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowRight - Next Day" });
         handleNavigation("next");
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault(); // Prevent default map scrolling
+      } else {
         ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowLeft - Previous Day" });
         handleNavigation("prev");
-      } else if (e.code === "Space" || e.key === "Enter") {
-        e.preventDefault();
-        ReactGA.event({ category: "Navigation", action: "Keyboard", label: `${e.code === "Space" ? "Space" : "Enter"} - Reset Zoom` });
-        resetZoom();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowUp - Zoom Out" });
-        zoomOut();
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowDown - Zoom In" });
-        zoomIn();
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [day, map, isSingleDayView]); // dependencies to ensure handleNavigation has latest context
+    } else if (e.code === "Space" || e.key === "Enter") {
+      e.preventDefault();
+      ReactGA.event({ category: "Navigation", action: "Keyboard", label: `${e.code === "Space" ? "Space" : "Enter"} - Reset Zoom` });
+      resetZoom();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowUp - Zoom Out" });
+      zoomOut();
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      ReactGA.event({ category: "Navigation", action: "Keyboard", label: "ArrowDown - Zoom In" });
+      zoomIn();
+    }
+  };
+
+  // Capture phase on window: runs before the map, a focused button, or the 3D
+  // canvas can stop the event. Day changes do not depend on who is focused.
+  useEffect(() => {
+    const handleKeyDown = (e) => onKeyRef.current(e);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, []);
 
   // Initial setup - do not auto-zoom to Day 1 on load
   useEffect(() => {}, []);

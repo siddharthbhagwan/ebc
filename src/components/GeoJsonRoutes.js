@@ -184,13 +184,13 @@ const GeoJsonRoutes = (props) => {
       // In Single Day view, we show the clean, raw gradient segments as requested.
       const isShowTube = !isZoomedIn && isHighlighted;
 
-      // In Zoomed In view, we only want to show the current day's route clearly.
-      // Filter out other routes unless we are in overview.
-      const isOtherDayInZoom = isZoomedIn && properties.day !== currentDay;
+      // Walking-day zoom shows only that day. A rest day has no line, so the
+      // other days stay. Their stroke is thinned below; opacity is unchanged.
+      const isOtherDayInZoom =
+        isZoomedIn && !isCurrentDayRestDay && properties.day !== currentDay;
 
-      // Skip rendering other days in zoom view to keep it clean, or keep them with minimal opacity
       if (isOtherDayInZoom) {
-        return; // For now, just hide other days in zoom view
+        return;
       }
 
       if (isShowTube) {
@@ -303,9 +303,18 @@ const GeoJsonRoutes = (props) => {
       } else {
         // Render standard gradient segments for background routes using GeoJSON
         segments.forEach((segment, segIdx) => {
-          // Increase weight and opacity for the focused route in Single Day view
-          // User requested a "thick" plain line for zoomed in view
-          let weight = isZoomedIn ? (isDesktop ? 8 : 7) : 1.8;
+          // Walking-day zoom uses the thick plain line. A rest-day zoom has no
+          // line of its own, so the other days stay at the thin 3D route width
+          // (ROUTE.width, about 2.4px). Opacity is left alone.
+          const REST_DAY_ROUTE_WEIGHT = 2.4;
+          let weight =
+            isZoomedIn && isCurrentDayRestDay
+              ? REST_DAY_ROUTE_WEIGHT
+              : isZoomedIn
+                ? isDesktop
+                  ? 8
+                  : 7
+                : 1.8;
           if (isDesktop && !isZoomedIn) {
             weight *= 1.15;
           }
@@ -321,7 +330,9 @@ const GeoJsonRoutes = (props) => {
                 "-" +
                 isZoomedIn +
                 "-" +
-                showLegend
+                showLegend +
+                "-" +
+                isCurrentDayRestDay
               }
               data={segment.geojson}
               style={{
@@ -363,7 +374,9 @@ const GeoJsonRoutes = (props) => {
             "-" +
             isZoomedIn +
             "-" +
-            showLegend
+            showLegend +
+            "-" +
+            isCurrentDayRestDay
           }
           data={geometry}
           style={{

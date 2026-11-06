@@ -5,6 +5,15 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-11-06
+
+### Changed
+- **3D camera**: The 3D camera looks along the day's route so the path is not hidden by terrain.
+- **2D bearing**: A walking day turns the map with MapLibre so the direction of travel is up. Overview and rest days stay north-up.
+- **3D day frame**: Clicking a walking day frames the route closer. The closest frame is 0.14 of the overview instead of 0.32, and the margin is 6 world units instead of 14.
+- **3D rest-day pulse**: The radiating pulse's maximum scale is 1.35, half of the previous 2.7. The stay circle is unchanged.
+- **Arrow keys**: Left and Right always move to the previous or next day, including when the 3D view, a button, or the map has focus.
+
 ## [2.0.0] - 2026-11-06
 
 ### Added

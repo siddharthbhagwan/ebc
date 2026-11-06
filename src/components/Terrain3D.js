@@ -12,10 +12,11 @@ import { getMarkers } from "../utils/markers";
 import { preCalculatedBounds } from "../utils/preCalculatedBounds";
 import { createGradientSegments, getColorForElevation } from "../utils/heightGradient";
 import { mapDispatchToProps } from "../utils/utils";
+import { dayTravel } from "../utils/routeBearing";
 
 // ---- Look knobs -------------------------------------------------------------
 // Terrain window (squared in meters around its center when built).
-const AREA = { south: 27.62, north: 28.02, west: 86.6, east: 86.92 };
+const AREA = { south: 27.62, north: 28.09, west: 86.6, east: 86.92 };
 const DEM_ZOOM = 11;
 const GRID_CELLS = 14; // cells per side; fewer = bigger facets
 const JITTER = 0.42; // interior vertex jitter, fraction of a cell
@@ -56,6 +57,13 @@ const CAMERA = {
   dayPadding: 14, // world units around a day's bounds
   minDayFrame: 0.32, // closest day framing, fraction of the overview distance
   easeMs: 900,
+};
+
+// Walking days only. The old floor (0.32) and 14-unit pad left short routes
+// small in the frame. 0.14 is about 2.3x closer when that floor was binding.
+const WALK_FRAME = {
+  padding: 6,
+  minFrame: 0.14,
 };
 
 // Line widths are screen pixels, matching the 2D weights.
@@ -306,7 +314,7 @@ Object.assign(LOOKS, {
   satCrisp: {
     ...SATELLITE_LOOK,
     canvasFilter: "saturate(1.3) contrast(1.18)",
-    tiltShift: { height: "20%", blur: 2 },
+    tiltShift: false,
   },
   satPainted: {
     ...SATELLITE_LOOK,
@@ -2659,6 +2667,15 @@ const isRestDay = (routes, day) => {
   return Boolean(features && features[0] && features[0].properties.time === "Rest Day");
 };
 
+// Same hue as the marker, lifted so the ring reads on satellite imagery.
+const brightRestColor = (hex) => {
+  const color = new THREE.Color(hex);
+  const hsl = { h: 0, s: 0, l: 0 };
+  color.getHSL(hsl);
+  color.setHSL(hsl.h, Math.min(1, hsl.s + 0.42), Math.min(0.72, hsl.l + 0.3));
+  return color;
+};
+
 // Flat strip along the route, never drawn, only raycast for hover and click.
 const hitRibbon = (points) => {
   const positions = [];
@@ -2807,6 +2824,18 @@ const addDiscs = (scene, terrain) => {
 
 const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
+const lerpAngle = (from, to, t) => {
+  let delta = to - from;
+  if (delta > Math.PI) delta -= Math.PI * 2;
+  else if (delta < -Math.PI) delta += Math.PI * 2;
+  return from + delta * t;
+};
+
+// Thin ring at 4.2x the stay radius. It scales out to 1.35, half the previous max of 2.7.
+// The stay disc is unchanged. Only the pulse's farthest reach is halved.
+const PULSE_BAND = 0.3;
+const PULSE_MAX_SCALE = 1.35;
+
 const Terrain3D = (props) => {
   const { day, isSingleDayView } = props;
   const mountRef = useRef(null);
@@ -2851,6 +2880,9 @@ const Terrain3D = (props) => {
       fitDistance: 300,
       target: overviewTarget.clone(),
     };
+    // Azimuth used when a day has no travel direction (overview and rest days).
+    let overviewAzimuth = view.azimuth;
+    let aimedAtRoute = false;
     let ease = null;
     let terrain = null;
     let terrainMesh = null;
@@ -2870,6 +2902,7 @@ const Terrain3D = (props) => {
           const k = easeInOut(t);
           view.target.lerpVectors(ease.fromTarget, ease.toTarget, k);
           view.frame = ease.fromFrame + (ease.toFrame - ease.fromFrame) * k;
+          view.azimuth = lerpAngle(ease.fromAzimuth, ease.toAzimuth, k);
           if (t < 1) render();
           else ease = null;
         }
@@ -2887,24 +2920,33 @@ const Terrain3D = (props) => {
         }
         if (discs) {
           const s = Math.min(1.6, Math.max(0.2, view.frame * view.zoom));
-          discs.children.forEach((disc) => disc.scale.setScalar(s));
+          discs.children.forEach((disc) => {
+            disc.scale.setScalar(s);
+            const stay = disc.userData.stayScale || 1;
+            disc.children.forEach((child) => {
+              if (child.userData.pulse) return;
+              child.scale.setScalar(stay);
+            });
+          });
         }
         if (pulse) {
-          const t = (performance.now() % 2500) / 2500;
-          pulse.scale.setScalar(1 + t * 2.4);
-          pulse.material.opacity = 0.7 * (1 - t);
+          const t = (performance.now() % 2800) / 2800;
+          pulse.scale.setScalar(1 + t * (PULSE_MAX_SCALE - 1));
+          pulse.material.opacity = 0.95 * (1 - t);
         }
         renderer.render(scene, camera);
         if (ease || pulse) render();
       });
     };
 
-    const frameTo = (target, frameRatio, animate) => {
+    const frameTo = (target, frameRatio, animate, azimuth) => {
       view.zoom = 1;
+      const nextAzimuth = azimuth == null ? view.azimuth : azimuth;
       if (!animate) {
         ease = null;
         view.target.copy(target);
         view.frame = frameRatio;
+        view.azimuth = nextAzimuth;
       } else {
         ease = {
           start: performance.now(),
@@ -2912,25 +2954,51 @@ const Terrain3D = (props) => {
           toTarget: target.clone(),
           fromFrame: view.frame,
           toFrame: frameRatio,
+          fromAzimuth: view.azimuth,
+          toAzimuth: nextAzimuth,
         };
       }
       render();
     };
 
+    // Remember the overview azimuth the first time a walking day takes over the camera.
+    const engageRouteAim = (azimuth) => {
+      if (azimuth == null) return releaseRouteAim();
+      if (!aimedAtRoute) {
+        overviewAzimuth = ease ? ease.toAzimuth : view.azimuth;
+        aimedAtRoute = true;
+      }
+      return azimuth;
+    };
+
+    const releaseRouteAim = () => {
+      if (!aimedAtRoute) return undefined;
+      aimedAtRoute = false;
+      return overviewAzimuth;
+    };
+
     // Frames the day's route in single-day view, the whole slab otherwise.
+    // A walking day aims the camera along the route. Overview and rest days do not.
     const frameDay = (dayKey, single, animate) => {
       if (!terrain) return;
       if (!single || !dayKey || dayKey === "0") {
-        frameTo(overviewTarget, 1, animate);
+        frameTo(overviewTarget, 1, animate, releaseRouteAim());
         return;
       }
+      const routes = getDayWiseDataG();
+      const features = (routes[dayKey] || {}).features || [];
+      const line = [];
+      features.forEach((feature) => {
+        const g = feature.geometry || {};
+        if (g.type === "MultiLineString") g.coordinates.forEach((part) => line.push(...part));
+        else if (g.type === "LineString") line.push(...g.coordinates);
+      });
       const stored = preCalculatedBounds[dayKey];
       let bounds = stored && (isDesktop ? stored.desktop : stored.mobile);
       if (!bounds) {
-        const coords = [];
-        ((getDayWiseDataG()[dayKey] || {}).features || []).forEach((feature) => {
+        const coords = line.slice();
+        features.forEach((feature) => {
           const g = feature.geometry || {};
-          if (g.type === "MultiLineString") g.coordinates.forEach((part) => coords.push(...part));
           if (g.type === "Point") coords.push(g.coordinates);
         });
         if (!coords.length) return;
@@ -2945,9 +3013,13 @@ const Terrain3D = (props) => {
       const [xb, zb] = terrain.toWorld(bounds[1][1], bounds[1][0]);
       const cx = (xa + xb) / 2;
       const cz = (za + zb) / 2;
-      const span = Math.max(Math.abs(xb - xa), Math.abs(zb - za)) + CAMERA.dayPadding;
-      const ratio = Math.min(1, Math.max(CAMERA.minDayFrame, span / SLAB_WIDTH));
-      frameTo(new THREE.Vector3(cx, terrain.surfaceAt(cx, cz).y, cz), ratio, animate);
+      const travel = dayTravel(dayKey);
+      const padding = travel ? WALK_FRAME.padding : CAMERA.dayPadding;
+      const minFrame = travel ? WALK_FRAME.minFrame : CAMERA.minDayFrame;
+      const span = Math.max(Math.abs(xb - xa), Math.abs(zb - za)) + padding;
+      const ratio = Math.min(1, Math.max(minFrame, span / SLAB_WIDTH));
+      const azimuth = travel ? engageRouteAim(travel.azimuth) : releaseRouteAim();
+      frameTo(new THREE.Vector3(cx, terrain.surfaceAt(cx, cz).y, cz), ratio, animate, azimuth);
     };
 
     const restyleRoutes = (dayKey, single) => {
@@ -2969,6 +3041,11 @@ const Terrain3D = (props) => {
         pulse.material.dispose();
         pulse = null;
       }
+      if (discs) {
+        discs.children.forEach((item) => {
+          item.userData.stayScale = 1;
+        });
+      }
       if (restDay && discs) {
         const feature = getDayWiseDataG()[dayKey].features[0];
         const [lng, lat] = feature.geometry.coordinates;
@@ -2976,17 +3053,25 @@ const Terrain3D = (props) => {
           (item) => Math.abs(item.userData.lat - lat) < 0.005 && Math.abs(item.userData.lng - lng) < 0.005,
         );
         if (disc) {
+          // Stay-place circle only. 3x the normal disc, so radius is 1.875.
+          const restRadius = DISC_STYLE.radius * 3;
+          const pulseOuter = restRadius * 4.2;
+          disc.userData.stayScale = 3;
           pulse = new THREE.Mesh(
-            new THREE.RingGeometry(DISC_STYLE.radius * 1.15, DISC_STYLE.radius * 1.45, 40),
+            new THREE.RingGeometry(pulseOuter - PULSE_BAND, pulseOuter, 96),
             new THREE.MeshBasicMaterial({
-              color: disc.userData.color,
+              color: brightRestColor(disc.userData.color),
               transparent: true,
-              opacity: 0.7,
+              opacity: 0.95,
               depthTest: false,
+              depthWrite: false,
+              toneMapped: false,
               side: THREE.DoubleSide,
             }),
           );
-          pulse.renderOrder = 6;
+          pulse.userData.pulse = true;
+          pulse.position.z = 0.45;
+          pulse.renderOrder = 8;
           disc.add(pulse);
         }
       }
@@ -3084,6 +3169,7 @@ const Terrain3D = (props) => {
       const dy = e.clientY - drag.y;
       drag.moved += Math.abs(dx) + Math.abs(dy);
       view.azimuth -= dx * 0.005;
+      if (!aimedAtRoute) overviewAzimuth = view.azimuth;
       view.elevation = Math.min(
         CAMERA.maxElevation,
         Math.max(CAMERA.minElevation, view.elevation + dy * 0.25),
