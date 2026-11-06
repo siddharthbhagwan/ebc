@@ -1,7 +1,9 @@
 {
   "files": {
-    "main.css": "/ebc/static/css/main.a3215990.css",
-    "main.js": "/ebc/static/js/main.45320bdf.js",
+    "main.css": "/ebc/static/css/main.5ec9afd0.css",
+    "main.js": "/ebc/static/js/main.51b7108b.js",
+    "static/js/223.80dbef80.chunk.js": "/ebc/static/js/223.80dbef80.chunk.js",
+    "static/js/766.0feeca16.chunk.js": "/ebc/static/js/766.0feeca16.chunk.js",
     "static/media/info.svg": "/ebc/static/media/info.9fdc8f8e92532f981b41866d276c7d6e.svg",
     "static/media/pass.svg": "/ebc/static/media/pass.42dcb394e4eb056aaa2e4ddd2cd6a064.svg",
     "static/media/airport.svg": "/ebc/static/media/airport.7089020aa01e717b41c9db3570de822e.svg",
@@ -13,11 +15,13 @@
     "static/media/leftArrow.svg": "/ebc/static/media/leftArrow.be4f18faef445343637e8b3831060d47.svg",
     "index.html": "/ebc/index.html",
     "static/media/legend.svg": "/ebc/static/media/legend.1a30f191c086361e21ef2614b1f097c8.svg",
-    "main.a3215990.css.map": "/ebc/static/css/main.a3215990.css.map",
-    "main.45320bdf.js.map": "/ebc/static/js/main.45320bdf.js.map"
+    "main.5ec9afd0.css.map": "/ebc/static/css/main.5ec9afd0.css.map",
+    "main.51b7108b.js.map": "/ebc/static/js/main.51b7108b.js.map",
+    "223.80dbef80.chunk.js.map": "/ebc/static/js/223.80dbef80.chunk.js.map",
+    "766.0feeca16.chunk.js.map": "/ebc/static/js/766.0feeca16.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.a3215990.css",
-    "static/js/main.45320bdf.js"
+    "static/css/main.5ec9afd0.css",
+    "static/js/main.51b7108b.js"
   ]
 }
