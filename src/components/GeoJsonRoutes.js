@@ -105,11 +105,6 @@ const GeoJsonRoutes = (props) => {
 
   const isZoomedIn = isSingleDayView;
 
-  // On acclimatization days (Rest Days), hide all routes when zoomed in
-  if (isZoomedIn && isCurrentDayRestDay) {
-    return null;
-  }
-
   const routeLayers = [];
   const highlightedLayers = [];
 
@@ -129,8 +124,9 @@ const GeoJsonRoutes = (props) => {
         return;
       }
 
-      // When zoomed in, only show the currently highlighted route
-      if (isZoomedIn && properties.day !== currentDay) {
+      // When zoomed in on a walking day, only that day's line is shown.
+      // A stay day has no line, so the other routes stay up. The map is never blank.
+      if (isZoomedIn && !isCurrentDayRestDay && properties.day !== currentDay) {
         return;
       }
 

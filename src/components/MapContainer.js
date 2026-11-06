@@ -93,39 +93,65 @@ const TerrainToggle = ({ is3D, onChange }) => {
         gap: 2,
         padding: "0 4px",
         boxSizing: "border-box",
-        background: "rgba(255, 255, 255, 0.95)",
-        borderRadius: "0 0 8px 8px",
+        background: "transparent",
         fontFamily: "'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
       }}
     >
-      {[
-        { id: false, label: "2D" },
-        { id: true, label: "3D" },
-      ].map((mode) => {
-        const active = is3D === mode.id;
-        return (
-          <button
-            key={mode.label}
-            type="button"
-            aria-pressed={active}
-            onClick={() => onChange(mode.id)}
-            style={{
-              border: active ? "1.5px solid #2563eb" : "1.5px solid transparent",
-              background: active ? "#2563eb" : "transparent",
-              color: active ? "#fff" : "#4a5568",
-              borderRadius: 4,
-              padding: "1px 8px",
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              cursor: "pointer",
-              lineHeight: 1.2,
-            }}
-          >
-            {mode.label}
-          </button>
-        );
-      })}
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          height: Math.max(18, place.height - 6),
+          padding: 2,
+          borderRadius: 999,
+          background: "#e6ebf2",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: 2,
+            bottom: 2,
+            left: is3D ? "50%" : 2,
+            width: "calc(50% - 2px)",
+            borderRadius: 999,
+            background: "#2563eb",
+            transition: "left 0.18s ease",
+          }}
+        />
+        {[
+          { id: false, label: "2D" },
+          { id: true, label: "3D" },
+        ].map((mode) => {
+          const active = is3D === mode.id;
+          return (
+            <button
+              key={mode.label}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(mode.id)}
+              style={{
+                position: "relative",
+                zIndex: 1,
+                border: "none",
+                background: "transparent",
+                color: active ? "#fff" : "#4a5568",
+                borderRadius: 999,
+                padding: "1px 10px",
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.04em",
+                cursor: "pointer",
+                lineHeight: 1.2,
+              }}
+            >
+              {mode.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

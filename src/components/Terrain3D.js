@@ -2789,6 +2789,9 @@ const addDiscs = (scene, terrain) => {
     const lean = normal.clone().add(new THREE.Vector3(0, 1.5, 0)).normalize();
     disc.quaternion.setFromUnitVectors(up, lean);
     disc.position.set(x, y, zz).addScaledVector(normal, DISC_STYLE.lift + 0.25);
+    disc.userData.lat = lat;
+    disc.userData.lng = lng;
+    disc.userData.color = getColorForElevation(altFt * 0.3048);
     group.add(disc);
   });
   if (onTop) {
@@ -2854,6 +2857,7 @@ const Terrain3D = (props) => {
     let routeLines = [];
     let routeHits = [];
     let discs = null;
+    let pulse = null;
     const lineMaterials = [];
 
     let frame = null;
@@ -2885,7 +2889,13 @@ const Terrain3D = (props) => {
           const s = Math.min(1.6, Math.max(0.2, view.frame * view.zoom));
           discs.children.forEach((disc) => disc.scale.setScalar(s));
         }
+        if (pulse) {
+          const t = (performance.now() % 2500) / 2500;
+          pulse.scale.setScalar(1 + t * 2.4);
+          pulse.material.opacity = 0.7 * (1 - t);
+        }
         renderer.render(scene, camera);
+        if (ease || pulse) render();
       });
     };
 
@@ -2944,7 +2954,7 @@ const Terrain3D = (props) => {
       const restDay = isRestDay(getDayWiseDataG(), dayKey);
       routeLines.forEach((line) => {
         const active = line.userData.day === dayKey && !restDay;
-        line.visible = single ? active : true;
+        line.visible = single && !restDay ? active : true;
         line.material.linewidth = active
           ? single
             ? ROUTE_STYLE.singleDayWidth
@@ -2953,6 +2963,33 @@ const Terrain3D = (props) => {
         line.material.opacity = line.userData.day === dayKey ? 1 : ROUTE_STYLE.opacity;
         line.renderOrder = active ? 2 : 1;
       });
+      if (pulse) {
+        if (pulse.parent) pulse.parent.remove(pulse);
+        pulse.geometry.dispose();
+        pulse.material.dispose();
+        pulse = null;
+      }
+      if (restDay && discs) {
+        const feature = getDayWiseDataG()[dayKey].features[0];
+        const [lng, lat] = feature.geometry.coordinates;
+        const disc = discs.children.find(
+          (item) => Math.abs(item.userData.lat - lat) < 0.005 && Math.abs(item.userData.lng - lng) < 0.005,
+        );
+        if (disc) {
+          pulse = new THREE.Mesh(
+            new THREE.RingGeometry(DISC_STYLE.radius * 1.15, DISC_STYLE.radius * 1.45, 40),
+            new THREE.MeshBasicMaterial({
+              color: disc.userData.color,
+              transparent: true,
+              opacity: 0.7,
+              depthTest: false,
+              side: THREE.DoubleSide,
+            }),
+          );
+          pulse.renderOrder = 6;
+          disc.add(pulse);
+        }
+      }
       render();
     };
 

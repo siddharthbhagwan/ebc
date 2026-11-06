@@ -207,7 +207,18 @@ generic-dashboard {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important;
 }
 
+.leaflet-div-icon.dest-circle-wrapper {
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
 /* Pulsating Ripple (Wave) for Rest Days */
+.rest-day-ripple {
+  isolation: isolate;
+  overflow: visible;
+}
+
 .rest-day-ripple::before {
   content: "";
   position: absolute;

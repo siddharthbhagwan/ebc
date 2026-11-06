@@ -268,7 +268,7 @@ const POI = (props) => {
       // In Single Day View, Circle only the destination and airports.
       // In Overview, only circle airports (not houses to avoid duplication).
       const shouldCircle = !isSingleDayView
-        ? isAirport
+        ? isAirport || (isCurrentDayRestDay && isDest && isHouse)
         : isDest || isAirport;
       
       // Houses always get white background circles for visibility, but not pulsating circles
