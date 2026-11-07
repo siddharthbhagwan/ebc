@@ -502,7 +502,7 @@ const POI = (props) => {
     const getMarkerType = (props) => {
       if (props.name?.toLowerCase().includes("base camp") || props.name === "EBC") return "Base Camp";
       if (props.name?.toLowerCase().includes("pass")) return "Pass";
-      if (props.name?.toLowerCase().includes("peak") || props.name === "Gokyo Ri" || props.name === "Kala Patthar") return "Summit";
+      if (props.name?.toLowerCase().includes("peak") || props.name === "Gokyo Ri" || props.name === "Kala Patthar" || props.name === "Everest") return "Summit";
       if (props.name === "Lukla") return "Airport";
       return "Camp";
     };

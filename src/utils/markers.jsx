@@ -208,6 +208,21 @@ const markers = [
     },
   },
   {
+    // Everest summit. Same flag icon as Kongma La. Not a place the route visits.
+    point: [27.9881, 86.925],
+    icon: passIcon,
+    size: [24, 24],
+    properties: {
+      day: "10",
+      icon: passIcon,
+      name: "Everest",
+      startAlt: "29,032",
+      direction: "left",
+      labelPriority: 2,
+      conflictGroup: "ebc-area",
+    },
+  },
+  {
     // Kala Patthar
     point: [27.9957, 86.8285],
     icon: summitIcon,

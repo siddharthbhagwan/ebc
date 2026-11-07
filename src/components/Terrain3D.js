@@ -66,6 +66,19 @@ const WALK_FRAME = {
   minFrame: 0.14,
 };
 
+// Phone single-day framing only. Desktop keeps WALK_FRAME and minDayFrame.
+// Mobile bound boxes are padded for the 2D map, so the same span leaves the
+// route small. 0.07 is half the desktop walking floor. 0.12 brings a rest
+// day in from the 0.32 floor so the place is not a speck.
+const MOBILE_DAY_FRAME = {
+  scale: 0.5,
+  walk: 0.07,
+  rest: 0.12,
+};
+
+// Screen-stable size of the Everest flag sprite, in world units at overview.
+const EVEREST_FLAG = 4.2;
+
 // Line widths are screen pixels, matching the 2D weights.
 const ROUTE = {
   lift: 0.3,
@@ -2788,6 +2801,31 @@ const addDiscs = (scene, terrain) => {
     const altFt = parseInt((marker.properties.startAlt || "0").replace(/,/g, ""), 10);
     const [x, zz] = terrain.toWorld(lng, lat);
     const { y, normal } = terrain.surfaceAt(x, zz);
+    if (marker.properties.name === "Everest") {
+      const texture = new THREE.TextureLoader().load(marker.icon);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const holder = new THREE.Group();
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+          depthWrite: false,
+        }),
+      );
+      // Anchor the flag's foot on the summit. The render loop scales the
+      // holder, and skips this sprite so the icon size is not reset.
+      sprite.center.set(0.5, 0);
+      sprite.scale.set(EVEREST_FLAG, EVEREST_FLAG, 1);
+      sprite.userData.flag = true;
+      sprite.renderOrder = 6;
+      holder.add(sprite);
+      holder.position.set(x, y + 0.4, zz);
+      holder.userData.lat = lat;
+      holder.userData.lng = lng;
+      holder.userData.color = getColorForElevation(altFt * 0.3048);
+      group.add(holder);
+      return;
+    }
     const disc = new THREE.Group();
     disc.add(
       new THREE.Mesh(fill, fillMaterial),
@@ -2924,7 +2962,7 @@ const Terrain3D = (props) => {
             disc.scale.setScalar(s);
             const stay = disc.userData.stayScale || 1;
             disc.children.forEach((child) => {
-              if (child.userData.pulse) return;
+              if (child.userData.pulse || child.userData.flag) return;
               child.scale.setScalar(stay);
             });
           });
@@ -3015,9 +3053,15 @@ const Terrain3D = (props) => {
       const cz = (za + zb) / 2;
       const travel = dayTravel(dayKey);
       const padding = travel ? WALK_FRAME.padding : CAMERA.dayPadding;
-      const minFrame = travel ? WALK_FRAME.minFrame : CAMERA.minDayFrame;
       const span = Math.max(Math.abs(xb - xa), Math.abs(zb - za)) + padding;
-      const ratio = Math.min(1, Math.max(minFrame, span / SLAB_WIDTH));
+      const spanRatio = span / SLAB_WIDTH;
+      // Desktop path is unchanged. Phones scale the padded mobile box in.
+      const ratio = isDesktop
+        ? Math.min(1, Math.max(travel ? WALK_FRAME.minFrame : CAMERA.minDayFrame, spanRatio))
+        : Math.min(
+            1,
+            Math.max(travel ? MOBILE_DAY_FRAME.walk : MOBILE_DAY_FRAME.rest, spanRatio * MOBILE_DAY_FRAME.scale),
+          );
       const azimuth = travel ? engageRouteAim(travel.azimuth) : releaseRouteAim();
       frameTo(new THREE.Vector3(cx, terrain.surfaceAt(cx, cz).y, cz), ratio, animate, azimuth);
     };
@@ -3144,6 +3188,13 @@ const Terrain3D = (props) => {
     const canvas = renderer.domElement;
     let drag = null;
     let hoverPending = null;
+    const pointers = new Map();
+    let pinchDist = 0;
+    const pinchSpan = () => {
+      const pts = Array.from(pointers.values());
+      if (pts.length < 2) return 0;
+      return Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+    };
     const hover = (clientX, clientY) => {
       const properties = pickRoute(clientX, clientY);
       canvas.style.cursor = properties ? "pointer" : "";
@@ -3153,11 +3204,33 @@ const Terrain3D = (props) => {
       if (properties.day !== current) dispatchLayerDetails(properties);
     };
     const onDown = (e) => {
-      drag = { x: e.clientX, y: e.clientY, moved: 0 };
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       canvas.setPointerCapture(e.pointerId);
+      if (pointers.size >= 2) {
+        drag = null;
+        pinchDist = pinchSpan();
+        return;
+      }
+      drag = { x: e.clientX, y: e.clientY, moved: 0, id: e.pointerId };
     };
     const onMove = (e) => {
-      if (!drag) {
+      if (pointers.has(e.pointerId)) {
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+      if (pointers.size >= 2) {
+        const dist = pinchSpan();
+        if (pinchDist > 8 && dist > 8) {
+          view.zoom = Math.min(
+            CAMERA.maxZoom,
+            Math.max(CAMERA.minZoom, view.zoom * (dist / pinchDist)),
+          );
+          render();
+        }
+        pinchDist = dist;
+        drag = null;
+        return;
+      }
+      if (!drag || e.pointerId !== drag.id) {
         if (e.pointerType !== "mouse" || hoverPending) return;
         hoverPending = requestAnimationFrame(() => {
           hoverPending = null;
@@ -3179,14 +3252,25 @@ const Terrain3D = (props) => {
       render();
     };
     const onUp = (e) => {
+      pointers.delete(e.pointerId);
+      if (pointers.size >= 1) {
+        pinchDist = pointers.size >= 2 ? pinchSpan() : 0;
+        drag = null;
+        return;
+      }
+      pinchDist = 0;
       const wasClick = drag && drag.moved < 6;
       drag = null;
       if (!wasClick) return;
       const properties = pickRoute(e.clientX, e.clientY);
       if (properties) selectRoute(properties);
     };
-    const onCancel = () => {
-      drag = null;
+    const onCancel = (e) => {
+      if (e && e.pointerId != null) pointers.delete(e.pointerId);
+      if (pointers.size === 0) {
+        drag = null;
+        pinchDist = 0;
+      }
     };
     const onLeave = () => {
       canvas.style.cursor = "";

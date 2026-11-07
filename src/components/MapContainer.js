@@ -254,6 +254,7 @@ const MapContainer = (props) => {
         zoomDelta={zoomSnap}
         zoom={initialZoom}
         minZoom={MIN_ZOOM}
+        touchZoom={true}
         maxBounds={NEPAL_BOUNDS}
         maxBoundsViscosity={1}
         style={style}
