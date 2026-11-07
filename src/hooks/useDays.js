@@ -22,12 +22,14 @@ const useDays = (currentDay, dispatcher) => {
     dayRef.current = currentDay;
   }
 
-  const step = (delta) => {
+  const step = (delta, skipOverview = false) => {
     let index = DAYS.indexOf(parseInt(dayRef.current, 10));
     if (index === -1) index = DAY_1_INDEX;
     let newIndex = index + delta;
     if (newIndex > MAX_DAY_INDEX) newIndex = DAY_0_INDEX;
     if (newIndex < DAY_0_INDEX) newIndex = MAX_DAY_INDEX;
+    // Left from day 1 stays on the last walking day instead of the overview.
+    if (skipOverview && delta < 0 && DAYS[newIndex] === 0) newIndex = MAX_DAY_INDEX;
     const targetFeature = routes[DAYS[newIndex]].features[0];
     dayRef.current = String(DAYS[newIndex]);
     dispatcher(targetFeature.properties);
@@ -35,8 +37,8 @@ const useDays = (currentDay, dispatcher) => {
   };
 
   return {
-    nextDay: () => step(1),
-    prevDay: () => step(-1),
+    nextDay: (skipOverview) => step(1, skipOverview),
+    prevDay: (skipOverview) => step(-1, skipOverview),
   };
 };
 

@@ -10,8 +10,6 @@ import Legend from "./Legend";
 import Info from "./Info";
 import POI from "./POI";
 import { isDesktop, useMobileOrientation } from "react-device-detect";
-import { dayTravel } from "../utils/routeBearing";
-
 // three.js only loads when 3D is shown.
 const Terrain3D = lazy(() => import("./Terrain3D"));
 
@@ -43,48 +41,59 @@ const hideBasemapTextLabels = (glMap) => {
   });
 };
 
-const TerrainToggle = ({ is3D, onChange }) => {
+const TerrainToggle = ({ is3D, onChange, showLegend }) => {
   const ref = useRef(null);
-  const legendHeight = useRef(0);
-  const [place, setPlace] = useState({ right: 12, height: 22 });
+  const openHeight = useRef(0);
+  const [place, setPlace] = useState({ right: 10, height: 0 });
 
   useLayoutEffect(() => {
     let host = null;
     let hostRight = null;
-    const align = () => {
-      const legend = document.querySelector(".legend");
+    let resizeObserver = null;
+
+    const apply = (height) => {
       const self = ref.current;
-      if (!self) return;
+      if (!self || !height) return;
+      const legend = document.querySelector(".legend");
       const gap = 8;
       const inset = 10;
       if (legend) {
         host = legend.parentElement;
-        const measured = Math.round(legend.getBoundingClientRect().height);
-        // Keep the open legend's height. A later hide must not shrink the pill.
-        if (measured > legendHeight.current) legendHeight.current = measured;
-        const width = self.offsetWidth;
-        const fullBleed = host && host.style.left === "0px";
+        const fullBleed = host && (host.style.left === "0px" || host.style.left === "0");
         if (!fullBleed && host) {
           if (hostRight == null) hostRight = host.style.right;
-          host.style.right = `${width + gap + inset}px`;
+          const nextRight = `${self.offsetWidth + gap + inset}px`;
+          if (host.style.right !== nextRight) host.style.right = nextRight;
         }
       }
-      if (!legendHeight.current) return;
-      setPlace((prev) => ({
-        right: legend ? inset : prev.right,
-        height: legendHeight.current,
-      }));
+      setPlace((prev) => (prev.right === inset && prev.height === height ? prev : { right: inset, height }));
     };
-    align();
-    const observer = new MutationObserver(align);
+
+    const measure = () => {
+      const legend = document.querySelector(".legend");
+      if (legend) {
+        const measured = Math.round(legend.getBoundingClientRect().height);
+        if (measured > 0) openHeight.current = measured;
+      }
+      if (openHeight.current) apply(openHeight.current);
+    };
+
+    measure();
+    const legend = document.querySelector(".legend");
+    if (legend && typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(measure);
+      resizeObserver.observe(legend);
+    }
+    const observer = new MutationObserver(measure);
     observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener("resize", align);
+    window.addEventListener("resize", measure);
     return () => {
+      if (resizeObserver) resizeObserver.disconnect();
       observer.disconnect();
-      window.removeEventListener("resize", align);
+      window.removeEventListener("resize", measure);
       if (host && hostRight != null) host.style.right = hostRight;
     };
-  }, []);
+  }, [showLegend]);
 
   return (
     <div
@@ -93,7 +102,7 @@ const TerrainToggle = ({ is3D, onChange }) => {
         position: "fixed",
         top: 0,
         right: place.right,
-        height: place.height,
+        height: place.height || undefined,
         zIndex: 10000,
         display: "flex",
         alignItems: "center",
@@ -109,7 +118,8 @@ const TerrainToggle = ({ is3D, onChange }) => {
           position: "relative",
           display: "flex",
           alignItems: "center",
-          height: Math.max(18, place.height - 6),
+          height: "100%",
+          boxSizing: "border-box",
           padding: 2,
           borderRadius: 999,
           background: "#e6ebf2",
@@ -137,8 +147,13 @@ const TerrainToggle = ({ is3D, onChange }) => {
             <button
               key={mode.label}
               type="button"
+              tabIndex={-1}
               aria-pressed={active}
-              onClick={() => onChange(mode.id)}
+              onClick={(event) => {
+                // Keyboard activation must not swap 2D and 3D. Only a pointer click does.
+                if (event.detail === 0) return;
+                onChange(mode.id);
+              }}
               style={{
                 position: "relative",
                 zIndex: 1,
@@ -163,75 +178,58 @@ const TerrainToggle = ({ is3D, onChange }) => {
   );
 };
 
-// Route and marker panes follow the MapLibre bearing so they stay on the basemap.
-// The basemap itself is turned with setBearing, not a CSS spin of the whole map.
-const OVERLAY_PANES = ["overlayPane", "shadowPane", "markerPane", "tooltipPane", "popupPane"];
+// Survives a remount. The first visit opens in 3D. After that, Right/Left must not flip it.
+let viewIs3D = true;
 
-const applyOverlayBearing = (map, bearing) => {
-  if (!map) return;
-  OVERLAY_PANES.forEach((name) => {
-    const pane = map.getPane(name);
-    if (!pane) return;
-    if (!bearing) {
-      pane.style.transform = "";
-      return;
-    }
-    const center = map.latLngToLayerPoint(map.getCenter());
-    pane.style.transform = `translate(${center.x}px, ${center.y}px) rotate(${-bearing}deg) translate(${-center.x}px, ${-center.y}px)`;
-  });
+const keepMapFlat = (glMap) => {
+  if (!glMap) return;
+  if (glMap.keyboard) glMap.keyboard.disable();
+  if (glMap.dragRotate) glMap.dragRotate.disable();
+  if (glMap.touchPitch) glMap.touchPitch.disable();
+  if (glMap.touchZoomRotate && glMap.touchZoomRotate.disableRotation) {
+    glMap.touchZoomRotate.disableRotation();
+  }
+  if (typeof glMap.setMaxPitch === "function") glMap.setMaxPitch(0);
+  if (typeof glMap.setPitch === "function") glMap.setPitch(0);
+  if (typeof glMap.setBearing === "function") glMap.setBearing(0);
 };
 
 const MapContainer = (props) => {
-  const { center, zoomSnap, zoom, style, url, day, isSingleDayView } = props;
+  const { center, zoomSnap, zoom, style, url } = props;
   const { isLandscape = false } = useMobileOrientation();
   const [leafletMap, setLeafletMap] = useState(null);
-  const [is3D, setIs3D] = useState(true);
-  const [glReady, setGlReady] = useState(false);
-  const glRef = useRef(null);
-  const bearingRef = useRef(0);
+  const [is3D, setIs3D] = useState(viewIs3D);
+  const chooseView = (next) => {
+    viewIs3D = next;
+    setIs3D(next);
+  };
 
   useEffect(() => {
     if (!leafletMap || !url) return undefined;
-    const layer = maplibreGL({ style: url }).addTo(leafletMap);
+    const layer = maplibreGL({
+      style: url,
+      keyboard: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+      maxPitch: 0,
+    }).addTo(leafletMap);
     const glMap = layer.getMaplibreMap();
-    glRef.current = glMap;
-    const onStyle = () => hideBasemapTextLabels(glMap);
-    const keepBearing = () => {
-      const gl = glRef.current;
-      if (!gl) return;
-      const desired = bearingRef.current;
-      if (Math.abs(gl.getBearing() - desired) > 0.5) gl.setBearing(desired);
-      applyOverlayBearing(leafletMap, desired);
+    const onStyle = () => {
+      hideBasemapTextLabels(glMap);
+      keepMapFlat(glMap);
     };
     glMap.on("load", onStyle);
     glMap.on("style.load", onStyle);
-    glMap.on("moveend", keepBearing);
-    leafletMap.on("move zoom zoomend viewreset resize", keepBearing);
+    keepMapFlat(glMap);
     if (glMap.isStyleLoaded && glMap.isStyleLoaded()) onStyle();
-    setGlReady(true);
-    keepBearing();
     return () => {
       glMap.off("load", onStyle);
       glMap.off("style.load", onStyle);
-      glMap.off("moveend", keepBearing);
-      leafletMap.off("move zoom zoomend viewreset resize", keepBearing);
-      applyOverlayBearing(leafletMap, 0);
-      glRef.current = null;
-      setGlReady(false);
+      keepMapFlat(glMap);
       leafletMap.removeLayer(layer);
     };
   }, [leafletMap, url]);
-
-  useEffect(() => {
-    const travel = isSingleDayView ? dayTravel(day) : null;
-    // A rest day has no route bearing. Keep the path heading until overview.
-    if (!isSingleDayView || travel) {
-      bearingRef.current = travel ? travel.bearing : 0;
-    }
-    const gl = glRef.current;
-    if (gl) gl.setBearing(bearingRef.current);
-    applyOverlayBearing(leafletMap, bearingRef.current);
-  }, [day, isSingleDayView, leafletMap, glReady]);
 
   // Calculate offset based on device type and orientation
   // Mobile portrait needs more offset to clear the dashboard
@@ -292,7 +290,7 @@ const MapContainer = (props) => {
           <Terrain3D />
         </Suspense>
       )}
-      <TerrainToggle is3D={is3D} onChange={setIs3D} />
+      <TerrainToggle is3D={is3D} onChange={chooseView} showLegend={props.showLegend} />
       <Dashboard map={leafletMap} />
       <Legend />
       <Info />
@@ -301,8 +299,6 @@ const MapContainer = (props) => {
 };
 
 const mapStateToProps = (state) => ({
-  day: state.route.day,
-  isSingleDayView: state.mapState.isSingleDayView,
   url: state.mapState.url,
   zoom: state.mapState.zoom,
   style: state.mapState.style,

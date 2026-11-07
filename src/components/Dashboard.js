@@ -383,7 +383,7 @@ const Dashboard = (props) => {
   // Re-apply bounds when padding-affecting states change or view mode changes
   // Skip for Day 0 (overview page)
   useEffect(() => {
-    if (isSingleDayView && day && day !== "0" && routes[day] && map && !isStayPlace(routes[day])) {
+    if (isSingleDayView && day && day !== "0" && routes[day] && map) {
       const bounds = getFeatureBounds(routes[day], day, isDesktop);
       if (bounds) {
         // Skip animation on initial mount to prevent jitter
@@ -475,7 +475,9 @@ const Dashboard = (props) => {
   const handleNavigation = useCallback(
     (direction) => {
       const fromDay = day;
-      const targetFeature = direction === "next" ? nextDay() : prevDay();
+      // Already on one day: left and right both stay on a day, including past day 1 and day 20.
+      const keepDay = isSingleDayView && fromDay !== "0";
+      const targetFeature = direction === "next" ? nextDay(keepDay) : prevDay(keepDay);
       const toDay = targetFeature?.properties?.day || "unknown";
       ReactGA.event({
         category: "Navigation",
@@ -494,14 +496,12 @@ const Dashboard = (props) => {
         return;
       }
 
-      // Right from the overview enters day 1 and frames that walking path.
-      if (fromDay === "0" && direction === "next" && routes[toDay] && !isStayPlace(routes[toDay])) {
+      // Either arrow from the overview opens that end's walking day.
+      if (fromDay === "0" && toDay !== "0" && routes[toDay] && !isStayPlace(routes[toDay])) {
         setSingleDayView(true);
       }
 
       if (!map) return;
-
-      if (isStayPlace(routes[toDay])) return;
 
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
@@ -529,6 +529,7 @@ const Dashboard = (props) => {
       map,
       routes,
       day,
+      isSingleDayView,
       effectivePaddingTopLeft,
       effectivePaddingBottomRight,
       props.zoomDuration,

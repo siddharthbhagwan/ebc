@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Build 28: separate increments for the thinner selected 3D route, overview lines when Left returns to the trek, opening in 3D, the version label, and the 2D/3D pill height.
+- Build 29: the 2D/3D pill stays the height of the open legend after the legend is hidden.
+- Build 30: left and right both keep the individual day, including the day before day 1 and a rest day.
+
+## [2.1.2] - 2026-11-07
+
+### Changed
+- Build 31: the 2D map stays north-up. Only the 3D camera follows the day's route.
+- Build 32: arrow keys stay on the current map. 2D and 3D do not switch on their own.
 
 ## [2.1.0] - 2026-11-06
 

@@ -12,8 +12,6 @@ import "../resources/css/legend.css";
 const Legend = (props) => {
   const { showLegend } = props;
 
-  if (!showLegend) return null;
-
   return (
     <div
       style={{
@@ -25,7 +23,9 @@ const Legend = (props) => {
         display: "flex",
         justifyContent: "center",
         pointerEvents: "none",
+        visibility: showLegend ? "visible" : "hidden",
       }}
+      aria-hidden={showLegend ? undefined : true}
     >
       <div
         className={"legend mapLegend-mobile"}
@@ -34,7 +34,7 @@ const Legend = (props) => {
           margin: "0",
           borderRadius: isDesktop ? "0 0 8px 8px" : "0", // Rounded bottom corners
           boxSizing: "border-box",
-          pointerEvents: "auto",
+          pointerEvents: showLegend ? "auto" : "none",
           background: "rgba(255, 255, 255, 0.95)",
           boxShadow: "none",
           display: "flex",

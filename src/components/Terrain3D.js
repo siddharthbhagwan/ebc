@@ -3016,7 +3016,7 @@ const Terrain3D = (props) => {
     };
 
     // Frames a walking day's route in single-day view, the whole slab in overview.
-    // A rest day or point has no line, so day steps keep the current camera.
+    // A rest day has no line, but the camera still moves to that place.
     const frameDay = (dayKey, single, animate) => {
       if (!terrain) return;
       if (!single || !dayKey || dayKey === "0") {
@@ -3031,7 +3031,6 @@ const Terrain3D = (props) => {
         if (g.type === "MultiLineString") g.coordinates.forEach((part) => line.push(...part));
         else if (g.type === "LineString") line.push(...g.coordinates);
       });
-      if (!line.length) return;
       const stored = preCalculatedBounds[dayKey];
       let bounds = stored && (isDesktop ? stored.desktop : stored.mobile);
       if (!bounds) {

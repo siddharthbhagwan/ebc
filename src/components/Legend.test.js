@@ -48,7 +48,7 @@ describe("Legend Component", () => {
     expect(passIcon).toHaveAttribute("width", "10px");
   });
 
-  test("does not render when showLegend is false", () => {
+  test("keeps the legend bar mounted but hidden when showLegend is false", () => {
     const initialState = {
       mapState: {
         showLegend: false
@@ -57,8 +57,9 @@ describe("Legend Component", () => {
     
     const { container } = renderWithRedux(<Legend />, { initialState });
     
-    // Legend should not render
     const legendElement = container.querySelector(".legend");
-    expect(legendElement).toBeNull();
+    expect(legendElement).not.toBeNull();
+    expect(legendElement.parentElement).toHaveStyle({ visibility: "hidden" });
+    expect(legendElement.parentElement).toHaveAttribute("aria-hidden", "true");
   });
 });
