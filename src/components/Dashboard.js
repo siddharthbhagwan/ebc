@@ -117,6 +117,18 @@ const getFeatureBounds = (input, dayOverride = null, isDesktopView = true) => {
   return allLatlngs.length > 0 ? L.latLngBounds(allLatlngs) : null;
 };
 
+// Rest days and place markers have no route. Day steps should not move the map.
+const isStayPlace = (collection) => {
+  if (!collection) return false;
+  const features = collection.features || (collection.geometry ? [collection] : []);
+  if (!features.length) return false;
+  if (features[0].properties && features[0].properties.time === "Rest Day") return true;
+  const types = features
+    .map((feature) => feature.geometry && feature.geometry.type)
+    .filter(Boolean);
+  return types.length > 0 && types.every((type) => type === "Point");
+};
+
 const Dashboard = (props) => {
   const {
     dispatchLayerDetails,
@@ -371,7 +383,7 @@ const Dashboard = (props) => {
   // Re-apply bounds when padding-affecting states change or view mode changes
   // Skip for Day 0 (overview page)
   useEffect(() => {
-    if (isSingleDayView && day && day !== "0" && routes[day] && map) {
+    if (isSingleDayView && day && day !== "0" && routes[day] && map && !isStayPlace(routes[day])) {
       const bounds = getFeatureBounds(routes[day], day, isDesktop);
       if (bounds) {
         // Skip animation on initial mount to prevent jitter
@@ -473,14 +485,23 @@ const Dashboard = (props) => {
       setIsToolsOpen(false);
       setShowTrekStats(false);
 
-      if (!map) return;
-
-      // Day 0 special handling - zoom out to overview
+      // Day 0 is the overview. Drop single-day view so every route line is drawn.
       if (toDay === "0") {
+        setSingleDayView(false);
+        if (!map) return;
         const initialCenter = calculateCenterOffset(center, currentOffset);
         map.flyTo(initialCenter, derivedZoom, { duration: 1.25 });
         return;
       }
+
+      // Right from the overview enters day 1 and frames that walking path.
+      if (fromDay === "0" && direction === "next" && routes[toDay] && !isStayPlace(routes[toDay])) {
+        setSingleDayView(true);
+      }
+
+      if (!map) return;
+
+      if (isStayPlace(routes[toDay])) return;
 
       if (targetFeature && map.getZoom() > 11.3) {
         const targetDayCollection = targetFeature.properties?.day
@@ -514,6 +535,7 @@ const Dashboard = (props) => {
       center,
       currentOffset,
       derivedZoom,
+      setSingleDayView,
     ],
   );
 
@@ -868,15 +890,15 @@ const Dashboard = (props) => {
                     </div>
                   </div>
 
-                  {/* Branding Strip - Version only */}
+                  {/* Branding Strip - Version and build */}
                   <div
                     className={`branding-strip branding-strip--${isDesktop ? "desktop" : "mobile"}`}
                   >
                     <div
                       className={`branding-title branding-title--${isDesktop ? "desktop" : "mobile"}`}
                     >
-                      <span style={{ fontSize: isDesktop ? "12px" : "9px", color: "#7f8c8d", fontWeight: 700, letterSpacing: "0.8px" }}>
-                        <span style={{ fontSize: "0.85em" }}>v</span>{packageJson.version}
+                      <span style={{ fontSize: isDesktop ? "12px" : "9px", color: "#7f8c8d", fontWeight: "normal", letterSpacing: "0.8px", textTransform: "none", whiteSpace: "pre" }}>
+                        {`v${packageJson.version}    Build ${packageJson.build}`}
                       </span>
                     </div>
                     {props.attribution && (

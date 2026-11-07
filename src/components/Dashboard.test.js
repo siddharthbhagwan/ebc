@@ -2972,8 +2972,8 @@ describe("Dashboard Branding Strip", () => {
     await waitFor(() => {
       const brandingStrip = container.querySelector('.branding-strip');
       expect(brandingStrip).toBeInTheDocument();
-      // Should contain version number (v prefix)
-      expect(brandingStrip.textContent).toMatch(/v\d+\.\d+\.\d+/);
+      // Should contain version and build together
+      expect(brandingStrip.textContent).toMatch(/v\d+\.\d+\.\d+\s+Build \d+/);
     });
   });
 

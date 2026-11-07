@@ -5,6 +5,14 @@ All notable changes to the EBC Dashboard project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-11-07
+
+### Added
+- Build number shown next to the version.
+
+### Fixed
+- Build 28: separate increments for the thinner selected 3D route, overview lines when Left returns to the trek, opening in 3D, the version label, and the 2D/3D pill height.
+
 ## [2.1.0] - 2026-11-06
 
 ### Changed

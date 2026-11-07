@@ -1028,8 +1028,8 @@ generic-dashboard {
 
 .branding-title {
   color: #7f8c8d;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: normal;
+  text-transform: none;
   letter-spacing: 1.2px;
   white-space: nowrap;
 }

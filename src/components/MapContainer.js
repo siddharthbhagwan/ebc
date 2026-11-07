@@ -45,6 +45,7 @@ const hideBasemapTextLabels = (glMap) => {
 
 const TerrainToggle = ({ is3D, onChange }) => {
   const ref = useRef(null);
+  const legendHeight = useRef(0);
   const [place, setPlace] = useState({ right: 12, height: 22 });
 
   useLayoutEffect(() => {
@@ -53,21 +54,26 @@ const TerrainToggle = ({ is3D, onChange }) => {
     const align = () => {
       const legend = document.querySelector(".legend");
       const self = ref.current;
-      if (!legend || !self) return;
-      host = legend.parentElement;
-      const box = legend.getBoundingClientRect();
+      if (!self) return;
       const gap = 8;
       const inset = 10;
-      const width = self.offsetWidth;
-      const fullBleed = host && host.style.left === "0px";
-      if (!fullBleed && host) {
-        if (hostRight == null) hostRight = host.style.right;
-        host.style.right = `${width + gap + inset}px`;
+      if (legend) {
+        host = legend.parentElement;
+        const measured = Math.round(legend.getBoundingClientRect().height);
+        // Keep the open legend's height. A later hide must not shrink the pill.
+        if (measured > legendHeight.current) legendHeight.current = measured;
+        const width = self.offsetWidth;
+        const fullBleed = host && host.style.left === "0px";
+        if (!fullBleed && host) {
+          if (hostRight == null) hostRight = host.style.right;
+          host.style.right = `${width + gap + inset}px`;
+        }
       }
-      setPlace({
-        right: inset,
-        height: Math.max(22, Math.round(box.height)),
-      });
+      if (!legendHeight.current) return;
+      setPlace((prev) => ({
+        right: legend ? inset : prev.right,
+        height: legendHeight.current,
+      }));
     };
     align();
     const observer = new MutationObserver(align);
@@ -218,7 +224,10 @@ const MapContainer = (props) => {
 
   useEffect(() => {
     const travel = isSingleDayView ? dayTravel(day) : null;
-    bearingRef.current = travel ? travel.bearing : 0;
+    // A rest day has no route bearing. Keep the path heading until overview.
+    if (!isSingleDayView || travel) {
+      bearingRef.current = travel ? travel.bearing : 0;
+    }
     const gl = glRef.current;
     if (gl) gl.setBearing(bearingRef.current);
     applyOverlayBearing(leafletMap, bearingRef.current);
@@ -245,8 +254,20 @@ const MapContainer = (props) => {
   const derivedZoom = isDesktop ? zoom : isLandscape ? ZOOM_LANDSCAPE : ZOOM_MOBILE;
   const initialZoom = derivedZoom;
 
+  useEffect(() => {
+    if (is3D || !leafletMap) return;
+    leafletMap.invalidateSize();
+  }, [is3D, leafletMap]);
+
   return (
-    <div style={{ height: "100%", width: "100%", position: "relative" }}>
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        position: "relative",
+        background: is3D ? "linear-gradient(180deg, #e9ecef 0%, #d6dbe0 100%)" : undefined,
+      }}
+    >
       <Map
         ref={(m) => { if (!leafletMap && m) setLeafletMap(m.leafletElement); }}
         center={initialCenter}
@@ -257,7 +278,7 @@ const MapContainer = (props) => {
         touchZoom={true}
         maxBounds={NEPAL_BOUNDS}
         maxBoundsViscosity={1}
-        style={style}
+        style={{ ...style, visibility: is3D ? "hidden" : "visible" }}
         zoomControl={false}
         attributionControl={false}
         keyboard={false}

@@ -83,8 +83,8 @@ const EVEREST_FLAG = 4.2;
 const ROUTE = {
   lift: 0.3,
   width: 2,
-  activeWidth: 6,
-  singleDayWidth: 7.5,
+  activeWidth: 3,
+  singleDayWidth: 3.75,
   opacity: 0.65,
   hitWidth: 2.6, // world units, invisible tap target like 2D's weight 25
 };
@@ -3015,8 +3015,8 @@ const Terrain3D = (props) => {
       return overviewAzimuth;
     };
 
-    // Frames the day's route in single-day view, the whole slab otherwise.
-    // A walking day aims the camera along the route. Overview and rest days do not.
+    // Frames a walking day's route in single-day view, the whole slab in overview.
+    // A rest day or point has no line, so day steps keep the current camera.
     const frameDay = (dayKey, single, animate) => {
       if (!terrain) return;
       if (!single || !dayKey || dayKey === "0") {
@@ -3031,6 +3031,7 @@ const Terrain3D = (props) => {
         if (g.type === "MultiLineString") g.coordinates.forEach((part) => line.push(...part));
         else if (g.type === "LineString") line.push(...g.coordinates);
       });
+      if (!line.length) return;
       const stored = preCalculatedBounds[dayKey];
       let bounds = stored && (isDesktop ? stored.desktop : stored.mobile);
       if (!bounds) {
@@ -3067,10 +3068,12 @@ const Terrain3D = (props) => {
     };
 
     const restyleRoutes = (dayKey, single) => {
-      const restDay = isRestDay(getDayWiseDataG(), dayKey);
+      // Day 0 is the overview title, not a stay. Single-day view must not hide every line.
+      const overview = !dayKey || dayKey === "0";
+      const restDay = !overview && isRestDay(getDayWiseDataG(), dayKey);
       routeLines.forEach((line) => {
-        const active = line.userData.day === dayKey && !restDay;
-        line.visible = single && !restDay ? active : true;
+        const active = line.userData.day === dayKey && !restDay && !overview;
+        line.visible = !overview && single && !restDay ? active : true;
         line.material.linewidth = active
           ? single
             ? ROUTE_STYLE.singleDayWidth
@@ -3222,7 +3225,7 @@ const Terrain3D = (props) => {
         if (pinchDist > 8 && dist > 8) {
           view.zoom = Math.min(
             CAMERA.maxZoom,
-            Math.max(CAMERA.minZoom, view.zoom * (dist / pinchDist)),
+            Math.max(CAMERA.minZoom, view.zoom * (pinchDist / dist)),
           );
           render();
         }
